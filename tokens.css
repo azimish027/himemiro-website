@@ -1,0 +1,146 @@
+/* =============================================================================
+   HIMEMIRO 视觉令牌 — 工坊 + 官网共享
+   -----------------------------------------------------------------------------
+   这个文件是**独立纯 CSS**，不依赖 Vue / TS / 任何框架。
+   工坊（Vite + Vue）用 @import 引用它；官网（纯 HTML）直接 <link> 它。
+
+   颜色来源：工坊 tokens.css 第 30 批最终值（巧克力奶油主题）
+   阴影/材质来源：工坊 tokens.css 阶段 B 扩展 + demo-patterns.html 实测
+
+   不要修改这个文件里的颜色值 —— 改之前想清楚是不是全项目联动要改。
+   ============================================================================= */
+
+:root {
+
+  /* ===== 核心颜色（6 种 + 黑灰辅助） ===== */
+  --c-chocolate:      #402A2A;   /* 主轮廓、标题、正文、按钮文字 */
+  --c-deep-chocolate: #3A2424;   /* 深端：装饰、强调边缘、顶棚条纹深条 */
+  --c-cream:          #F3E5C8;   /* 应用主背景、普通面板、按钮基底 */
+  --c-vanilla:        #FFF8E9;   /* 面板内面、输入框、留白、糖果夹心内层 */
+  --c-candy-orange:   #F0643B;   /* 高饱和强调：橘红边带、装饰描边、选中态 */
+  --c-cranberry:      #C95770;   /* 蔓越莓：少女风装饰、爱心、次要强调 */
+  --c-mint:           #A9C8A8;   /* 薄荷：辅助装饰、标签、次要状态 */
+  --c-ink-dark:       #2A1818;   /* 极深棕：外轮廓最硬的那种 */
+  --c-gray-brown:     #B9A18B;   /* 灰棕过渡：次级边缘、分隔线 */
+
+  /* ===== 字体栈（与工坊一致） ===== */
+  --font-serif:   "Noto Serif SC", "Source Han Serif SC", Georgia, serif;
+  --font-sans:    "HMYuanqi", "Noto Sans SC", system-ui, sans-serif;
+  --font-rounded: "M PLUS Rounded 1c", "Noto Sans SC", "Source Han Sans SC", system-ui, sans-serif;  /* ← 圆体：古早日杂感的核心字体 */
+  --font-pixel:   "PixelOperator8", "VT323", monospace;
+
+  /* ===== 五种材质阴影（每个带外投影 + 内阴影 + 过渡） ===== */
+  /* A. 奶油塑料（普通面板 / 普通按钮） */
+  --shadow-plastic:
+    0 3px 0 rgba(64, 42, 42, .16),
+    0 4px 8px rgba(64, 42, 42, .10),
+    inset 0 0 0 1px rgba(122, 74, 60, .14),
+    inset 0 1px 0 rgba(255, 255, 255, .35),
+    inset 0 -1px 0 rgba(64, 42, 42, .10);
+
+  /* B. 糖果夹心（重点面板 / 主按钮 / 大拱门） */
+  --shadow-candy:
+    0 4px 0 rgba(120, 40, 10, .35),
+    0 6px 14px rgba(120, 40, 10, .18),
+    inset 0 0 0 1px var(--c-candy-orange),
+    inset 0 0 0 2px rgba(160, 80, 40, .16),
+    inset 0 1px 0 rgba(255, 255, 255, .45),
+    inset 0 -1px 0 rgba(64, 42, 42, .18);
+
+  /* C. 巧克力塑料（深色标题条 / 拱门核心 / 铭牌） */
+  --shadow-choco:
+    0 3px 0 rgba(26, 12, 12, .50),
+    0 4px 8px rgba(26, 12, 12, .20),
+    inset 0 1px 0 rgba(255, 248, 233, .18),
+    inset 0 -1px 0 rgba(26, 12, 12, .40);
+
+  /* D. 拼贴纸张（卡片 / 空状态 / 展览卡） */
+  --shadow-paper:
+    0 1px 0 rgba(64, 42, 42, .10),
+    0 2px 6px rgba(64, 42, 42, .08);
+
+  /* ===== 按钮阴影变量（两轨） ===== */
+  --btn-shadow-retro:            /* 复古立体：外投影 + 高光 + 过渡 + 厚度 */
+    0 3px 0 rgba(64, 42, 42, .40),
+    0 4px 8px rgba(64, 42, 42, .18),
+    inset 0 0 0 1px rgba(122, 74, 60, .18),
+    inset 0 0 0 2px rgba(122, 74, 60, .10),
+    inset 0 1px 0 rgba(255, 255, 255, .65),
+    inset 0 -1px 0 rgba(64, 42, 42, .18);
+  --btn-shadow-candy:            /* 糖果厚边：橘红 3px 视觉厚度 + 高光 + 过渡 */
+    0 1px 0 rgba(120, 40, 10, .25),
+    inset 0 0 0 1px var(--c-candy-orange),
+    inset 0 0 0 2px rgba(160, 80, 40, .16),
+    inset 0 1px 0 rgba(255, 255, 255, .55),
+    inset 0 -1px 0 rgba(64, 42, 42, .15);
+
+  /* ===== 输入控件 ===== */
+  --input-shadow:
+    inset 0 2px 4px rgba(64, 42, 42, .10),
+    0 1px 0 rgba(255, 255, 255, .50);
+  --input-focus-ring: 0 0 0 2px rgba(240, 100, 59, .35);
+
+  /* ===== 装饰纹理（纯 CSS gradient，无图片） ===== */
+  --pattern-stripe-45: repeating-linear-gradient(
+    45deg, transparent 0, transparent 7px,
+    rgba(58, 36, 36, .10) 7px, rgba(58, 36, 36, .10) 8px
+  );
+  --pattern-stripe-90: repeating-linear-gradient(
+    90deg, var(--c-vanilla) 0, var(--c-vanilla) 17px,
+    var(--c-deep-chocolate) 17px, var(--c-deep-chocolate) 34px
+  );
+  --pattern-dot:
+    radial-gradient(circle at 18px 18px, rgba(58, 36, 36, .14) 1.5px, transparent 2px),
+    radial-gradient(circle at 9px 9px, rgba(58, 36, 36, .08) 1px, transparent 1.5px);
+
+  /* ===== 波浪 / 扇贝 / 撕纸 clip-path ===== */
+  --clip-wave-bottom: polygon(
+    0 0, 100% 0,
+    100% 88%, 95% 100%, 90% 88%, 85% 100%, 80% 88%, 75% 100%,
+    70% 88%, 65% 100%, 60% 88%, 55% 100%, 50% 88%, 45% 100%,
+    40% 88%, 35% 100%, 30% 88%, 25% 100%, 20% 88%, 15% 100%,
+    10% 88%, 5% 100%, 0 88%
+  );
+  --clip-arch-candy: polygon(
+    8% 100%, 8% 42%,               /* 左柱底 → 左柱顶 */
+    12% 35%, 20% 22%,              /* 左拱腹上升曲线 */
+    32% 14%, 50% 12%,              /* 拱顶 */
+    68% 14%, 80% 22%,              /* 右拱腹下降曲线 */
+    88% 35%, 92% 42%,              /* 右柱顶 → 右柱底 */
+    92% 100%                       /* 右柱底 */
+  );
+
+  /* ===== 颜文字分隔线颜色 ===== */
+  --divider-regular: var(--c-gray-brown);
+  --divider-girl:    var(--c-cranberry);
+  --divider-special: var(--c-candy-orange);
+
+  /* ===== 间距 / 圆角 / 过渡 ===== */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+  --radius-xl: 22px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --ease-soft: cubic-bezier(.25,.8,.25,1);
+  --transition-base: 150ms var(--ease-soft);
+
+  /* ===== 降低动画偏好（accessibility） ===== */
+  --transition-reduced: 0ms;
+
+}
+
+/* reduced-motion：系统设了就停掉所有过渡（工坊和官网共用） */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition-base: var(--transition-reduced);
+  }
+  *, *::before, *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
