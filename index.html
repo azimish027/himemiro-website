@@ -1,0 +1,187 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="HIMEMIRO 魔法梦工厂 — 个人数字博物馆与创作空间">
+<title>HIMEMIRO — A Magical Dream Factory</title>
+<!-- 视觉令牌（颜色/材质/阴影） -->
+<link rel="stylesheet" href="../shared/tokens.css">
+<!-- 布局与组件样式 -->
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles-v3.css">
+</head>
+<body>
+
+<!-- Flash 风格入场动画 -->
+<div class="intro" id="intro" role="dialog" aria-label="HIMEMIRO 入场">
+  <span class="intro__star">✦</span>
+  <span class="intro__star">★</span>
+  <span class="intro__star">✧</span>
+  <span class="intro__star">◆</span>
+  <div class="intro__title">HIMEMIRO</div>
+  <div class="intro__subtitle">— A MAGICAL DREAM FACTORY —</div>
+  <button class="intro__enter" id="introEnter" type="button">▶ START</button>
+  <div class="intro__skip" id="introSkip" role="button" tabindex="0">skip intro ▶</div>
+</div>
+
+<!-- Header -->
+<header class="header">
+  <div class="header__inner">
+    <div class="header__logo">
+      <span class="logo-dot"></span>
+      HIMEMIRO
+    </div>
+    <nav class="header__nav" aria-label="主导航">
+      <a href="#entrance">Entrance</a>
+      <a href="#worlds">Worlds &amp; IP</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#games">Games</a>
+      <a href="#studio">Creative Studio</a>
+      <a href="#curator">Curator's Room</a>
+      <a href="#archives">Archives</a>
+    </nav>
+  </div>
+</header>
+
+<!-- 撕纸剪报拼贴 Hero（方案 1+4 组合） -->
+<section class="stage" id="entrance">
+  <!-- 重点修：去掉 section--dot-bg — 点阵移到底层不遮字 -->
+  <div class="stage__arch" aria-label="撕纸剪报拼贴入口">
+    <!-- 固定胶带：斜贴在撕纸的左上角和右上角 -->
+    <div class="sticker-tape" style="top:8px; left:28px; --r:-10deg; background:rgba(240,100,59,.55); width:70px;">✿ TAPE ✿</div>
+    <div class="sticker-tape" style="bottom:12px; right:32px; --r:8deg; background:rgba(201,87,112,.50); width:54px; position:absolute;">MADE</div>
+
+    <div class="stage__arch-inner">
+      <!-- HIMEMIRO 拆成 8 个 span — 每个字母不同角度（模拟剪报拼贴） -->
+      <div class="stage__name">
+        <span>H</span><span>I</span><span>M</span><span>E</span><span>M</span><span>I</span><span>R</span><span>O</span>
+      </div>
+      <div class="stage__tagline">魔法梦工厂 · 数字博物馆</div>
+    </div>
+  </div>
+
+  <!-- 点阵（Halftone）移到底层：只做 stage 的半透明背景垫纸，不直接盖在文字上 -->
+  <div class="sticker-halftone-bg" aria-hidden="true"></div>
+
+  <button class="stage__enter" type="button" onclick="document.getElementById('exhibit').scrollIntoView({behavior:'smooth'})">▶ EXPLORE THE MUSEUM</button>
+  <p class="stage__intro">
+    欢迎走进一座属于个人的数字博物馆。<br>
+    这里收藏着原创的世界、插画、游戏、音乐与手工拼贴——
+    每一扇橱窗背后，都是一位创作者精心布置的梦境。
+  </p>
+</section>
+
+<!-- 博物馆小部件 -->
+<section class="widgets section--grid-bg" aria-label="博物馆小部件">
+  <!-- 拼贴装饰层 -->
+  <div class="washi-tape washi-tape--pink" style="--r:-5deg; top:-10px; left:40%; width:120px;">✿ WEEKLY DREAMS ✿</div>
+  <div class="sticky-note sticky-note--pink" style="--r:-6deg; top:-24px; right:30px;">
+    ★ 本周重点<br>· 完成世界观<br>· 整理素材表<br>· 写日记 3 条
+  </div>
+  <!-- 日历 → 撕下来的日历页 -->
+  <div class="widget widget-calendar style--torn-calendar">
+    <div class="widget__title">◆ 博物馆日历</div>
+    <div class="widget__content" id="calendarWidget">加载中…</div>
+  </div>
+  <!-- 占卜 → 拍立得相纸 -->
+  <div class="widget widget-fortune style--polaroid-card">
+    <div class="widget__title">★ 今日占卜</div>
+    <div class="widget__content">
+      <button type="button" class="fortune-btn" onclick="drawFortune()">✦ 抽一张牌 ✦</button>
+      <div class="fortune-result" id="fortuneResult"></div>
+    </div>
+  </div>
+  <!-- 音乐 → Walkman/磁带盒 -->
+  <div class="widget widget-music style--walkman">
+    <div class="widget__title">✿ 迷你播放</div>
+    <div class="widget__content music-ctrl">
+      <button class="music-btn" type="button" aria-label="播放/暂停" onclick="toggleMusic()">♪</button>
+      <span class="music-track" id="musicTrack">暂无曲目</span>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Exhibition -->
+<section class="exhibit" id="exhibit">
+  <!-- 拼贴装饰层 -->
+  <span class="sticker sticker--heart" style="--r:-10deg; top:-12px; left:18px;"></span>
+  <span class="sticker sticker--dot" style="--r:0deg; top:8px; right:30px;"></span>
+  <span class="sticker sticker--dot" style="--r:0deg; top:20px; right:48px;"></span>
+  <span class="sticker sticker--sparkle" style="--r:20deg; bottom:-10px; left:50%;"></span>
+  <span class="handwrite" style="--r:-3deg; bottom:-18px; right:20px; font-size:9px;">please look forward to it ♡</span>
+  <div class="exhibit__frame">
+    <div class="exhibit__visual" aria-label="当前展览视觉占位">展览视觉占位 · 请替换图片</div>
+    <div class="exhibit__info">
+      <span class="exhibit__label">CURRENT EXHIBITION</span>
+      <h3 class="exhibit__title">待确认展览标题</h3>
+      <p class="exhibit__desc">
+        这里是当前精选展览的位置。展览内容由策展人（你）手动选择，不是自动生成。
+        你可以把自己最新完成的原创世界、插画系列或互动项目放在这里。
+      </p>
+      <a class="exhibit__link" href="#worlds">EXPLORE EXHIBITION →</a>
+    </div>
+  </div>
+</section>
+
+<!-- Explore the Museum -->
+<section class="explore section--dot-bg" id="worlds">
+  <!-- 拼贴装饰层 -->
+  <span class="sticker sticker--star" style="--r:8deg; top:-8px; left:20px;"></span>
+  <span class="sticker sticker--star" style="--r:-5deg; top:-14px; right:24px;"></span>
+  <span class="handwrite" style="--r:-2deg; top:-22px; left:50%; font-size:10px;">♡ pick your world ♡</span>
+  <h2 class="explore__title">★ EXPLORE THE MUSEUM ★</h2>
+  <div class="explore__divider">✦ ◆ ✧ ◆ ✦ ◆ ✧ ◆ ✦ ◆ ✧ ◆ ✦</div>
+  <div class="explore__grid">
+    <div class="explore__card style--torn   sparkle-target" id="worlds">       <!-- 方案1：撕纸 -->
+      <div class="explore__card-icon">✦</div>
+      <div class="explore__card-title">Worlds &amp; IP</div>
+      <div class="explore__card-desc">原创世界与虚构世界观</div>
+    </div>
+    <div class="explore__card style--polaroid sparkle-target" id="gallery">   <!-- 方案2：拍立得 -->
+      <div class="explore__card-icon">◆</div>
+      <div class="explore__card-title">Gallery</div>
+      <div class="explore__card-desc">插画与视觉艺术</div>
+    </div>
+    <div class="explore__card style--diecut sparkle-target" id="games">      <!-- 方案3：模切贴纸 -->
+      <div class="explore__card-icon">♡</div>
+      <div class="explore__card-title">Games</div>
+      <div class="explore__card-desc">互动项目与小游戏</div>
+    </div>
+    <div class="explore__card style--stack   sparkle-target" id="studio">     <!-- 方案4：多层叠放 -->
+      <div class="explore__card-icon">✿</div>
+      <div class="explore__card-title">Creative Studio</div>
+      <div class="explore__card-desc">数字拼贴与创作工坊</div>
+    </div>
+    <div class="explore__card style--binder  sparkle-target">                <!-- 方案5：活页打孔纸 -->
+      <div class="explore__card-icon">✧</div>
+      <div class="explore__card-title">Music</div>
+      <div class="explore__card-desc">原声与音乐抽屉</div>
+    </div>
+    <div class="explore__card style--tag sparkle-target" id="archives">              <!-- 方案6：吊牌/行李牌 -->
+      <div class="explore__card-icon">★</div>
+      <div class="explore__card-title">Archives</div>
+      <div class="explore__card-desc">开发笔记与项目存档</div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer__brand">HIMEMIRO</div>
+  <div class="footer__line">— A Magical Dream Factory —</div>
+  <div class="footer__line" style="margin-top:8px;">© HIMEMIRO · 个人数字博物馆 · 本站零数据库、零追踪、零社交</div>
+  <div class="footer__links">
+    <a href="#curator">Curator's Room</a>
+    <a href="#archives">Archives</a>
+    <a href="#entrance">Back to Entrance</a>
+  </div>
+</footer>
+
+<script src="scripts/home.js" defer></script>
+
+<!-- SPA 框架 → scripts/app.js --><script src="scripts/app.js" defer></script>
+<!-- v3 增强层 → scripts/enhance.js (Gallery + Worlds 新交互) --><script src="scripts/enhance.js" defer></script>
+</body>
+</html>
+

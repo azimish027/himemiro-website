@@ -1,0 +1,2531 @@
+/* =========================================================================
+   HIMEMIRO 官网 — 巧克力奶油 × 复古少女 × 2000 年代日系网页
+   -------------------------------------------------------------------------
+   所有视觉令牌走 ../shared/tokens.css，不在此处硬编码颜色值。
+   零依赖、可直接扔 Neocities、可拆分成多页。
+   ========================================================================= */
+
+/* ---------- 全局 ---------- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-sans);
+  color: var(--c-chocolate);
+  background: var(--c-cream);
+  background-image: var(--pattern-stripe-45);
+  background-size: 36px 36px;
+  background-attachment: fixed;
+  min-height: 100vh;
+  line-height: 1.7;
+}
+a { color: var(--c-candy-orange); text-decoration: none; transition: color var(--transition-base); }
+a:hover { color: var(--c-cranberry); }
+img { max-width: 100%; display: block; }
+
+/* ---------- Flash 风格入场动画 ---------- */
+.intro {
+  position: fixed; inset: 0; z-index: 9999;
+  background: var(--c-deep-chocolate);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  color: var(--c-vanilla); font-family: var(--font-pixel);
+}
+.intro__star { position: absolute; animation: sparkle 2s ease-in-out infinite; opacity: .6; }
+.intro__star:nth-child(1) { top: 15%; left: 20%; font-size: 24px; animation-delay: .0s; }
+.intro__star:nth-child(2) { top: 25%; right: 18%; font-size: 18px; animation-delay: .3s; }
+.intro__star:nth-child(3) { bottom: 22%; left: 12%; font-size: 20px; animation-delay: .7s; }
+.intro__star:nth-child(4) { bottom: 15%; right: 25%; font-size: 16px; animation-delay: 1.1s; }
+@keyframes sparkle { 0%,100% { opacity:.2; transform: scale(.8) } 50% { opacity:.9; transform: scale(1.2) } }
+.intro__title { font-size: 42px; letter-spacing: .3em; margin-bottom: 8px; color: var(--c-vanilla); text-shadow: 0 0 20px rgba(240,100,59,.55); }
+.intro__subtitle { font-size: 14px; letter-spacing: .4em; margin-bottom: 48px; color: var(--c-gray-brown); font-family: var(--font-sans); }
+.intro__enter {
+  padding: 12px 36px; font-family: var(--font-pixel); font-size: 18px; letter-spacing: .2em;
+  color: var(--c-vanilla); border: 2px solid var(--c-candy-orange);
+  background: rgba(240,100,59,.12); cursor: pointer;
+  box-shadow: 0 3px 0 rgba(240,100,59,.35), inset 0 0 0 1px rgba(240,100,59,.30);
+  transition: all var(--transition-base);
+}
+.intro__enter:hover { background: rgba(240,100,59,.25); transform: translateY(-2px); }
+.intro__enter:active { transform: translateY(1px); box-shadow: 0 1px 0 rgba(240,100,59,.35); }
+.intro__skip { margin-top: 24px; font-family: var(--font-sans); font-size: 12px; color: var(--c-gray-brown); cursor: pointer; opacity: .7; transition: opacity var(--transition-base); }
+.intro__skip:hover { opacity: 1; color: var(--c-vanilla); }
+.intro--fade { animation: fadeOut .6s ease forwards; pointer-events: none; }
+@keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+
+/* ---------- Header ---------- */
+.header {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--c-chocolate);
+  box-shadow: var(--shadow-choco);
+}
+.header__inner {
+  max-width: 1100px; margin: 0 auto; padding: 14px 24px;
+  display: flex; align-items: center; justify-content: space-between; gap: 20px;
+}
+.header__logo {
+  font-family: var(--font-pixel); font-size: 18px; letter-spacing: .2em;
+  color: var(--c-vanilla); text-shadow: 2px 2px 0 rgba(0,0,0,.25);
+  display: flex; align-items: center; gap: 8px;
+}
+.header__logo .logo-dot { width: 10px; height: 10px; background: var(--c-candy-orange); border-radius: 50%; box-shadow: 0 0 8px rgba(240,100,59,.60); }
+.header__nav { display: flex; gap: 6px; flex-wrap: wrap; }
+.header__nav a {
+  padding: 6px 14px; font-size: 12px; font-family: var(--font-sans);
+  color: var(--c-vanilla); letter-spacing: .1em; border-radius: var(--radius-sm);
+  transition: all var(--transition-base);
+  border: 1px solid transparent;
+}
+.header__nav a:hover {
+  background: rgba(255,248,233,.08);
+  color: var(--c-vanilla);
+  border-color: rgba(240,100,59,.35);
+}
+
+/* ---------- Main Stage (大拱门 Hero) ---------- */
+.stage {
+  max-width: 1100px; margin: 0 auto; padding: 60px 24px 40px;
+  text-align: center;
+  position: relative;   /* ← 装饰层定位 */
+  background: var(--c-cream);
+  background-image: var(--pattern-stripe-45);
+  background-size: 36px 36px;
+}
+/* =========================================================================
+   方案 1+4 组合：撕纸剪报拼贴（多层叠放 + 不规则多边形 + 倾斜）
+   —— 彻底干掉拱门，换成 3 层纸叠
+   ========================================================================= */
+
+/* 底层：旧报纸色块（稍大，z-index 最低，错位露出边缘） */
+.stage__arch {
+  margin: 0 auto 32px; position: relative;
+  width: 380px; height: 260px;
+  /* 多层叠放：3 张纸叠在一起 */
+}
+
+/* 底层（z-index 1）：旧报纸，露出底部和右侧边缘 */
+.stage__arch::before {
+  content: ''; position: absolute;
+  top: 14px; left: 18px;
+  width: 380px; height: 260px;
+  background-image: radial-gradient(circle, rgba(60,40,30,.22) 1px, transparent 1.5px);
+  background-size: 4px 4px;
+  background-color: rgba(230,220,200,.75);
+  border: 1px solid rgba(64,42,42,.20);
+  transform: rotate(2deg);
+  z-index: 1;
+}
+
+/* 中层（z-index 2）：半透明硫酸纸（椭圆） */
+.stage__arch::after {
+  content: ''; position: absolute;
+  top: -8px; left: 40px;
+  width: 260px; height: 180px;
+  background: rgba(255,248,233,.60);
+  border: 1px dashed rgba(64,42,42,.25);
+  border-radius: 50% 48% 52% 50% / 48% 52% 48% 52%;
+  transform: rotate(-4deg);
+  z-index: 2;
+  filter: blur(.3px);
+}
+
+/* 顶层（z-index 3）：撕纸 — 不规则多边形 + 锯齿边缘 */
+.stage__arch-inner {
+  position: relative; z-index: 3;
+  width: 340px; height: 230px;
+  /* 撕纸边缘：24 顶点 clip-path，模拟手工撕 */
+  clip-path: polygon(
+    0 6%, 3% 0, 8% 3%, 14% 1%, 20% 4%, 27% 1%, 35% 3%, 43% 0,
+    51% 2%, 59% 0, 67% 3%, 74% 1%, 82% 4%, 89% 0, 96% 3%, 100% 7%,
+    98% 15%, 100% 25%, 97% 35%, 100% 45%, 98% 55%, 100% 65%, 97% 75%,
+    100% 85%, 98% 92%, 100% 100%, 92% 97%, 84% 100%, 76% 98%, 68% 100%,
+    60% 97%, 52% 100%, 44% 98%, 36% 100%, 28% 97%, 20% 100%, 12% 98%,
+    4% 100%, 0 94%, 3% 86%, 0 78%, 2% 70%, 0 62%, 3% 54%, 0 46%,
+    2% 38%, 0 30%, 3% 22%, 0 14%
+  );
+  background: var(--c-vanilla);
+  box-shadow:
+    5px 6px 0 rgba(64,42,42,.22),
+    12px 10px 0 rgba(64,42,42,.08);
+  transform: rotate(-4deg);
+  padding: 32px 28px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+
+  /* 固定撕纸的胶带 — 斜贴左上角 */
+  /* (::before/::after 已被外层用了，用 JS 动态加或伪元素换位置) */
+}
+
+/* 别针/书签：中层纸边缘 */
+.stage__paperclip { display: none; }  /* CSS-only，保留给 JS */
+
+/* 顶层撕纸的胶带 — 作为 stage__arch-inner 的额外伪元素（但 ::before/::after 已被外层用了，所以用 JS 动态加也可以） */
+/* 这里用 .stage 下的额外元素 */
+
+.stage__name {
+  font-family: var(--font-pixel); font-size: 40px; letter-spacing: .38em;
+  color: var(--c-deep-chocolate);
+  text-shadow:
+    -1px 0 var(--c-vanilla), 1px 0 var(--c-vanilla),
+    -1px -1px var(--c-vanilla), 1px 1px var(--c-vanilla);
+  padding-left: .38em;
+  /* 每个字母错位排贴（模拟剪报） */
+  display: inline-flex; gap: 0;
+}
+.stage__name span {
+  display: inline-block;
+  transform-origin: center bottom;
+}
+/* 每个字母不同角度（模拟从不同报纸上剪下来拼贴） */
+.stage__name span:nth-child(1) { transform: rotate(-3deg) translateY(-2px); }
+.stage__name span:nth-child(2) { transform: rotate(2deg) translateY(1px); }
+.stage__name span:nth-child(3) { transform: rotate(-1deg) translateY(-1px); }
+.stage__name span:nth-child(4) { transform: rotate(3deg) translateY(2px); }
+.stage__name span:nth-child(5) { transform: rotate(-2deg) translateY(-2px); }
+.stage__name span:nth-child(6) { transform: rotate(1deg) translateY(0); }
+.stage__name span:nth-child(7) { transform: rotate(-1deg) translateY(1px); }
+.stage__name span:nth-child(8) { transform: rotate(2deg) translateY(-1px); }
+
+.stage__tagline {
+  font-size: 11px; color: var(--c-deep-chocolate); letter-spacing: .3em; font-family: var(--font-rounded); font-weight: 600;
+  padding: 4px 12px;
+  background: var(--c-cream);
+  border: 1px dashed var(--c-deep-chocolate);
+  transform: rotate(2deg);
+  margin-top: 6px;
+}
+
+.stage__enter {
+  display: inline-block; margin-top: 32px; padding: 14px 48px;
+  font-family: var(--font-pixel); font-size: 16px; letter-spacing: .2em;
+  color: var(--c-vanilla);
+  background: var(--c-deep-chocolate);
+  border: 3px solid var(--c-candy-orange);
+  box-shadow: var(--btn-shadow-candy);
+  border-radius: var(--radius-lg);
+  cursor: pointer; transition: all var(--transition-base);
+}
+.stage__enter:hover { transform: translateY(-2px); background: #4A2E2E; }
+.stage__enter:active { transform: translateY(1px); box-shadow: none; }
+.stage__intro { margin-top: 20px; font-size: 14px; font-family: var(--font-rounded); font-weight: 500; color: var(--c-deep-chocolate); max-width: 520px; margin-left: auto; margin-right: auto; letter-spacing: .03em; line-height: 1.8; }
+
+/* ---------- 博物馆小部件 ---------- */
+.widgets {
+  max-width: 1100px; margin: 0 auto; padding: 0 24px 48px;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;
+  position: relative;
+}
+.widget {
+  background: var(--c-vanilla); border: 2px solid var(--c-deep-chocolate);
+  border-radius: 4px 14px 6px 12px;   /* 非对称：摆脱死板圆角 */
+  box-shadow:
+    4px 4px 0 rgba(64,42,42,.18),     /* 硬阴影层 1 */
+    8px 8px 0 rgba(64,42,42,.08);     /* 硬阴影层 2 */
+  padding: var(--space-4); text-align: left;
+  position: relative; overflow: visible;  /* 让角贴溢出可见 */
+  transform-origin: top center;
+  transition: transform var(--transition-base);
+  opacity: 0; transform: translateY(24px) rotate(-1deg);   /* 初始隐藏：滚动触发后贴上 */
+}
+.widget.is-stuck { opacity: 1; transform: translateY(0) rotate(0); }
+
+/* 卡片角贴（被胶带固定在网页上的感觉） */
+.widget::before, .widget::after {
+  content: ''; position: absolute; width: 30px; height: 10px;
+  background: rgba(240,100,59,.65);   /* 半透明橘红胶带 */
+  box-shadow: 0 1px 2px rgba(0,0,0,.18);
+  opacity: .85;
+  z-index: 2;
+}
+.widget::before { top: -5px; left: 16px; transform: rotate(-8deg); }
+.widget::after  { top: -5px; right: 16px; transform: rotate(7deg); background: rgba(201,87,112,.65); }
+
+/* 悬停旋转抖动：手碰触桌面物品的物理反应 */
+.widget:hover { transform: rotate(.6deg) scale(1.01); }
+
+/* 顶部边缘的角贴（便签卡/小卡用） */
+.widget__tape-top { display: none; }
+.widget__title {
+  font-family: var(--font-pixel); font-size: 12px; letter-spacing: .1em;
+  color: var(--c-deep-chocolate); margin-bottom: 8px;
+}
+.widget__content { font-size: 13px; color: var(--c-chocolate); }
+/* 日历小部件 */
+.widget-calendar .cal-row { display: flex; gap: 2px; font-size: 11px; }
+.widget-calendar .cal-row span { width: 14px; height: 14px; display: flex; align-items: center; justify-content: center; color: var(--c-gray-brown); }
+.widget-calendar .cal-row .today { background: var(--c-candy-orange); color: var(--c-vanilla); border-radius: 2px; }
+.widget-calendar .cal-row .cal-head { font-weight: 700; color: var(--c-deep-chocolate); }
+/* 占卜小部件 */
+.widget-fortune button {
+  padding: 6px 12px; font-size: 12px; font-family: var(--font-sans);
+  background: var(--c-deep-chocolate); color: var(--c-vanilla);
+  border: none; border-radius: var(--radius-sm); cursor: pointer;
+  box-shadow: 0 2px 0 rgba(120,40,10,.30); transition: all var(--transition-base);
+}
+.widget-fortune button:hover { background: #4A2E2E; transform: translateY(-1px); }
+.widget-fortune button:active { transform: translateY(1px); box-shadow: none; }
+.widget-fortune .fortune-result { margin-top: 10px; font-size: 12px; color: var(--c-cranberry); font-family: var(--font-sans); }
+/* 音乐小部件 */
+.widget-music .music-ctrl {
+  display: flex; gap: 6px; align-items: center;
+}
+.widget-music .music-btn {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--c-vanilla); border: 2px solid var(--c-deep-chocolate);
+  box-shadow: var(--btn-shadow-retro); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--c-deep-chocolate); font-size: 14px;
+}
+.widget-music .music-btn:hover { background: var(--c-candy-orange); color: var(--c-vanilla); }
+.widget-music .music-track { flex: 1; font-size: 11px; color: var(--c-gray-brown); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ---------- Featured Exhibition ---------- */
+.exhibit {
+  max-width: 1100px; margin: 0 auto; padding: 0 24px 48px;
+  position: relative;
+}
+.exhibit__frame {
+  background: var(--c-vanilla); border: 3px solid var(--c-deep-chocolate);
+  border-radius: 6px 18px 8px 14px;
+  box-shadow:
+    5px 5px 0 rgba(64,42,42,.20),
+    10px 10px 0 rgba(64,42,42,.08);
+  padding: var(--space-5); display: flex; gap: var(--space-5);
+  flex-wrap: wrap; align-items: center;
+  position: relative; overflow: visible;
+  opacity: 0; transform: translateY(28px) rotate(.6deg);
+  transition: all .5s cubic-bezier(.2,1.2,.3,1);
+}
+.exhibit__frame.is-stuck { opacity: 1; transform: translateY(0) rotate(0); }
+
+/* 展览框四角胶带（更明显） */
+.exhibit__frame > .tape { display: none; }   /* 保留给 JS 动态加 */
+.exhibit__frame::before {
+  content: '★ ◆ ★ ◆ ★ ◆ ★ ◆ ★ ◆ ★ ◆ ★ ◆ ★ ◆ ★ ◆ ★ ◆ ★';
+  position: absolute; top: 6px; left: 0; right: 0; text-align: center;
+  font-size: 11px; letter-spacing: 4px; color: var(--c-candy-orange);
+  opacity: .85;
+}
+.exhibit__visual {
+  width: 260px; height: 180px; flex-shrink: 0;
+  border: 2px solid var(--c-deep-chocolate); border-radius: var(--radius-md);
+  background:
+    linear-gradient(135deg, rgba(240,100,59,.15) 0%, rgba(58,36,36,.05) 100%),
+    var(--c-cream);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-pixel); font-size: 11px; color: var(--c-gray-brown);
+  box-shadow: var(--shadow-paper);
+}
+.exhibit__info { flex: 1; min-width: 240px; }
+.exhibit__label {
+  display: inline-block; padding: 3px 10px;
+  font-size: 10px; letter-spacing: .2em;
+  background: var(--c-deep-chocolate); color: var(--c-vanilla);
+  border-radius: var(--radius-sm); margin-bottom: var(--space-2);
+}
+.exhibit__title { font-family: var(--font-serif); font-size: 22px; color: var(--c-deep-chocolate); margin-bottom: var(--space-2); }
+.exhibit__desc { font-size: 14px; color: var(--c-chocolate); margin-bottom: var(--space-3); line-height: 1.7; }
+.exhibit__link {
+  display: inline-block; padding: 8px 20px;
+  background: var(--c-vanilla); color: var(--c-deep-chocolate);
+  border: 2px solid var(--c-deep-chocolate); border-radius: var(--radius-md);
+  box-shadow: var(--btn-shadow-retro); font-size: 13px; letter-spacing: .1em;
+  font-family: var(--font-pixel); cursor: pointer; transition: all var(--transition-base);
+}
+.exhibit__link:hover { background: var(--c-candy-orange); color: var(--c-vanilla); transform: translateY(-1px); }
+.exhibit__link:active { transform: translateY(1px); box-shadow: none; }
+
+/* ---------- Explore the Museum ---------- */
+.explore {
+  max-width: 1100px; margin: 0 auto; padding: 0 24px 60px;
+  position: relative;
+}
+.explore__title {
+  font-family: var(--font-pixel); font-size: 18px; letter-spacing: .2em;
+  color: var(--c-deep-chocolate); text-align: center; margin-bottom: var(--space-4);
+}
+.explore__divider { text-align: center; color: var(--c-candy-orange); font-size: 11px; letter-spacing: 4px; margin-bottom: var(--space-5); }
+.explore__grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-4);
+}
+.explore__card {
+  background: var(--c-vanilla); border: 2px solid var(--c-chocolate);
+  border-radius: 8px 4px 14px 6px;
+  box-shadow:
+    4px 4px 0 rgba(64,42,42,.18),
+    8px 8px 0 rgba(64,42,42,.06);
+  padding: var(--space-4); text-align: center;
+  transition: all var(--transition-base);
+  cursor: pointer;
+  position: relative;
+  opacity: 0; transform: translateY(24px) rotate(-.8deg);
+}
+.explore__card.is-stuck { opacity: 1; transform: translateY(0) rotate(0); }
+.explore__card:hover {
+  transform: rotate(1.2deg) scale(1.03) translateY(-4px);
+  box-shadow:
+    6px 6px 0 rgba(240,100,59,.25),
+    12px 12px 0 rgba(240,100,59,.10);
+  border-color: var(--c-candy-orange);
+}
+/* 按压位移：模拟真实按钮触感 */
+.explore__card:active {
+  transform: translate(2px, 2px) scale(1.02);
+  box-shadow: 2px 2px 0 rgba(64,42,42,.15);
+}
+
+/* 卡片打孔锯齿状外发光描边（hover 时出现）— 但 clip-path 卡片不用 */
+.explore__card:hover::after {
+  content: ''; position: absolute; inset: -2px;
+  border: 1px dashed var(--c-candy-orange);
+  border-radius: inherit; opacity: .4; pointer-events: none;
+}
+.explore__card.style--torn:hover::after,
+.explore__card.style--diecut:hover::after,
+.explore__card.style--tag:hover::after {
+  display: none;   /* clip-path 卡片的 dashed outline 会被裁掉，隐藏 */
+}
+.explore__card-icon {
+  font-size: 28px; margin-bottom: var(--space-2);
+  filter: drop-shadow(0 0 6px rgba(240,100,59,.25));
+}
+.explore__card-title { font-family: var(--font-pixel); font-size: 13px; letter-spacing: .1em; color: var(--c-deep-chocolate); margin-bottom: 4px; }
+.explore__card-desc { font-size: 12px; color: var(--c-gray-brown); line-height: 1.5; }
+
+/* ---------- Footer ---------- */
+.footer {
+  background: var(--c-chocolate); color: var(--c-vanilla);
+  padding: var(--space-5) var(--space-4); text-align: center;
+  box-shadow: var(--shadow-choco);
+  font-size: 12px; letter-spacing: .08em;
+}
+.footer__brand { font-family: var(--font-pixel); font-size: 14px; margin-bottom: 8px; letter-spacing: .25em; }
+.footer__line { color: var(--c-gray-brown); margin-bottom: 4px; }
+.footer__links { margin-top: var(--space-3); display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; }
+.footer__links a { color: var(--c-candy-orange); font-size: 12px; }
+.footer__links a:hover { color: var(--c-vanilla); }
+
+/* ---------- 响应式 ---------- */
+@media (max-width: 768px) {
+  .header__inner { flex-direction: column; gap: 10px; padding: 10px 16px; }
+  .header__nav { justify-content: center; }
+  .stage { padding: 32px 16px 24px; }
+  .stage__arch { width: 280px; height: 220px; }
+  .stage__name { font-size: 30px; letter-spacing: .28em; }
+  .stage__name span { font-size: 24px; }
+  .exhibit__frame { flex-direction: column; text-align: center; }
+  .exhibit__visual { width: 100%; max-width: 320px; }
+  .widgets { padding: 0 16px 32px; }
+  .explore__grid { padding: 0 16px; }
+}
+
+/* =========================================================================
+   古早日本少女杂志 · 拼贴装饰层（纯 CSS，不依赖抠好的素材）
+   全部是绝对定位的装饰层，叠在已有内容上 → 密度加法
+   ========================================================================= */
+
+/* ---------- 荧光笔色块（手写体标注背后的半透明彩块） ---------- */
+.hl-block {
+  position: relative; display: inline-block;
+  padding: 1px 6px 2px 8px;
+  font-family: var(--font-serif);
+  font-size: 13px;
+  color: var(--c-deep-chocolate);
+  letter-spacing: .02em;
+}
+.hl-block::before {
+  content: ''; position: absolute; inset: -1px 0 0 0; z-index: -1;
+  border-radius: 2px;
+  /* 水彩笔涂抹效果：略不规则的色块 */
+  transform: skewX(-1deg);
+}
+.hl-block--pink::before { background: rgba(240,100,59,.25); }   /* 橘红高光 */
+.hl-block--mint::before { background: rgba(169,200,168,.35); }   /* 薄荷绿 */
+.hl-block--berry::before { background: rgba(201,87,112,.25); }   /* 蔓越莓粉 */
+.hl-block--paper::before { background: rgba(255,248,233,.85); }  /* 奶油纸 */
+
+/* ---------- 手写体标注（歪歪扭扭的中文/日文小字，散在页面上） ---------- */
+.handwrite {
+  position: absolute;
+  font-family: var(--font-rounded);
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--c-ink-dark);
+  opacity: .95;
+  letter-spacing: .05em;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ---------- 散排装饰贴纸（绝对定位 + 随机旋转，纯 CSS 图形） ---------- */
+/* 每种贴纸用 CSS border-radius / clip-path / box-shadow 画出来，不依赖素材表 */
+.sticker {
+  position: absolute; pointer-events: none; user-select: none;
+  filter: drop-shadow(0 3px 5px rgba(64,42,42,.32));
+}
+.sticker--star {
+  /* 五角星 — 放大 50% */
+  width: 34px; height: 34px;
+  background: var(--c-candy-orange);
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  opacity: .92;
+}
+.sticker--heart {
+  /* 爱心 — 放大 50% + 饱和色 */
+  width: 30px; height: 30px;
+  background: #C95770;
+  clip-path: path('M15 27 C-3 12 6 0 15 6 C 24 0 33 12 15 27Z');
+  opacity: .95;
+}
+.sticker--cross {
+  /* 小十字架 — 放大 50% + 完全不透明 */
+  width: 20px; height: 32px;
+  position: relative;
+  opacity: 1;
+}
+.sticker--cross::before {
+  content: ''; position: absolute; left: 9px; top: 0; width: 3px; height: 100%;
+  background: var(--c-ink-dark); border-radius: 1px;
+}
+.sticker--cross::after {
+  content: ''; position: absolute; top: 12px; left: 0; width: 20px; height: 3px;
+  background: var(--c-ink-dark); border-radius: 1px;
+}
+.sticker--ribbon {
+  /* 蝴蝶结剪影 */
+  width: 24px; height: 14px;
+  background: var(--c-deep-chocolate);
+  clip-path: polygon(0 50%, 30% 0%, 40% 40%, 50% 20%, 60% 40%, 70% 0%, 100% 50%, 70% 100%, 60% 60%, 50% 80%, 40% 60%, 30% 100%);
+  opacity: .55;
+}
+.sticker--sparkle {
+  /* 闪光小星芒 */
+  width: 12px; height: 12px;
+  background: var(--c-candy-orange);
+  clip-path: polygon(50% 0%, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0% 50%, 40% 40%);
+  opacity: .6;
+}
+.sticker--dot {
+  /* 彩色圆点 */
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--c-cranberry); opacity: .55;
+}
+.sticker--tag {
+  /* 价格标签小纸片 */
+  width: 36px; height: 20px;
+  background: var(--c-vanilla);
+  border: 1px dashed var(--c-deep-chocolate);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 8px 100%, 0 50%);
+  font-family: var(--font-pixel); font-size: 7px; padding: 3px 6px;
+  display: flex; align-items: center;
+  color: var(--c-deep-chocolate);
+}
+
+/* ---------- 纸胶带（横跨在卡片上的半透明彩条，略带倾斜） ---------- */
+.washi-tape {
+  position: absolute;
+  height: 28px; padding: 0 16px;
+  font-family: var(--font-rounded); font-weight: 700; font-size: 9px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--c-ink-dark);
+  letter-spacing: .18em;
+  box-shadow: 0 2px 4px rgba(64,42,42,.28), inset 0 1px 0 rgba(255,255,255,.45);
+  pointer-events: none; user-select: none;
+  z-index: 12;   /* 比卡片高，贴在上面 */
+  border-top: 1px solid rgba(0,0,0,.12);
+  border-bottom: 1px solid rgba(0,0,0,.12);
+}
+.washi-tape--pink   { background: #F0643B; }
+.washi-tape--cran   { background: #C95770; color: #FFF; }
+.washi-tape--mint   { background: #A9C8A8; }
+.washi-tape--vanilla{ background: #FFF8E9; }
+
+/* ---------- 拍立得白边照片卡 ---------- */
+.polaroid {
+  background: var(--c-vanilla);
+  padding: 10px 10px 32px 10px;
+  box-shadow: 2px 3px 8px rgba(64,42,42,.18);
+  border-radius: 2px;
+  position: relative;
+  display: inline-block;
+}
+.polaroid::before {
+  content: ''; position: absolute; top: 10px; left: 10px; right: 10px; bottom: 32px;
+  background:
+    linear-gradient(135deg, rgba(240,100,59,.12) 0%, rgba(58,36,36,.05) 100%),
+    var(--c-cream);
+  border-radius: 1px;
+}
+.polaroid__caption {
+  position: absolute; bottom: 6px; left: 10px; right: 10px;
+  font-family: var(--font-serif); font-size: 10px;
+  color: var(--c-deep-chocolate); text-align: center;
+  transform: rotate(-1deg);
+}
+
+/* ---------- 便签纸（小方块，浅彩底，略带倾斜） ---------- */
+.sticky-note {
+  position: absolute;
+  width: 96px; padding: 10px 10px 12px;
+  background: #fff1a8;           /* 经典黄色便签 */
+  box-shadow: 2px 3px 6px rgba(64,42,42,.18);
+  font-family: var(--font-serif); font-size: 10px;
+  color: var(--c-deep-chocolate); line-height: 1.6;
+  /* 撕纸顶部边缘：略带斜切 */
+  clip-path: polygon(0 6px, 3% 2px, 7% 5px, 12% 1px, 18% 4px, 25% 1px, 32% 5px, 40% 2px, 48% 4px, 55% 1px, 62% 3px, 70% 1px, 78% 5px, 85% 2px, 92% 4px, 100% 1px, 100% 100%, 0 100%);
+}
+.sticky-note--pink   { background: #ffd5e0; }
+.sticky-note--mint   { background: #cde8d0; }
+.sticky-note--cream  { background: var(--c-cream); }
+
+/* ---------- 虚线装饰方块（手写体标注旁边的小边框） ---------- */
+.dash-box {
+  position: absolute;
+  border: 1.5px dashed var(--c-deep-chocolate);
+  border-radius: 4px;
+  pointer-events: none;
+  opacity: .55;
+}
+
+/* ---------- 蕾丝花边裁切（装饰在卡片底部） ---------- */
+.lace-edge {
+  position: absolute; left: 0; right: 0; bottom: -1px; height: 10px;
+  background:
+    radial-gradient(circle at 5px 5px, transparent 3px, var(--c-vanilla) 3.5px) 0 0/10px 10px,
+    radial-gradient(circle at 10px 5px, transparent 3px, var(--c-vanilla) 3.5px) 0 0/10px 10px;
+  pointer-events: none;
+}
+
+/* ---------- 波点 section 背景（逐图拆解图 07） ---------- */
+.section--dot-bg {
+  background-image: radial-gradient(var(--c-cranberry) 1.4px, transparent 1.7px);
+  background-size: 18px 18px;
+  background-color: rgba(243, 229, 200, .72);
+}
+.section--grid-bg {
+  background-image:
+    linear-gradient(rgba(201,87,112,.30) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,87,112,.30) 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-color: rgba(255,248,233,.55);
+}
+
+/* ---------- 粉毛锁天使立绘 standee（挡住右下角） ---------- */
+/* 只有当 assets/characters/angel-full.png 存在时才显示，否则隐藏 */
+.hero-standee {
+  position: absolute;
+  right: -20px; bottom: -60px;
+  width: 200px; height: auto;
+  z-index: 20;
+  pointer-events: none;
+  opacity: 0;    /* 默认隐藏，HTML 里加 img 后显示 */
+  transition: opacity var(--transition-base);
+}
+.hero-standee.is-visible { opacity: 1; }
+
+/* ---------- 装饰层的随机旋转变量（HTML 里用 inline style 设置） ---------- */
+/* 每个 sticker/handwrite 可以在 HTML 里写 style="--r:-4deg" 来调角度 */
+.sticker, .handwrite, .washi-tape, .sticky-note, .polaroid {
+  transform: rotate(var(--r, -2deg));
+}
+.sticker--reverse { transform: rotate(var(--r, 3deg)) scaleX(-1); }
+
+/* ---------- hover 星芒（鼠标 hover 卡片时随机出现） ---------- */
+.sparkle-target:hover::after {
+  content: '✦'; position: absolute; top: -8px; left: 50%;
+  font-size: 16px; color: var(--c-candy-orange);
+  animation: sparkle-burst .6s ease-out forwards;
+  pointer-events: none;
+}
+@keyframes sparkle-burst {
+  0% { opacity: .9; transform: translate(-50%, 0) scale(.6); }
+  60% { opacity: 1; transform: translate(-50%, -12px) scale(1.4); }
+  100% { opacity: 0; transform: translate(-50%, -20px) scale(1); }
+}
+
+/* =========================================================================
+   古早日杂概率拼贴系统 v2 — 按 dict.json 5 层独立抽样
+   -------------------------------------------------------------------------
+   直接对应你给的 dict.json 的 5 层：基底 / 织物 / 装饰 / 时间痕迹 / 色彩系统
+   每层多个选项，按权重随机。纯 CSS，不用下载素材。
+   ========================================================================= */
+
+/* ---------- 层 1：基底（概率 60/25/15） ---------- */
+/* 和纸 60% — 半透明纤维感 */
+.collage-base--washi {
+  background-image:
+    repeating-linear-gradient(88deg, rgba(180,160,140,.08) 0 2px, transparent 2px 9px),
+    repeating-linear-gradient(2deg, rgba(180,160,140,.06) 0 1px, transparent 1px 7px);
+  background-color: rgba(255,248,233,.90);
+}
+/* 牛皮纸 25% — 粗糙颗粒 */
+.collage-base--kraft {
+  background-image:
+    radial-gradient(circle at 23% 17%, rgba(100,60,30,.08) 1px, transparent 1.5px),
+    radial-gradient(circle at 67% 83%, rgba(100,60,30,.06) 1px, transparent 1.5px);
+  background-size: 14px 14px, 11px 11px;
+  background-color: rgba(190,165,135,.50);
+}
+/* 旧报纸 15% — 灰底网点 + 网点感 */
+.collage-base--newsprint {
+  background-image:
+    radial-gradient(circle, rgba(60,40,30,.18) 1px, transparent 1.5px);
+  background-size: 5px 5px;
+  background-color: rgba(230,220,200,.85);
+}
+
+/* ---------- 层 2：织物 ---------- */
+/* 扇贝边蕾丝 50% — 波浪状底部装饰 */
+.collage-lace--scallop::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: -4px; height: 14px;
+  background-image:
+    radial-gradient(circle at 7px 14px, var(--c-deep-chocolate) 4px, transparent 5px),
+    radial-gradient(circle at 0px 14px, var(--c-deep-chocolate) 4px, transparent 5px);
+  background-size: 14px 14px;
+  background-position: 0 0, 7px 0;
+  /* 上半部分切掉，只剩下半圆 */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 50%, black 50%);
+  mask-image: linear-gradient(to bottom, transparent 50%, black 50%);
+  pointer-events: none;
+  opacity: .65;
+}
+/* 褶皱蕾丝 30% — 边缘波动 + 薄纱纹理 */
+.collage-lace--ruffle::before {
+  content: ''; position: absolute; top: 0; bottom: 0; left: -6px; width: 12px;
+  background: repeating-linear-gradient(
+    180deg,
+    var(--c-deep-chocolate) 0 2px, transparent 2px 6px
+  );
+  border-radius: 50% / 12px;
+  opacity: .50;
+  pointer-events: none;
+}
+/* 缎带蝴蝶结 40% — 四角装饰（放大 50% + 实色） */
+.collage-ribbon {
+  position: absolute; pointer-events: none;
+  filter: drop-shadow(0 3px 5px rgba(64,42,42,.38));
+  opacity: 1;
+}
+.collage-ribbon--bow {
+  width: 64px; height: 36px;
+  background: #C95770;
+  clip-path: polygon(45% 0, 55% 0, 100% 50%, 55% 100%, 45% 100%, 0 50%);
+}
+.collage-ribbon--strip {
+  width: 120px; height: 14px;
+  background: repeating-linear-gradient(
+    90deg, var(--c-deep-chocolate) 0 8px, var(--c-vanilla) 8px 10px
+  );
+  transform: rotate(-12deg);
+}
+
+/* ---------- 层 3：装饰（概率 描边贴纸90% / 胶带50% / 蝴蝶30% / 珍珠25%） ---------- */
+/* 描边贴纸 — 白边黑内 + 卡通感 clip-path（放大 30% + 加粗描边 + 圆体字） */
+.collage-sticker {
+  position: absolute; pointer-events: none; user-select: none;
+  background: var(--c-vanilla);
+  border: 2.5px solid var(--c-ink-dark);
+  filter: drop-shadow(2px 3px 0 rgba(64,42,42,.30));
+  padding: 4px 8px;
+  font-family: var(--font-rounded); font-weight: 700; font-size: 11px; letter-spacing: .08em;
+  color: var(--c-deep-chocolate);
+  opacity: 1;
+  --r: -3deg;
+}
+.collage-sticker--heart { clip-path: path('M26 47 C0 22 8 0 26 10 C 44 0 52 22 26 47Z'); width: 52px; height: 47px; background: #C95770; border: none; }
+.collage-sticker--star  { clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); width: 47px; height: 44px; background: #F0643B; border: none; }
+.collage-sticker--cross {
+  width: 24px; height: 38px; position: absolute; opacity: 1;
+}
+.collage-sticker--cross::before {
+  content: ''; position: absolute; left: 9px; top: 0; width: 5px; height: 100%;
+  background: var(--c-ink-dark); border-radius: 2px;
+}
+.collage-sticker--cross::after {
+  content: ''; position: absolute; top: 14px; left: 0; width: 24px; height: 5px;
+  background: var(--c-ink-dark); border-radius: 2px;
+}
+/* 撕纸边缘 — 不规则 clip-path */
+.collage-torn {
+  clip-path: polygon(
+    0 3%, 2% 0, 7% 2%, 12% 0, 18% 3%, 25% 1%, 32% 4%, 40% 1%, 48% 3%,
+    55% 0, 62% 2%, 70% 0, 78% 3%, 85% 1%, 92% 2%, 97% 0, 100% 3%,
+    100% 100%, 0 100%
+  );
+}
+
+/* ---------- 层 4：时间痕迹（旧杂志剪报70% / 手写便签40% / 套印不准30% / 咖啡渍20%） ---------- */
+/* 旧杂志剪报 — 半调网点 + 旋转 + 白边 + 放大 */
+.collage-clipping {
+  position: absolute; pointer-events: none;
+  background-image: radial-gradient(circle, var(--c-deep-chocolate) 1.2px, transparent 1.6px);
+  background-size: 5px 5px;
+  border: 4px solid var(--c-vanilla);
+  box-shadow: 3px 4px 9px rgba(64,42,42,.28);
+  --r: -6deg;
+  opacity: .95;
+}
+/* 手写便签 — 经典黄色便签 + 手写体 + 放大 */
+.collage-handwrite-note {
+  position: absolute; pointer-events: none;
+  width: 130px; padding: 14px 14px 18px;
+  background: #FFEE8C;
+  box-shadow: 3px 4px 10px rgba(64,42,42,.26);
+  font-family: var(--font-rounded); font-weight: 600; font-size: 11px; line-height: 1.8;
+  color: var(--c-ink-dark);
+  --r: 5deg;
+}
+.collage-handwrite-note::before {
+  /* 便签顶部波浪撕纸 */
+  content: ''; position: absolute; top: -2px; left: 0; right: 0; height: 6px;
+  background:
+    radial-gradient(circle at 5px 8px, transparent 4px, #fff1a8 4.5px) 0 0/10px 8px;
+  -webkit-mask: linear-gradient(to top, black 50%, transparent 50%);
+  mask: linear-gradient(to top, black 50%, transparent 50%);
+}
+/* 套印不准 — RGB 色偏 text-shadow */
+.collage-offset {
+  text-shadow:
+    2px 0 #F0643B,
+    -2px 0 #C95770;
+  color: var(--c-deep-chocolate);
+}
+
+/* ---------- 层 5：色彩系统（概率 egg35 / Olive40 / ageha25） ---------- */
+/* egg 系 — 荧光撞色：荧光粉 + 酸黄 + 电蓝点缀 */
+.collage-egg .stage__name { text-shadow: 0 0 12px rgba(255,20,147,.55); }
+/* Olive 系 — 帕斯特尔米白 + 淡色点缀（就是你现在奶油底，基本不变） */
+.collage-olive { /* 默认就是 */ }
+/* ageha 系 — 银白 + 粉蓝闪亮 */
+.collage-ageha {
+  --c-cream: #FAF0F5;
+  --c-candy-orange: #B89FD4;
+}
+.collage-ageha .stage__name {
+  text-shadow: 0 0 20px rgba(184,159,212,.50), 0 0 40px rgba(184,159,212,.30);
+}
+
+/* ---------- 🎲 随机拼贴按钮 + 🔄 角色切换（FAB 挂绳标签形态） ---------- */
+.collage-random-btn {
+  position: fixed; z-index: 9998;
+  padding: 10px 18px; font-family: var(--font-rounded); font-weight: 700; font-size: 12px; letter-spacing: .12em;
+  background: var(--c-deep-chocolate); color: var(--c-vanilla);
+  border: 2px solid var(--c-candy-orange);
+  box-shadow: 4px 4px 0 rgba(64,42,42,.25);
+  border-radius: 6px 14px 8px 12px;    /* 非对称，挂绳标签感 */
+  cursor: pointer; transition: transform .25s cubic-bezier(.2,1.2,.3,1), box-shadow .2s;
+  transform-origin: top center;        /* 顶部为锚点 —— 摆动动画的根 */
+  /* 挂绳标签：底部小三角（打孔器效果） */
+  clip-path: polygon(0 0, 100% 0, 100% 70%, 85% 100%, 15% 100%, 0 70%);
+  animation: fab-idle 3.2s ease-in-out infinite;  /* 呼吸式微摆 */
+}
+.collage-random-btn:hover {
+  box-shadow: 6px 6px 0 rgba(240,100,59,.30);
+  animation: fab-swing 1.4s ease-in-out infinite;  /* 悬停时大幅摆动 */
+}
+.collage-random-btn:active {
+  transform: translate(3px, 3px); box-shadow: 1px 1px 0 rgba(64,42,42,.20);
+  animation: none;
+}
+
+/* 摆动动画：挂绳标签被风吹 */
+@keyframes fab-swing {
+  0%, 100% { transform: rotate(-4deg); }
+  50%      { transform: rotate(4deg); }
+}
+/* 空闲微摆：呼吸式 */
+@keyframes fab-idle {
+  0%, 100% { transform: rotate(-1deg); }
+  50%      { transform: rotate(1deg); }
+}
+.collage-random-btn--rolling { animation: dice-roll .4s ease; }
+@keyframes dice-roll {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-15deg) translateY(-2px); }
+  50% { transform: rotate(15deg); }
+  75% { transform: rotate(-5deg); }
+}
+
+/* =========================================================================
+   第三批：光标 + 垂直文字 + 黑胶/卡带 + Curator's Modal
+   ========================================================================= */
+
+/* ---------- 自定义光标 ---------- */
+body {
+  /* 剪刀默认光标（纯 SVG data URI，无外部文件） */
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'><g fill='%233A2424' stroke='%233A2424' stroke-width='1.6'><circle cx='7' cy='9' r='2.8'/><circle cx='7' cy='19' r='2.8'/><path d='M9 9 L24 19' fill='none' stroke-linecap='round'/><path d='M9 19 L24 9' fill='none' stroke-linecap='round'/></g></svg>") 2 2, auto;
+}
+/* 可交互元素 → 画笔光标 */
+a:hover, button:hover, .explore__card:hover, .widget-fortune button:hover {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'><g fill='none' stroke='%23F0643B' stroke-width='2.2' stroke-linecap='round'><path d='M3 25 L12 13'/><path d='M12 13 L14 15' fill='%23F0643B'/><path d='M14 15 L26 3'/><path d='M20 8 L24 12' stroke='%23C95770'/></g></svg>") 2 26, pointer;
+}
+/* 装饰元素 → 镊子光标 */
+.collage-sticker:hover, .collage-handwrite-note:hover, .collage-clipping:hover {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'><g fill='none' stroke='%233A2424' stroke-width='2.5' stroke-linecap='round'><path d='M7 3 L9 22'/><path d='M21 3 L19 22'/><path d='M9 22 L19 22' stroke-width='3'/></g><circle cx='14' cy='13' r='2' fill='%23F0643B'/></svg>") 14 2, grab;
+}
+
+/* ---------- 垂直排版侧边文字（栏目名 + 日期，writing-mode: vertical-rl） ---------- */
+.side-rail {
+  position: fixed; top: 50%; transform: translateY(-50%);
+  writing-mode: vertical-rl; text-orientation: mixed;
+  font-family: var(--font-pixel); font-size: 11px; letter-spacing: .4em;
+  color: var(--c-deep-chocolate); opacity: .55;
+  pointer-events: none; z-index: 5;
+  user-select: none;
+}
+.side-rail--left  { left: 10px; }
+.side-rail--right { right: 10px; }
+
+/* ---------- 迷你播放器：黑胶旋转 + 卡带静音 ---------- */
+.widget-music .music-btn {
+  position: relative;
+  /* 黑胶唱片纹理（radial-gradient 模拟同心圆纹路） */
+  background:
+    repeating-radial-gradient(circle at center,
+      rgba(64,42,42,.10) 0 1px, transparent 1px 3px),
+    var(--c-vanilla);
+}
+/* 播放中：黑胶旋转 */
+.widget-music.is-playing .music-btn {
+  animation: vinyl-spin 1.8s linear infinite;
+  background:
+    repeating-radial-gradient(circle at center,
+      rgba(240,100,59,.18) 0 1px, transparent 1px 3px),
+    var(--c-vanilla);
+}
+@keyframes vinyl-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+/* 静音/无曲目：卡带图标（像素风 2 个方块） */
+.widget-music .music-btn.is-idle::after {
+  content: ''; position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+  width: 14px; height: 10px;
+  background: var(--c-deep-chocolate);
+  border-radius: 1px;
+  box-shadow:
+    -4px 0 0 var(--c-deep-chocolate),  /* 左轮 */
+    4px 0 0 var(--c-deep-chocolate);   /* 右轮 */
+}
+
+/* ---------- Curator's Room Modal（立体书展开） ---------- */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 10000;
+  background: rgba(58,36,36,.55); backdrop-filter: blur(4px);
+  display: none; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity .35s ease;
+}
+.modal-overlay.is-open { display: flex; opacity: 1; }
+
+/* 立体书展开动画：从中心向外翻页 */
+.modal-book {
+  position: relative; width: 640px; height: 420px;
+  background: var(--c-vanilla);
+  border: 3px solid var(--c-deep-chocolate);
+  border-radius: 6px 18px 8px 14px;
+  box-shadow: 8px 8px 0 rgba(64,42,42,.25), 20px 20px 0 rgba(64,42,42,.10);
+  overflow: hidden;
+  transform: scale(.2) rotate(-8deg); opacity: 0;
+  transition: transform .5s cubic-bezier(.2,1.3,.3,1), opacity .4s;
+}
+.modal-overlay.is-open .modal-book {
+  transform: scale(1) rotate(0); opacity: 1;
+}
+
+/* 书页内容 */
+.modal-book__inner {
+  padding: 40px 48px; height: 100%;
+  font-family: var(--font-rounded); font-weight: 500;
+  overflow-y: auto;
+}
+.modal-book__title {
+  font-family: var(--font-pixel); font-size: 24px; letter-spacing: .3em;
+  color: var(--c-deep-chocolate);
+  padding-left: .3em; margin-bottom: 20px;
+  border-bottom: 2px dashed var(--c-candy-orange);
+}
+.modal-book__item {
+  display: flex; gap: 12px; margin-bottom: 12px;
+  font-size: 13px; line-height: 1.6;
+}
+.modal-book__tag {
+  flex-shrink: 0;
+  padding: 2px 8px; font-family: var(--font-pixel); font-size: 10px;
+  background: var(--c-candy-orange); color: var(--c-vanilla);
+  border-radius: 2px; letter-spacing: .1em;
+}
+.modal-book__tag--purple { background: var(--c-cranberry); }
+.modal-book__tag--mint   { background: var(--mint-lite); color: var(--c-deep-chocolate); }
+
+/* 关闭按钮（书页右侧挂绳标签） */
+.modal-book__close {
+  position: absolute; top: -12px; right: 24px;
+  padding: 4px 14px 10px;
+  font-family: var(--font-rounded); font-weight: 700; font-size: 12px;
+  background: var(--c-cranberry); color: var(--c-vanilla);
+  border: 2px solid var(--c-deep-chocolate);
+  box-shadow: 2px 2px 0 rgba(64,42,42,.30);
+  clip-path: polygon(0 0, 100% 0, 100% 70%, 85% 100%, 15% 100%, 0 70%);
+  cursor: pointer; transform-origin: top center;
+  animation: fab-swing 2.2s ease-in-out infinite;
+}
+.modal-book__close:active { transform: translate(2px, 2px); }
+
+/* =========================================================================
+   撕纸剪报 Hero 的配套组件
+   ========================================================================= */
+
+/* 固定胶带（斜贴在撕纸四角） */
+.sticker-tape {
+  position: absolute; z-index: 4;
+  height: 16px; padding: 2px 10px;
+  font-family: var(--font-rounded); font-weight: 700; font-size: 9px; letter-spacing: .2em;
+  color: var(--c-ink-dark);
+  box-shadow: 0 2px 3px rgba(64,42,42,.25);
+  transform-origin: center;
+  transform: rotate(var(--r, -6deg));
+  pointer-events: none; user-select: none;
+}
+
+/* =========================================================================
+   6 套方案各用各的 — 保持多样性
+   ========================================================================= */
+
+/* ---------- 方案 1：撕纸/剪报（Worlds & IP） ---------- */
+.explore__card.style--torn {
+  clip-path: polygon(
+    0 6%, 3% 0, 8% 3%, 14% 1%, 20% 4%, 27% 1%, 35% 3%, 43% 0,
+    51% 2%, 59% 0, 67% 3%, 74% 1%, 82% 4%, 89% 0, 96% 3%, 100% 7%,
+    98% 50%, 100% 100%, 0 100%
+  );
+  border-radius: 0;
+  border: 2px solid var(--c-deep-chocolate);
+  transform: rotate(-4deg);
+  background-image: radial-gradient(circle, rgba(60,40,30,.12) 1px, transparent 1.5px);
+  background-size: 5px 5px;
+}
+.explore__card.style--torn:hover { transform: rotate(-2deg) scale(1.03); }
+
+/* ---------- 方案 2：拍立得/宝丽来（Gallery） ---------- */
+.explore__card.style--polaroid {
+  background: var(--c-vanilla);
+  border: none;
+  border-radius: 2px;
+  box-shadow: 3px 4px 0 rgba(64,42,42,.20), 6px 8px 0 rgba(64,42,42,.08);
+  padding-bottom: 34px;   /* 底部大片留白（拍立得相纸底部签名区） */
+  transform: rotate(3deg);
+}
+.explore__card.style--polaroid::before {
+  /* 顶部图钉 */
+  content: ''; position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--c-cranberry); box-shadow: 0 2px 3px rgba(0,0,0,.25);
+}
+.explore__card.style--polaroid:hover {
+  transform: rotate(0deg) scale(1.03);   /* 悬停解开旋转 */
+}
+/* 相纸底部签名（取代 desc） */
+.explore__card.style--polaroid .explore__card-desc {
+  position: absolute; bottom: 8px; left: 0; right: 0; text-align: center;
+  font-family: var(--font-serif); font-style: italic; font-size: 11px;
+  color: var(--c-deep-chocolate); opacity: .75;
+}
+
+/* ---------- 方案 3：模切贴纸（Games） ---------- */
+.explore__card.style--diecut {
+  border-radius: 50% 48% 52% 50% / 48% 52% 48% 52%;  /* 有机云朵形状 */
+  border: 2.5px solid var(--c-deep-chocolate);
+  background: var(--c-candy-orange);
+  color: var(--c-vanilla);
+  filter: drop-shadow(0 3px 6px rgba(64,42,42,.30));
+  transform: rotate(-5deg);
+  padding: 36px 20px;
+}
+.explore__card.style--diecut .explore__card-icon { color: var(--c-vanilla); font-size: 36px; }
+.explore__card.style--diecut .explore__card-title { color: var(--c-vanilla); }
+.explore__card.style--diecut .explore__card-desc { color: rgba(255,255,255,.85); }
+.explore__card.style--diecut:hover { transform: rotate(0deg) scale(1.08); }
+
+/* ---------- 方案 4：多层叠放（Creative Studio） ---------- */
+.explore__card.style--stack {
+  border-radius: 2px;
+  border: none;
+  background: var(--c-vanilla);
+  /* 3 张纸叠放效果（纯 box-shadow，不污染 DOM） */
+  box-shadow:
+    /* 底层旧报纸（黄色，露出下方边缘） */
+    -6px 6px 0 -2px rgba(200,170,120,.50),
+    /* 中层棕色卡纸（露出右侧边缘） */
+    6px -4px 0 -2px rgba(100,70,40,.40),
+    /* 顶层奶油纸（主卡） */
+    3px 3px 0 0 rgba(64,42,42,.22);
+  transform: rotate(1.5deg);
+  padding: 28px 24px;
+}
+.explore__card.style--stack:hover { transform: rotate(0.5deg) scale(1.02); }
+
+/* ---------- 方案 5：活页打孔纸（Music） ---------- */
+.explore__card.style--binder {
+  border-radius: 0;
+  border-left: 2px solid rgba(64,42,42,.25);
+  border-right: 2px solid var(--c-deep-chocolate);
+  border-top: 2px solid var(--c-deep-chocolate);
+  border-bottom: 2px solid var(--c-deep-chocolate);
+  background: var(--c-vanilla);
+  box-shadow: 3px 3px 0 rgba(64,42,42,.18);
+  padding-left: 30px;   /* 给打孔留空间 */
+  transform: rotate(2deg);
+  position: relative;
+}
+/* 左侧 3 个打孔（用 ::before + radial-gradient） */
+.explore__card.style--binder::before {
+  content: ''; position: absolute; left: 10px; top: 0; bottom: 0; width: 12px;
+  background-image:
+    radial-gradient(circle, #3A2424 2.5px, transparent 3px);
+  background-size: 12px 50px;
+  background-position: 0 18px;
+  background-repeat: no-repeat;
+  /* 只画 3 个孔 */
+  -webkit-mask-image:
+    radial-gradient(circle at 6px 18px, black 3px, transparent 4px),
+    radial-gradient(circle at 6px 90px, black 3px, transparent 4px),
+    radial-gradient(circle at 6px 162px, black 3px, transparent 4px);
+  mask-image:
+    radial-gradient(circle at 6px 18px, black 3px, transparent 4px),
+    radial-gradient(circle at 6px 90px, black 3px, transparent 4px),
+    radial-gradient(circle at 6px 162px, black 3px, transparent 4px);
+}
+.explore__card.style--binder:hover { transform: rotate(0deg) scale(1.02); }
+
+/* ---------- 方案 6：吊牌/行李牌（Archives / Curator's Room） ---------- */
+.explore__card.style--tag {
+  /* 上圆下尖：clip-path 做吊牌 */
+  clip-path: polygon(0 0, 100% 0, 100% 80%, 85% 100%, 15% 100%, 0 80%);
+  border-radius: 0;
+  border: none;
+  background: var(--c-cranberry);
+  color: var(--c-vanilla);
+  box-shadow: 3px 3px 0 rgba(64,42,42,.28);
+  transform: rotate(-6deg);
+  padding: 24px 18px 32px;
+}
+.explore__card.style--tag .explore__card-icon { color: var(--c-vanilla); font-size: 32px; }
+.explore__card.style--tag .explore__card-title { color: var(--c-vanilla); }
+.explore__card.style--tag .explore__card-desc { color: rgba(255,255,255,.85); }
+/* 吊牌穿绳孔 */
+.explore__card.style--tag::before {
+  content: ''; position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+  width: 10px; height: 10px; border-radius: 50%;
+  background: transparent;
+  border: 2px solid var(--c-vanilla);
+  box-shadow: inset 0 0 0 1px var(--c-cranberry);
+}
+.explore__card.style--tag:hover { transform: rotate(-2deg) scale(1.05); }
+
+/* =========================================================================
+   第 1 批：3 个 widget 各自穿物理皮肤
+   ========================================================================= */
+
+/* ---------- widget 通用：悬停对角抬起 ---------- */
+.widget:hover {
+  transform: rotate(.6deg) scale(1.01) translateY(-2px);
+  box-shadow:
+    6px 6px 0 rgba(64,42,42,.22),
+    12px 12px 0 rgba(64,42,42,.08);
+}
+
+/* ---------- 日历：撕下来的日历页 ---------- */
+.widget.style--torn-calendar {
+  /* 撕纸边缘（底部不规则） */
+  clip-path: polygon(
+    0 0, 100% 0, 100% 92%, 96% 100%, 90% 95%, 84% 100%, 78% 96%,
+    72% 100%, 66% 95%, 60% 100%, 54% 96%, 48% 100%, 42% 95%, 36% 100%,
+    30% 96%, 24% 100%, 18% 95%, 12% 100%, 6% 96%, 0 100%
+  );
+  border-radius: 0;
+  border: 1px solid rgba(64,42,42,.35);
+  background: var(--c-vanilla);
+  box-shadow: 4px 4px 0 rgba(64,42,42,.18), 8px 8px 0 rgba(180,150,120,.40);
+  transform: rotate(-3deg);
+  /* 背后垫一张旧报纸 */
+  position: relative;
+}
+.widget.style--torn-calendar::before {
+  content: ''; position: absolute; z-index: -1;
+  top: 10px; left: -8px; right: 14px; bottom: -10px;
+  background-image: radial-gradient(circle, rgba(60,40,30,.10) 1px, transparent 1.5px);
+  background-size: 4px 4px;
+  background-color: rgba(230,220,200,.70);
+  transform: rotate(2deg);
+  border: 1px solid rgba(64,42,42,.18);
+}
+/* 日历顶部图钉 */
+.widget.style--torn-calendar::after {
+  content: ''; position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--c-deep-chocolate);
+  box-shadow: 0 2px 3px rgba(0,0,0,.30), inset 0 -2px 0 rgba(0,0,0,.25);
+}
+/* 日历页顶部红色撕边 */
+.widget.style--torn-calendar .widget__title {
+  background: var(--c-candy-orange); color: var(--c-vanilla);
+  margin: -16px -16px 12px; padding: 8px 14px;
+  font-family: var(--font-pixel); letter-spacing: .2em;
+  clip-path: polygon(0 0, 100% 0, 100% 85%, 95% 100%, 88% 92%, 80% 100%, 72% 94%, 65% 100%, 58% 94%, 50% 100%, 42% 94%, 35% 100%, 28% 94%, 20% 100%, 12% 94%, 5% 100%, 0 88%);
+}
+
+/* ---------- 占卜：拍立得相纸 ---------- */
+.widget.style--polaroid-card {
+  background: var(--c-vanilla);
+  border: none; border-radius: 2px;
+  box-shadow: 3px 4px 0 rgba(64,42,42,.20), 6px 8px 0 rgba(64,42,42,.08);
+  transform: rotate(4deg);
+  padding-bottom: 40px;   /* 底部手写批注区 */
+  position: relative;
+  overflow: visible;
+}
+/* 拍立得底部手写批注 */
+.widget.style--polaroid-card::before {
+  content: '— 今日のお告げ —';
+  position: absolute; bottom: 6px; left: 0; right: 0; text-align: center;
+  font-family: var(--font-serif); font-style: italic; font-size: 10px;
+  color: var(--c-deep-chocolate); opacity: .60;
+  transform: rotate(-2deg);
+}
+/* 相纸左边缘的"撕边"感 */
+.widget.style--polaroid-card::after {
+  content: ''; position: absolute; left: -2px; top: 0; bottom: 0; width: 6px;
+  background: repeating-linear-gradient(0deg,
+    var(--c-vanilla) 0 2px, transparent 2px 4px);
+}
+.widget.style--polaroid-card .widget__title {
+  font-family: var(--font-serif); font-weight: 700; font-style: italic;
+  border-bottom: 1px dashed var(--c-deep-chocolate);
+  padding-bottom: 6px; margin-bottom: 10px;
+}
+/* "抽一张牌"按钮做成相纸底部的手写批注按钮 */
+.widget.style--polaroid-card .fortune-btn {
+  font-family: var(--font-serif); font-style: italic; font-weight: 700;
+  background: transparent; border: none; color: var(--c-candy-orange);
+  text-decoration: underline; cursor: pointer;
+  padding: 4px 0; font-size: 14px;
+}
+
+/* ---------- 音乐：Walkman 磁带盒 ---------- */
+.widget.style--walkman {
+  background: var(--c-deep-chocolate);
+  border: 2px solid var(--c-deep-chocolate);
+  border-radius: 6px 6px 8px 8px;
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.12),   /* 顶部高光 */
+    inset 0 -3px 0 rgba(0,0,0,.30),        /* 底部阴影 */
+    4px 4px 0 rgba(64,42,42,.35);
+  transform: rotate(-2deg);
+  color: var(--c-vanilla);
+  position: relative;
+  /* Walkman 外壳金属拉丝感 */
+  background-image:
+    linear-gradient(180deg, rgba(255,255,255,.06) 0%, transparent 40%),
+    linear-gradient(0deg, #2A1818 0%, #3A2424 50%, #2A1818 100%);
+}
+.widget.style--walkman .widget__title {
+  color: var(--c-vanilla);
+  font-family: var(--font-pixel); letter-spacing: .25em; font-size: 11px;
+  border-bottom: 1px solid rgba(240,100,59,.50);
+  padding-bottom: 6px;
+  /* Walkman 品牌标签感 */
+}
+.widget.style--walkman .music-btn {
+  background: var(--c-candy-orange);
+  color: var(--c-vanilla);
+  border: 2px solid var(--c-vanilla);
+  width: 36px; height: 36px; border-radius: 50%;
+  box-shadow: 0 3px 0 rgba(0,0,0,.35);
+  cursor: pointer; font-size: 14px;
+  transition: transform .08s;
+}
+.widget.style--walkman .music-btn:active {
+  transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,.35);
+}
+.widget.style--walkman .music-track {
+  color: rgba(255,255,255,.80); font-family: var(--font-pixel); font-size: 11px; letter-spacing: .1em;
+}
+
+/* =========================================================================
+   第 2 批：6 张 explore card — 重新映射到用户方案
+   ========================================================================= */
+
+/* （已在上一轮写了 style--torn/polaroid/diecut/stack/binder/tag，
+   这里只需要确保每个 style 独立不冲突）
+   同时重新分配：
+   Worlds & IP    → style--binder 文件夹标签（顶部凸起标签）
+   Gallery        → style--stack 叠放拍立得（改动：多层偏移）
+   Games          → style--diecut 游戏卡带（保持：实色橘红）
+   Creative Studio → style--stack 工具箱（搭扣） — 已用 stack，保留
+   Music          → style--binder 黑胶封套（改动：圆改方）— 已用 binder，保留
+   Archives       → style--tag 档案袋 — 已用 tag，保持
+   实际上 style--torn 还没用，把 Worlds 改成撕纸+文件夹叠层
+*/
+
+/* Worlds & IP → 文件夹标签（style--torn 升级） */
+.explore__card.style--torn {
+  /* 撕纸边缘 + 文件夹顶部凸起 tab */
+  clip-path: polygon(
+    0 12%, 28% 12%, 30% 4%, 60% 4%, 62% 12%, 100% 12%,
+    100% 100%, 95% 96%, 88% 100%, 82% 95%, 76% 100%, 70% 95%,
+    64% 100%, 58% 95%, 52% 100%, 46% 95%, 40% 100%, 34% 95%,
+    28% 100%, 22% 95%, 16% 100%, 10% 95%, 4% 100%, 0 96%
+  );
+  background: var(--c-vanilla);
+  border: 2px solid var(--c-deep-chocolate);
+  border-radius: 0;
+  transform: rotate(-3deg);
+}
+.explore__card.style--torn .explore__card-icon {
+  background: var(--c-candy-orange); color: var(--c-vanilla);
+  width: 36px; height: 36px; border-radius: 4px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 20px;
+}
+
+/* Gallery → 叠放拍立得（style--polaroid 升级） */
+.explore__card.style--polaroid {
+  background: var(--c-vanilla);
+  border: none; border-radius: 2px;
+  box-shadow:
+    -4px 3px 0 -1px rgba(100,80,60,.35),   /* 后层照片 */
+    3px 4px 0 rgba(64,42,42,.22),          /* 当前照片 */
+    6px 8px 0 rgba(64,42,42,.08);
+  transform: rotate(3deg);
+  padding-bottom: 32px;
+}
+.explore__card.style--polaroid .explore__card-desc {
+  font-family: var(--font-serif); font-style: italic; font-size: 11px;
+  color: var(--c-deep-chocolate); opacity: .70;
+}
+
+/* =========================================================================
+   第 3 批：EXPLORE 按钮 → 打孔卡片 / 展览框三层
+   ========================================================================= */
+
+/* EXPLORE THE MUSEUM → 打孔卡片按钮 */
+.stage__enter {
+  display: inline-block;
+  padding: 16px 56px 16px 56px;
+  font-family: var(--font-pixel); font-size: 15px; letter-spacing: .18em;
+  color: var(--c-vanilla); background: var(--c-deep-chocolate);
+  border: 3px solid var(--c-candy-orange);
+  box-shadow: 4px 4px 0 rgba(64,42,42,.25);
+  cursor: pointer;
+  border-radius: 0;
+  position: relative;
+  /* 两端打孔：用 radial-gradient */
+  background-image:
+    radial-gradient(circle at 14px 50%, rgba(255,255,255,.50) 3px, transparent 3.5px),
+    radial-gradient(circle at calc(100% - 14px) 50%, rgba(255,255,255,.50) 3px, transparent 3.5px);
+  transition: transform .15s, box-shadow .15s;
+}
+.stage__enter:hover {
+  transform: translateY(-2px); box-shadow: 6px 6px 0 rgba(240,100,59,.30);
+}
+.stage__enter:active {
+  transform: translate(2px, 2px); box-shadow: 2px 2px 0 rgba(64,42,42,.20);
+}
+
+/* 展览框 → 三层结构 */
+.exhibit__frame {
+  position: relative;
+  /* 底层画框：深棕色带木纹感 */
+  background:
+    repeating-linear-gradient(90deg,
+      rgba(0,0,0,.08) 0 1px, transparent 1px 4px),
+    #6B4226;
+  border: 4px solid #3A2424;
+  border-radius: 4px;
+  box-shadow: 6px 6px 0 rgba(64,42,42,.22), 12px 12px 0 rgba(64,42,42,.08);
+  padding: 16px;
+  transform: rotate(.8deg);
+  overflow: visible;
+}
+/* 中层米色卡纸 */
+.exhibit__frame::before {
+  content: ''; position: absolute;
+  top: 12px; left: 12px; right: 12px; bottom: 12px;
+  background: rgba(255,248,233,.92);
+  border: 1px solid rgba(64,42,42,.20);
+  transform: rotate(-.6deg);
+  z-index: 1;
+}
+/* 展品用胶带贴在卡纸上（用 exhibit__visual 作为顶层） */
+.exhibit__frame > * { position: relative; z-index: 2; }
+
+/* 展览标题：打字机 + 横线标签 */
+.exhibit__title {
+  font-family: var(--font-pixel); font-size: 18px; letter-spacing: .22em;
+  color: var(--c-deep-chocolate);
+  padding-bottom: 6px; border-bottom: 2px solid var(--c-candy-orange);
+}
+
+/* 展览 CTA：黄铜铭牌（兼容 exhibit__link 和 exhibit__cta 两个 class） */
+.exhibit__link, .exhibit__cta {
+  font-family: var(--font-pixel); font-size: 12px; letter-spacing: .18em;
+  background: linear-gradient(180deg, #D4A24C, #8B6914);
+  color: #3A2424;
+  border: 2px solid #5C3D10;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.50), 3px 3px 0 rgba(64,42,42,.22);
+  padding: 6px 18px;
+  transform-origin: center;
+  transition: transform .12s;
+  text-decoration: none; display: inline-block;
+}
+.exhibit__link:hover, .exhibit__cta:hover { transform: translateY(-1px); }
+.exhibit__link:active, .exhibit__cta:active { transform: translateY(1px) scale(.98); }
+
+/* 展品：手撕纸边缘 */
+.exhibit__visual {
+  clip-path: polygon(
+    0 4%, 4% 0, 10% 3%, 16% 0, 22% 4%, 28% 1%, 34% 3%, 40% 0,
+    46% 3%, 52% 0, 58% 4%, 64% 1%, 70% 3%, 76% 0, 82% 4%, 88% 1%,
+    94% 3%, 100% 0, 97% 8%, 100% 16%, 97% 24%, 100% 32%, 97% 40%,
+    100% 48%, 97% 56%, 100% 64%, 97% 72%, 100% 80%, 97% 88%, 100% 96%,
+    94% 100%, 88% 97%, 82% 100%, 76% 97%, 70% 100%, 64% 97%, 58% 100%,
+    52% 97%, 46% 100%, 40% 97%, 34% 100%, 28% 97%, 22% 100%, 16% 97%,
+    10% 100%, 4% 97%, 0 100%, 3% 92%, 0 84%, 3% 76%, 0 68%, 3% 60%,
+    0 52%, 3% 44%, 0 36%, 3% 28%, 0 20%, 3% 12%
+  );
+  background: var(--c-cream);
+  border: 1px solid rgba(64,42,42,.30);
+  box-shadow: 3px 3px 0 rgba(64,42,42,.18);
+}
+
+/* 点击 explore__card 放大充满屏幕的过渡 */
+.explore__card.is-opening {
+  position: fixed; z-index: 9999;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%) scale(10);
+  opacity: 0;
+  transition: transform .6s ease-out, opacity .4s ease-out;
+}
+
+/* =========================================================================
+   SPA 页面过渡
+   ========================================================================= */
+
+.page {
+  display: none;
+  opacity: 0;
+  transform: scale(.98);
+  transition: opacity .35s ease, transform .35s ease;
+}
+.page.page--active {
+  display: block;
+  opacity: 1;
+  transform: scale(1);
+  animation: page-in .4s cubic-bezier(.2,1.2,.3,1);
+}
+@keyframes page-in {
+  from { opacity: 0; transform: scale(1.02); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* =========================================================================
+   Gallery 公告栏（软木板 + 拍立得 + 图钉 + 手写批注）
+   ========================================================================= */
+
+/* 软木板背景 */
+.gallery-corkboard {
+  position: fixed; inset: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  background-color: #C9A876;
+  /* 软木板颗粒感 — background-attachment: fixed 让纹理贴在视口上，物品滚而板不滚 */
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(120,80,40,.25) .8px, transparent 1.2px),
+    radial-gradient(circle at 80% 70%, rgba(100,60,30,.30) .6px, transparent 1px),
+    radial-gradient(circle at 50% 50%, rgba(140,100,60,.15) 1px, transparent 1.5px);
+  background-size: 6px 6px, 10px 10px, 14px 14px;
+  background-attachment: fixed, fixed, fixed;
+}
+.gallery-cork {
+  position: fixed; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse at 20% 80%, rgba(0,0,0,.06), transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(0,0,0,.05), transparent 40%);
+  background-attachment: fixed;
+}
+
+/* 左侧导航 */
+.gallery-sidebar {
+  position: fixed; top: 24px; left: 24px; z-index: 10;
+  background: var(--c-vanilla);
+  border: 2px solid var(--c-deep-chocolate);
+  border-radius: 2px 14px 4px 12px;
+  box-shadow: 4px 4px 0 rgba(64,42,42,.25);
+  padding: 16px 18px;
+  min-width: 160px;
+  transform: rotate(-2deg);
+  font-family: var(--font-rounded); font-weight: 600;
+}
+.gallery-return {
+  display: flex; align-items: center; gap: 8px; cursor: pointer;
+  padding: 6px 10px; margin-bottom: 12px;
+  background: var(--c-deep-chocolate); color: var(--c-vanilla);
+  border: 2px solid var(--c-candy-orange);
+  box-shadow: 2px 2px 0 rgba(64,42,42,.25);
+  transform-origin: top center;
+  transition: transform .15s;
+}
+.gallery-return:hover { transform: translateY(-1px); }
+.gallery-return:active { transform: translate(2px,2px); }
+.return-scissors { font-size: 16px; }
+.gallery-nav-title {
+  font-family: var(--font-pixel); font-size: 10px; letter-spacing: .2em;
+  color: var(--c-deep-chocolate); margin: 10px 0 6px; opacity: .65;
+}
+.gallery-nav-link {
+  display: block; padding: 4px 6px; margin-bottom: 3px;
+  font-size: 12px; color: var(--c-deep-chocolate); text-decoration: none;
+  border-left: 3px solid transparent;
+}
+.gallery-nav-link.is-current {
+  border-left-color: var(--c-candy-orange);
+  background: rgba(240,100,59,.12);
+}
+.gallery-nav-link:hover {
+  background: rgba(64,42,42,.08);
+}
+
+/* 公告栏内容容器 — min-height 替代固定 height，小屏不卡 */
+.gallery-board {
+  position: relative; width: 1200px; min-height: 2400px;
+  margin: 0 auto;
+  padding: 80px 0;
+}
+
+/* ---------- 拍立得通用 ---------- */
+.polaroid {
+  position: absolute;
+  left: var(--x, 50%); top: var(--y, 50%);
+  transform: translate(-50%, -50%) rotate(var(--r, 0deg));
+  z-index: 2;
+  cursor: pointer;
+  transition: transform .25s cubic-bezier(.2,1.2,.3,1);
+}
+.polaroid:hover {
+  transform: translate(-50%, -52%) rotate(0deg) scale(1.04);
+  z-index: 10;
+}
+.polaroid-frame {
+  background: var(--c-vanilla);
+  padding: 12px 12px 42px;   /* 底部大量留白（拍立得签名区） */
+  border-radius: 2px;
+  box-shadow:
+    2px 3px 0 rgba(0,0,0,.15),
+    6px 8px 0 rgba(0,0,0,.08);
+  width: var(--pw, 200px);
+  position: relative;
+}
+.polaroid-photo {
+  width: 100%; aspect-ratio: 1 / 1;
+  background: var(--c-cream);
+  border: 1px solid rgba(64,42,42,.20);
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+.polaroid-photo img {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform .3s;
+}
+.polaroid:hover .polaroid-photo img { transform: scale(1.03); }
+/* fallback（图片加载失败时） */
+.polaroid-photo.photo-fallback::before {
+  content: ''; position: absolute; inset: 0;
+  background:
+    repeating-linear-gradient(45deg, rgba(0,0,0,.08) 0 10px, transparent 10px 20px);
+}
+.photo-fallback-text {
+  font-family: var(--font-serif); font-style: italic; color: var(--c-deep-chocolate);
+  font-size: 14px; opacity: .70; text-align: center; display: block;
+}
+.polaroid-caption {
+  position: absolute; bottom: 10px; left: 0; right: 0;
+  text-align: center;
+  font-family: var(--font-serif); font-style: italic; font-size: 11px;
+  color: var(--c-deep-chocolate); opacity: .75;
+}
+
+/* 图钉 */
+.pin {
+  position: absolute; z-index: 5;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--c-candy-orange);
+  box-shadow: 0 2px 4px rgba(0,0,0,.30), inset -2px -2px 0 rgba(0,0,0,.25), inset 2px 2px 0 rgba(255,255,255,.30);
+  top: -10px; left: 50%; transform: translateX(-50%);
+  transition: transform .2s;
+}
+.pin--blue   { background: #4A7BB8; }
+.pin--yellow { background: #D4A24C; }
+.pin--red    { background: #C95770; }
+.polaroid:hover .pin { top: -16px; }  /* 悬停图钉微微翘起 */
+
+/* 各拍立得尺寸 */
+.polaroid--1 { --pw: 240px; }
+.polaroid--2 { --pw: 240px; }
+.polaroid--3 { --pw: 180px; }
+.polaroid--tiny1 { --pw: 140px; }
+.polaroid--tiny2 { --pw: 140px; }
+
+/* ---------- 便签纸 ---------- */
+.gallery-paper {
+  position: absolute;
+  left: var(--x, 50%); top: var(--y, 50%);
+  transform: translate(-50%, -50%) rotate(var(--r, 0deg));
+  z-index: 2;
+  padding: 20px 22px;
+  cursor: pointer;
+  transition: transform .25s cubic-bezier(.2,1.2,.3,1);
+}
+.gallery-paper:hover {
+  transform: translate(-50%, -52%) rotate(0deg) scale(1.04);
+  z-index: 10;
+}
+
+/* WORK SHEET 撕纸 */
+.gallery-paper--torn {
+  width: 260px;
+  background: var(--c-vanilla);
+  border: 1px solid rgba(64,42,42,.30);
+  clip-path: polygon(
+    0 0, 100% 0, 100% 96%, 96% 100%, 90% 97%, 84% 100%, 78% 96%,
+    72% 100%, 66% 97%, 60% 100%, 54% 96%, 48% 100%, 42% 97%, 36% 100%,
+    30% 96%, 24% 100%, 18% 97%, 12% 100%, 6% 96%, 0 100%
+  );
+  box-shadow: 3px 3px 0 rgba(64,42,42,.18), 5px 5px 0 rgba(180,150,120,.40);
+  font-family: var(--font-rounded); font-weight: 500; font-size: 13px; line-height: 1.7;
+  position: relative;
+}
+.gallery-paper-inner { padding-bottom: 8px; }
+.gallery-paper-line { color: var(--c-deep-chocolate); opacity: .85; }
+
+/* 手写便签 */
+.gallery-paper--handwrite {
+  width: 200px; height: 160px;
+  background: var(--c-candy-orange);
+  clip-path: polygon(
+    0 0, 100% 0, 100% 94%, 93% 100%, 87% 94%, 80% 100%,
+    74% 94%, 68% 100%, 60% 94%, 54% 100%, 48% 94%, 40% 100%,
+    34% 94%, 28% 100%, 20% 94%, 14% 100%, 7% 94%, 0 100%
+  );
+  box-shadow: 3px 3px 0 rgba(64,42,42,.22);
+  position: relative;
+}
+.gallery-paper--handwrite .gallery-handwrite { color: var(--c-vanilla); font-weight: 700; }
+
+/* 胶带 */
+.gallery-tape {
+  position: absolute; z-index: 6;
+  height: 16px; padding: 2px 12px;
+  font-family: var(--font-rounded); font-weight: 700; font-size: 9px; letter-spacing: .15em;
+  transform: rotate(var(--r, -6deg));
+  box-shadow: 0 2px 3px rgba(0,0,0,.22);
+  color: var(--c-ink-dark);
+}
+.gallery-tape--pink { background: rgba(240,100,59,.70); width: 80px; }
+.gallery-tape--mint { background: rgba(169,200,168,.75); width: 60px; }
+
+/* 手写体批注（贴在拍立得上的小字） */
+.gallery-handwrite {
+  position: absolute;
+  font-family: var(--font-serif); font-style: italic;
+  font-size: 11px; color: var(--c-cranberry);
+  transform: rotate(var(--r, 0deg));
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* ---------- 中央大标题 ---------- */
+.gallery-big-title {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%) rotate(-2deg);
+  text-align: center;
+  z-index: 1;
+  opacity: .18;
+  pointer-events: none;
+  user-select: none;
+}
+.gallery-title-main {
+  font-family: var(--font-pixel); font-size: 140px; letter-spacing: .3em;
+  color: var(--c-deep-chocolate); margin: 0;
+  text-shadow: 2px 2px 0 rgba(64,42,42,.12);
+}
+.gallery-title-sub {
+  font-family: var(--font-rounded); font-weight: 600; font-size: 18px;
+  color: var(--c-deep-chocolate); letter-spacing: .4em;
+  margin-top: 4px;
+}
+.gallery-title-line {
+  width: 200px; height: 4px;
+  background: var(--c-candy-orange);
+  margin: 12px auto 0;
+  transform: rotate(1deg);
+}
+
+/* 滚动条美化 */
+.gallery-corkboard::-webkit-scrollbar { width: 12px; }
+.gallery-corkboard::-webkit-scrollbar-track { background: rgba(0,0,0,.10); }
+.gallery-corkboard::-webkit-scrollbar-thumb {
+  background: var(--c-deep-chocolate); border-radius: 6px;
+  border: 2px solid rgba(0,0,0,.10);
+}
+
+/* =========================================================================
+   Games · CRT 电脑（复古显示器 + 扫描线 + 频道切换）
+   ========================================================================= */
+
+.crt-scene {
+  min-height: 100vh;
+  background: #1a1410;
+  background-image:
+    radial-gradient(ellipse at 50% 20%, rgba(240,100,59,.08), transparent 50%),
+    radial-gradient(ellipse at 50% 90%, rgba(100,60,30,.30), transparent 60%);
+  position: relative;
+  padding: 60px 40px 80px;
+  overflow: hidden;
+}
+
+/* CRT 整体容器 */
+.crt-wrapper {
+  max-width: 780px; margin: 0 auto;
+  display: flex; flex-direction: column; align-items: center; gap: 24px;
+}
+
+/* 显示器外壳 */
+.crt-monitor {
+  background:
+    linear-gradient(180deg, #4a423a, #2e2822);
+  border-radius: 16px 16px 8px 8px;
+  padding: 18px 18px 0;
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.10),
+    inset 0 -4px 0 rgba(0,0,0,.40),
+    8px 10px 0 rgba(0,0,0,.50);
+  position: relative;
+}
+
+/* 屏幕边框（bezel） */
+.crt-bezel {
+  background: #1a1410;
+  border-radius: 12px 12px 4px 4px;
+  padding: 12px;
+  position: relative;
+}
+
+/* CRT 屏幕 */
+.crt-screen {
+  position: relative;
+  width: 700px; height: 420px;
+  background: #1a2a1a;
+  border-radius: 8px 8px 3px 3px;
+  box-shadow:
+    inset 0 0 60px rgba(0,0,0,.70),
+    inset 0 0 120px rgba(0,0,0,.40);
+  overflow: hidden;
+  /* 轻微模糊 + 球面变形感 */
+  filter: blur(.3px);
+}
+
+/* 扫描线（水平） */
+.crt-scanlines {
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0,0,0,.22) 0 2px,
+    transparent 2px 4px
+  );
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* 玻璃反光（顶部高亮光斑） */
+.crt-glow {
+  position: absolute; inset: 0;
+  background: radial-gradient(
+    ellipse at 35% 25%,
+    rgba(255,255,255,.10),
+    transparent 50%
+  );
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* 屏幕内容 */
+.crt-content {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-pixel);
+  z-index: 2;
+  color: #9fff9f;
+}
+.crt-channel { display: none; width: 100%; height: 100%; }
+.crt-channel.is-channel { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
+
+/* Pong */
+.crt-pong { position: relative; width: 100%; height: 100%; }
+.pong-paddle {
+  position: absolute; width: 14px; height: 80px; background: #9fff9f;
+  box-shadow: 0 0 6px rgba(159,255,159,.6);
+  animation: pong-move 2.5s ease-in-out infinite alternate;
+}
+.pong-left  { left: 20px;  top: 60px; animation-name: pong-move-l; }
+.pong-right { right: 20px; top: 140px; animation-name: pong-move-r; }
+.pong-ball {
+  position: absolute; width: 14px; height: 14px; background: #9fff9f; border-radius: 50%;
+  left: 50%; top: 50%; transform: translate(-50%, -50%);
+  box-shadow: 0 0 10px rgba(159,255,159,.8);
+  animation: pong-ball 1.2s linear infinite;
+}
+.pong-score {
+  position: absolute; top: 24px; left: 50%; transform: translateX(-50%);
+  font-size: 28px; letter-spacing: .4em;
+  text-shadow: 0 0 8px rgba(159,255,159,.6);
+}
+.crt-label {
+  position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+  font-size: 12px; letter-spacing: .2em; opacity: .70;
+}
+@keyframes pong-move-l { 0%{top:40px} 100%{top:220px} }
+@keyframes pong-move-r { 0%{top:200px} 100%{top:60px} }
+@keyframes pong-ball {
+  0% { left: 50%; top: 50%; }
+  25% { left: 75%; top: 20%; }
+  50% { left: 30%; top: 80%; }
+  75% { left: 65%; top: 30%; }
+  100% { left: 50%; top: 50%; }
+}
+
+/* Tetris */
+.tetris-grid {
+  display: grid; grid-template-columns: repeat(8, 28px); grid-template-rows: repeat(12, 16px);
+  gap: 1px; padding: 8px; border: 2px solid #9fff9f;
+  box-shadow: 0 0 16px rgba(159,255,159,.20);
+}
+.tetris-cell {
+  background: rgba(159,255,159,.05);
+}
+.tetris-cell.is-block {
+  background: #9fff9f;
+  animation: tetris-fall .5s ease-out;
+  box-shadow: 0 0 4px rgba(159,255,159,.4);
+}
+@keyframes tetris-fall { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+/* Snake */
+.crt-snake { position: relative; width: 300px; height: 200px; }
+.snake-seg {
+  position: absolute; width: 10px; height: 10px; background: #9fff9f;
+  border-radius: 2px; box-shadow: 0 0 6px rgba(159,255,159,.6);
+  animation: snake-wave 2s ease-in-out infinite alternate;
+}
+@keyframes snake-wave {
+  from { transform: translateY(0) scale(1); }
+  to   { transform: translateY(8px) scale(1.1); }
+}
+
+/* Demo 像素文字 */
+.crt-demo-text {
+  font-family: var(--font-pixel); font-size: 14px; line-height: 1.8;
+  color: #9fff9f; white-space: pre; text-shadow: 0 0 6px rgba(159,255,159,.4);
+}
+
+/* 雪花噪点（切换时出现） */
+.crt-static {
+  position: absolute; inset: 0; z-index: 5;
+  opacity: 0; pointer-events: none;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255,255,255,.08) 0 1px, transparent 1px 2px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.04) 0 1px, transparent 1px 2px);
+  mix-blend-mode: screen;
+  animation: static-noise .08s steps(2) infinite;
+}
+.crt-static.is-on {
+  opacity: 1;
+  animation: static-flash .1s steps(4) 6;
+}
+@keyframes static-noise {
+  0%{transform: translate(0,0)} 25%{transform: translate(-1px,1px)}
+  50%{transform: translate(1px,-1px)} 75%{transform: translate(-1px,-1px)}
+}
+@keyframes static-flash {
+  0%,100% { opacity: 1; filter: brightness(2); }
+  50% { opacity: .3; filter: brightness(.5); }
+}
+
+/* 频道号 */
+.crt-channel-indicator {
+  position: absolute; top: 12px; right: 18px;
+  font-family: var(--font-pixel); font-size: 14px; letter-spacing: .15em;
+  color: #9fff9f; text-shadow: 0 0 8px rgba(159,255,159,.6);
+  z-index: 6;
+}
+
+/* 品牌标签 */
+.crt-brand {
+  position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%);
+  font-family: var(--font-pixel); font-size: 9px; letter-spacing: .25em;
+  color: #9a8a7a; opacity: .70;
+}
+
+/* 显示器底座 */
+.crt-base {
+  width: 260px; height: 14px; margin: 0 auto;
+  background: linear-gradient(180deg, #3a3228, #1e1810);
+  border-radius: 0 0 8px 8px;
+  box-shadow: inset 0 -3px 0 rgba(0,0,0,.40), 6px 10px 0 rgba(0,0,0,.50);
+}
+
+/* 旋钮区 */
+.crt-knobs {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 28px;
+  background: #2e2822;
+  border-radius: 4px 4px 0 0;
+  box-shadow: inset 0 2px 0 rgba(255,255,255,.08);
+}
+.crt-knob {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: linear-gradient(180deg, #b0a090, #6a5a4a);
+  border: 2px solid #1a1410;
+  box-shadow:
+    inset 0 -3px 0 rgba(0,0,0,.35),
+    inset 0 3px 0 rgba(255,255,255,.20),
+    0 3px 0 rgba(0,0,0,.50);
+  cursor: pointer;
+  transition: transform .12s;
+  position: relative;
+}
+.crt-knob::after {
+  content: ''; position: absolute; top: 6px; left: 50%;
+  width: 2px; height: 10px; background: #1a1410; transform: translateX(-50%);
+  border-radius: 1px;
+}
+.crt-knob:hover { transform: translateY(-2px); }
+.crt-knob:active { transform: translateY(2px); box-shadow: inset 0 2px 0 rgba(0,0,0,.35); }
+.crt-knob-label {
+  font-family: var(--font-pixel); font-size: 10px; letter-spacing: .2em;
+  color: #9a8a7a; padding: 0 8px;
+}
+.crt-power {
+  margin-left: auto;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(180deg, #f0643b, #c94520);
+  border: 2px solid #1a1410;
+  color: var(--c-vanilla); font-size: 14px;
+  cursor: pointer;
+  box-shadow: inset 0 -2px 0 rgba(0,0,0,.30), 0 3px 0 rgba(0,0,0,.50);
+}
+
+/* 桌面 */
+.crt-desk {
+  width: 720px;
+  background: var(--c-cream);
+  border: 2px solid var(--c-deep-chocolate);
+  border-top: none;
+  box-shadow: 6px 8px 0 rgba(0,0,0,.40);
+  padding: 14px;
+  display: flex; gap: 12px; align-items: flex-start;
+  position: relative;
+}
+.crt-icon {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 6px 10px; cursor: pointer;
+  font-family: var(--font-rounded); font-weight: 600; font-size: 11px;
+  color: var(--c-deep-chocolate);
+  transition: background .12s;
+}
+.crt-icon:hover {
+  background: rgba(240,100,59,.15);
+  border-radius: 2px;
+}
+.crt-icon:active {
+  background: var(--c-candy-orange); color: var(--c-vanilla);
+}
+.crt-start {
+  margin-left: auto;
+  background: var(--c-deep-chocolate); color: var(--c-vanilla);
+  font-family: var(--font-pixel); font-size: 11px; letter-spacing: .2em;
+  padding: 6px 14px; border-radius: 2px;
+  cursor: pointer;
+}
+
+/* =========================================================================
+   Worlds · 商业街（横向滚动街道 + 店铺 + 遮阳篷 + 垂直木牌）
+   ========================================================================= */
+
+.street-scene {
+  position: fixed; inset: 0; overflow: hidden;
+  overscroll-behavior: none;
+  background: #2a2018;
+}
+.street-sky {
+  position: absolute; top: 0; left: 0; right: 0; height: 55%;
+  background: linear-gradient(180deg,
+    #4a3a5a 0%,
+    #7a5a6a 40%,
+    #d4a070 80%,
+    #f0c090 100%);
+}
+.street-ground {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 35%;
+  background:
+    repeating-linear-gradient(90deg,
+      rgba(60,40,30,.60) 0 60px, transparent 60px 120px),
+    linear-gradient(180deg, #6a5040, #4a3020);
+  border-top: 4px solid #2a1810;
+}
+
+/* 横向滚动容器 */
+.street-scroll {
+  position: absolute; bottom: 20%; left: 0;
+  display: flex; gap: 40px;
+  padding: 0 80px;
+  width: max-content;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  overscroll-behavior-x: contain;
+}
+.street-scroll::-webkit-scrollbar { height: 10px; }
+.street-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,.30); }
+.street-scroll::-webkit-scrollbar-thumb { background: var(--c-candy-orange); border-radius: 5px; }
+
+/* 店铺通用 */
+.shop {
+  position: relative; width: 240px; height: 200px;
+  flex-shrink: 0;
+}
+
+/* 遮阳篷 */
+.shop-awning {
+  position: absolute; top: -20px; left: -12px; right: -12px; height: 28px;
+  border: 2px solid var(--c-deep-chocolate);
+  border-radius: 4px 4px 0 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,.30);
+  /* 条纹 */
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--aw-color, #C95770) 0 16px,
+    rgba(255,255,255,.80) 16px 20px
+  );
+}
+.shop-awning--orange  { --aw-color: #F0643B; }
+.shop-awning--mint    { --aw-color: #A9C8A8; }
+.shop-awning--cranberry { --aw-color: #C95770; }
+.shop-awning--choco   { --aw-color: #3A2424; }
+.shop-awning--cream   { --aw-color: #F5E6C8; }
+
+/* 店铺正面 — preserve-3d 让木门 rotateY 有真实深度 */
+.shop-front {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 170px;
+  background: var(--c-vanilla);
+  border: 2px solid var(--c-deep-chocolate);
+  border-top: none;
+  box-shadow: 4px 4px 0 rgba(0,0,0,.40);
+  display: flex; flex-direction: column; gap: 4px; padding: 8px;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  perspective: 600px;
+  transition: transform .15s;
+}
+.shop:hover .shop-front { transform: translateY(-3px); box-shadow: 6px 6px 0 rgba(0,0,0,.50); }
+
+/* 窗户 */
+.shop-window {
+  flex: 1;
+  background: rgba(58,36,36,.85);
+  border: 2px solid var(--c-deep-chocolate);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.shop-window img {
+  width: 80%; height: 80%; object-fit: contain;
+  filter: drop-shadow(0 0 6px rgba(240,100,59,.30));
+}
+.shop-window > *:not(img) {
+  color: var(--c-candy-orange); font-size: 28px;
+  text-shadow: 0 0 10px rgba(240,100,59,.50);
+}
+
+/* 门 —— backface-visibility 配合 shop-front preserve-3d */
+.shop-door {
+  height: 28px;
+  background: var(--c-deep-chocolate); color: var(--c-vanilla);
+  font-family: var(--font-pixel); font-size: 10px; letter-spacing: .2em;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--c-deep-chocolate);
+  backface-visibility: hidden;
+}
+
+/* 木牌（垂直排版店名） */
+.shop-sign {
+  position: absolute; top: -70px; left: 50%; transform: translateX(-50%) rotate(-2deg);
+  width: var(--ws, 220px);
+  background: #8B6914;
+  border: 3px solid #5C3D10;
+  box-shadow: 3px 3px 0 rgba(0,0,0,.40), inset 0 0 20px rgba(0,0,0,.20);
+  padding: 8px;
+}
+.shop-sign-text {
+  display: block; text-align: center;
+  font-family: var(--font-pixel); font-size: var(--s, 14px);
+  color: var(--c-vanilla); letter-spacing: .3em;
+  text-shadow: 0 0 6px rgba(0,0,0,.40);
+}
+
+/* 横向滚动提示 */
+.street-hint {
+  position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
+  font-family: var(--font-pixel); font-size: 11px; letter-spacing: .2em;
+  color: var(--c-vanilla); opacity: .60;
+  pointer-events: none;
+  animation: hint-blink 2s ease-in-out infinite;
+}
+@keyframes hint-blink { 0%,100%{opacity:.35} 50%{opacity:.70} }
+
+/* =========================================================================
+   Studio · 工具箱（工作台 + 抽屉 + 画布 + HTML5 拖拽）
+   ========================================================================= */
+
+.studio-scene {
+  min-height: 100vh;
+  background:
+    repeating-linear-gradient(90deg, rgba(180,150,120,.12) 0 1px, transparent 1px 40px),
+    repeating-linear-gradient(0deg, rgba(180,150,120,.08) 0 1px, transparent 1px 40px),
+    var(--c-cream);
+  padding: 60px 60px 40px;
+}
+
+.workbench {
+  display: flex; gap: 32px; align-items: flex-start;
+  max-width: 1100px; margin: 0 auto;
+}
+
+/* 工具箱 */
+.toolbox {
+  width: 340px; flex-shrink: 0;
+  background: linear-gradient(180deg, #b08060, #8B6914);
+  border: 3px solid #5C3D10;
+  border-radius: 6px 6px 4px 4px;
+  box-shadow: 6px 8px 0 rgba(0,0,0,.40), inset 0 2px 0 rgba(255,255,255,.10);
+  padding: 6px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.toolbox-handle {
+  font-family: var(--font-pixel); font-size: 11px; letter-spacing: .2em;
+  color: var(--c-vanilla); text-align: center;
+  padding: 6px; background: #3A2424; border-radius: 2px;
+}
+
+/* 抽屉 */
+.drawer {
+  background: linear-gradient(180deg, #D4A880, #b08860);
+  border: 2px solid #5C3D10; border-radius: 4px;
+  box-shadow: inset 0 2px 0 rgba(255,255,255,.15), 0 2px 0 rgba(0,0,0,.30);
+  position: relative; overflow: hidden;
+  transition: height .35s cubic-bezier(.2,1.3,.3,1);
+  height: 48px;
+}
+.drawer.is-open { height: auto; }
+.drawer-front {
+  height: 44px; display: flex; align-items: center; gap: 10px;
+  padding: 0 14px; cursor: pointer;
+  font-family: var(--font-rounded); font-weight: 700; font-size: 13px; color: #3A2424;
+}
+.drawer-knob {
+  width: 16px; height: 16px; border-radius: 50%;
+  background: linear-gradient(180deg, #D4A24C, #8B6914);
+  box-shadow: inset 0 -2px 0 rgba(0,0,0,.30), 0 1px 0 rgba(0,0,0,.20);
+}
+.drawer-label { flex: 1; }
+
+.drawer-inner {
+  padding: 0 12px 10px;
+  display: flex; flex-wrap: wrap; gap: 8px;
+  background: rgba(60,40,30,.15);
+}
+.material {
+  padding: 6px 10px;
+  background: var(--c-vanilla); border: 1px solid var(--c-deep-chocolate);
+  font-family: var(--font-rounded); font-size: 11px; font-weight: 600;
+  color: var(--c-deep-chocolate);
+  cursor: grab; border-radius: 3px;
+  display: inline-flex; align-items: center; gap: 4px;
+  transition: transform .12s, box-shadow .12s;
+  user-select: none;
+}
+.material:hover { transform: translateY(-2px); box-shadow: 2px 2px 0 rgba(0,0,0,.20); }
+.material:active { cursor: grabbing; transform: scale(.95); }
+.material--char { flex-direction: column; padding: 4px; width: 72px; gap: 2px; }
+.material--char img { width: 50px; height: 50px; object-fit: contain; }
+
+/* 画布 */
+.canvas-drop {
+  flex: 1;
+  min-height: 480px;
+  background: rgba(255,255,255,.40);
+  border: 3px dashed rgba(64,42,42,.40);
+  border-radius: 6px;
+  padding: 4px;
+  position: relative;
+}
+.canvas-drop.is-drop-over {
+  background: rgba(240,100,59,.10);
+  border-color: var(--c-candy-orange);
+}
+.canvas-paper {
+  position: relative; width: 100%; height: 100%; min-height: 474px;
+  background:
+    repeating-linear-gradient(0deg, rgba(64,42,42,.06) 0 1px, transparent 1px 24px),
+    repeating-linear-gradient(90deg, rgba(64,42,42,.04) 0 1px, transparent 1px 24px),
+    var(--c-vanilla);
+  padding: 16px;
+}
+.canvas-title {
+  font-family: var(--font-pixel); font-size: 10px; letter-spacing: .25em;
+  color: var(--c-deep-chocolate); text-align: center; opacity: .50;
+}
+.canvas-hint {
+  font-family: var(--font-serif); font-style: italic; font-size: 12px;
+  color: var(--c-deep-chocolate); opacity: .40;
+  text-align: center; margin-top: 100px;
+}
+.canvas-items { position: relative; width: 100%; height: 380px; }
+
+/* 画布上被拖进来的元素 */
+.canvas-item {
+  position: absolute;
+  font-size: 13px; font-weight: 700;
+  padding: 6px 10px;
+  background: var(--c-candy-orange); color: var(--c-vanilla);
+  border: 2px solid var(--c-deep-chocolate);
+  box-shadow: 3px 3px 0 rgba(0,0,0,.22);
+  border-radius: 3px;
+  cursor: move;
+  user-select: none;
+  transition: transform .15s;
+  animation: canvas-pop .3s cubic-bezier(.2,1.3,.3,1);
+}
+.canvas-item:hover { transform: scale(1.05); }
+@keyframes canvas-pop { from { transform: scale(.4) rotate(-10deg); opacity: 0; } to { transform: scale(1) rotate(0); opacity: 1; } }
+.canvas-item--lace    { background: rgba(255,255,255,.85); color: var(--c-deep-chocolate); border-style: dashed; }
+.canvas-item--ribbon  { background: var(--c-cranberry); }
+.canvas-item--sticker { background: transparent; border: none; color: var(--c-candy-orange); font-size: 28px; box-shadow: none; }
+.canvas-item--char    { padding: 0; background: transparent; border: none; box-shadow: none; }
+.canvas-item--char img { width: 80px; height: 80px; object-fit: contain; filter: drop-shadow(2px 2px 3px rgba(0,0,0,.25)); }
+
+/* =========================================================================
+   Music · 点唱机（黑胶转盘 + 磁带仓 + 打字机曲目表）
+   ========================================================================= */
+
+.jukebox-scene {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #1a1410 0%, #2a1820 100%);
+  padding: 60px 60px 40px;
+  display: flex; align-items: center; justify-content: center;
+}
+.jukebox {
+  width: 640px;
+  background: linear-gradient(180deg, #3a2424, #1a1010);
+  border: 4px solid #5C3D10; border-radius: 12px;
+  box-shadow: 8px 10px 0 rgba(0,0,0,.50), inset 0 2px 0 rgba(255,255,255,.08);
+  padding: 24px;
+}
+
+/* 黑胶转盘 */
+.jukebox-top {
+  position: relative; height: 220px; margin-bottom: 20px;
+  background: radial-gradient(circle at center, #2a1818 0%, #1a0a0a 80%);
+  border-radius: 8px;
+  border: 2px solid #5C3D10;
+  overflow: hidden;
+}
+.jukebox-vinyl {
+  position: absolute; top: 50%; left: 50%;
+  width: 180px; height: 180px;
+  transform: translate(-50%, -50%);
+  animation: vinyl-spin 4s linear infinite;
+}
+.vinyl-inner {
+  width: 100%; height: 100%; border-radius: 50%;
+  background:
+    repeating-radial-gradient(circle at center,
+      #1a1a1a 0 2px, #2a2a2a 2px 3px);
+  box-shadow: inset 0 0 30px rgba(0,0,0,.80);
+}
+.vinyl-label {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 60px; height: 60px; border-radius: 50%;
+  background: var(--c-candy-orange);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-pixel); font-size: 10px; letter-spacing: .1em;
+  color: var(--c-vanilla); font-weight: 700;
+}
+.vinyl-hole {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #1a0a0a;
+}
+@keyframes vinyl-spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+/* 唱臂 */
+.jukebox-vinyl-arm {
+  position: absolute; top: -20px; right: 40px;
+  width: 8px; height: 140px;
+  background: linear-gradient(180deg, #b0a090, #6a5a4a);
+  border-radius: 4px;
+  transform-origin: top center;
+  transform: rotate(20deg);
+  box-shadow: 2px 2px 0 rgba(0,0,0,.40);
+}
+
+/* 磁带仓（抽屉式） */
+.jukebox-drawers {
+  display: flex; flex-direction: column; gap: 8px;
+  margin-bottom: 20px;
+}
+.jukebox-drawer {
+  height: 36px;
+  background: linear-gradient(180deg, #D4A880, #8B6914);
+  border: 2px solid #5C3D10; border-radius: 4px;
+  display: flex; align-items: center; gap: 12px;
+  padding: 0 12px;
+  font-family: var(--font-rounded); font-weight: 700; font-size: 12px;
+  color: #3A2424; cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+}
+.jukebox-drawer:hover { transform: translateX(-4px); box-shadow: -4px 0 0 rgba(0,0,0,.30); }
+.jukebox-drawer.jbox-active {
+  background: linear-gradient(180deg, var(--c-candy-orange), #C94520);
+  color: var(--c-vanilla);
+}
+.jbox-knob {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: linear-gradient(180deg, #D4A24C, #8B6914);
+  box-shadow: inset 0 -2px 0 rgba(0,0,0,.30);
+}
+
+/* 打字机曲目表 */
+.jukebox-tracklist {
+  background: var(--c-cream);
+  border: 2px solid #5C3D10; border-radius: 4px;
+  padding: 12px 16px;
+}
+.jbox-typewriter {
+  font-family: var(--font-pixel); font-size: 11px; line-height: 1.6;
+  color: var(--c-deep-chocolate);
+  margin: 0; white-space: pre;
+}
+
+/* =========================================================================
+   Archives · 档案柜（抽屉滑出 + 索引卡片 + 打字机标签）
+   ========================================================================= */
+
+.archives-scene {
+  min-height: 100vh;
+  background:
+    linear-gradient(180deg, #f5e6c8 0%, #e8d4a0 100%);
+  padding: 60px 60px 40px;
+}
+.archive-cabinet {
+  max-width: 780px; margin: 0 auto;
+  background: linear-gradient(180deg, #8B6914, #5C3D10);
+  border: 3px solid #3A2424; border-radius: 6px;
+  box-shadow: 6px 8px 0 rgba(0,0,0,.40);
+  padding: 24px 24px 16px;
+}
+.archive-title {
+  font-family: var(--font-pixel); font-size: 18px; letter-spacing: .3em;
+  color: var(--c-vanilla); text-align: center;
+  padding-left: .3em;
+}
+.archive-sub {
+  font-family: var(--font-serif); font-style: italic; font-size: 12px;
+  color: rgba(255,255,255,.65); text-align: center; margin-bottom: 20px;
+}
+
+.archive-drawer {
+  background: linear-gradient(180deg, #D4A880, #b08860);
+  border: 2px solid #5C3D10; border-radius: 4px;
+  box-shadow: inset 0 2px 0 rgba(255,255,255,.15);
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+.archive-drawer-label {
+  padding: 10px 14px;
+  font-family: var(--font-rounded); font-weight: 700; font-size: 13px;
+  color: #3A2424; cursor: pointer;
+  display: flex; align-items: center; gap: 10px;
+}
+.archive-drawer-handle {
+  width: 14px; height: 10px; border-radius: 0 0 4px 4px;
+  background: linear-gradient(180deg, #D4A24C, #8B6914);
+  box-shadow: inset 0 -2px 0 rgba(0,0,0,.30);
+}
+.archive-cards {
+  padding: 0 12px 12px;
+  display: grid; gap: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+.archive-drawer:not(.is-open) .archive-cards { display: none; }
+
+/* 索引卡片（打字机标签） */
+.archive-card {
+  background: var(--c-vanilla);
+  border: 1px solid rgba(64,42,42,.50);
+  padding: 10px 12px;
+  box-shadow: 2px 2px 0 rgba(0,0,0,.15);
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+  font-family: var(--font-pixel);
+}
+.archive-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 rgba(0,0,0,.25);
+  background: #fff8e0;
+}
+.ac-num { font-size: 10px; letter-spacing: .15em; color: var(--c-candy-orange); font-weight: 700; }
+.ac-title { font-size: 12px; color: var(--c-deep-chocolate); margin: 4px 0; }
+.ac-meta { font-size: 9px; letter-spacing: .1em; color: rgba(64,42,42,.60); }
+.archive-drawer--future { background: rgba(180,150,120,.50); }
+
+
+
+
+
+
+
+/* ==========================================================================
+   功能增强层 v3 — Gallery 拖拽 / Worlds 木门 / Studio 画布 / Archives 放大
+   ========================================================================== */
+
+/* ---- Gallery 拍立得拖拽重排 ---- */
+.polaroid { cursor: grab; }
+.polaroid.is-dragging {
+  cursor: grabbing;
+  z-index: 999;
+  transition: transform .12s ease-out, box-shadow .2s ease-out !important;
+  box-shadow: 0 24px 40px -16px rgba(0,0,0,.35), 0 12px 20px -8px rgba(0,0,0,.22) !important;
+  filter: saturate(1.05);
+}
+.gallery-board.is-drag-lock .polaroid:not(.is-dragging) { opacity: .35; transition: opacity .2s ease; }
+.gallery-board-drop-hint {
+  position: absolute; inset: 0;
+  border: 3px dashed var(--c-candy-orange, #F0643B);
+  border-radius: 18px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .2s ease;
+}
+.gallery-board.is-drop-target .gallery-board-drop-hint { opacity: .5; }
+
+/* ---- Worlds 店铺木门推开 ---- */
+.shop-door {
+  cursor: pointer;
+  position: relative;
+  transition: transform .35s cubic-bezier(.3,.02,.4,1);
+  transform-origin: left center;
+}
+.shop-door:hover { background: var(--c-candy-orange, #F0643B); color: white; transform: skewX(-2deg); }
+.shop-door.is-open { transform: translateX(-100%) rotateY(-70deg) scale(.7); opacity: .15; pointer-events: none; }
+.shop-window.is-reveal {
+  animation: window-glow .6s ease-out .3s both;
+  background: linear-gradient(135deg, rgba(255,248,224,.85), rgba(245,230,200,.6));
+}
+@keyframes window-glow {
+  0% { box-shadow: inset 0 0 0 rgba(240,100,59,0); }
+  100% { box-shadow: inset 0 0 32px rgba(240,100,59,.35); }
+}
+
+/* ---- Worlds 店铺弹出面板 ---- */
+.shop-panel {
+  position: absolute;
+  bottom: calc(100% + 16px);
+  left: 50%; transform: translateX(-50%);
+  min-width: 360px; max-width: 480px;
+  background: var(--c-vanilla, #FFF8E0);
+  border: 3px solid var(--c-chocolate, #6B4226);
+  border-radius: 16px;
+  padding: 20px 24px 22px;
+  box-shadow: 0 20px 40px -12px rgba(0,0,0,.35), 0 8px 14px rgba(0,0,0,.18);
+  opacity: 0; pointer-events: none;
+  transform-origin: bottom center;
+  transition: opacity .3s ease, transform .35s cubic-bezier(.2,1.4,.4,1);
+  z-index: 100;
+}
+.shop-panel.is-open { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(-4px); }
+.shop-panel::after {
+  content: ''; position: absolute;
+  bottom: -12px; left: 50%; transform: translateX(-50%);
+  border: 12px solid transparent; border-top-color: var(--c-chocolate, #6B4226);
+}
+.shop-panel-title {
+  font-family: var(--font-rounded);
+  font-size: 18px; font-weight: 800;
+  color: var(--c-deep-chocolate, #3A2424);
+  margin-bottom: 8px;
+  letter-spacing: .02em;
+}
+.shop-panel-sub {
+  font-family: var(--font-serif, Georgia);
+  font-size: 13px;
+  color: var(--c-cranberry, #C95770);
+  margin-bottom: 14px;
+  letter-spacing: .05em;
+}
+.shop-panel-body {
+  font-size: 14px; line-height: 1.7;
+  color: var(--c-chocolate, #6B4226);
+}
+.shop-panel-closes {
+  position: absolute; top: 10px; right: 14px;
+  background: none; border: none;
+  font-size: 20px; color: var(--c-candy-orange, #F0643B);
+  cursor: pointer; line-height: 1;
+  font-family: var(--font-serif, Georgia);
+}
+
+/* ---- Studio 画布 canvas-item 自由拖拽 ---- */
+.canvas-item {
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  transition: box-shadow .2s ease;
+}
+.canvas-item:hover { box-shadow: 0 8px 16px rgba(0,0,0,.25) !important; z-index: 10; }
+.canvas-item.is-selected { outline: 2px dashed var(--c-candy-orange, #F0643B); outline-offset: 4px; }
+.canvas-item.is-dragging { cursor: grabbing; transition: none; z-index: 100; }
+
+/* ---- Archives 卡片放大 Modal ---- */
+.archive-modal {
+  position: fixed; inset: 0; z-index: 10000;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(58,36,36,.82);
+  backdrop-filter: blur(6px);
+  opacity: 0; pointer-events: none;
+  transition: opacity .28s ease;
+}
+.archive-modal.is-open { opacity: 1; pointer-events: auto; }
+.archive-modal-card {
+  transform-origin: center;
+  animation: modal-pop .45s cubic-bezier(.2,1.4,.3,1);
+}
+@keyframes modal-pop {
+  0% { transform: scale(.5) rotate(-8deg); opacity: 0; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+.archive-modal-closes {
+  position: absolute; top: 28px; right: 32px;
+  background: var(--c-candy-orange, #F0643B); color: white;
+  border: none; border-radius: 50%;
+  width: 44px; height: 44px;
+  font-size: 22px; cursor: pointer;
+  box-shadow: 0 6px 14px rgba(0,0,0,.3);
+  font-family: var(--font-serif, Georgia);
+}

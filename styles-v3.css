@@ -1,0 +1,450 @@
+/* =========================================================================
+   HIMEMIRO v3 增强层 — Gallery + Worlds 模块升级
+   独立文件，不污染 styles.css 主结构
+   ========================================================================= */
+
+/* ==========================================================================
+   Gallery · G-C 进入动效（揭幕 + 拍立得依次贴上来）
+   ========================================================================== */
+
+/* 软木板揭幕：进入时从暗到亮 */
+.page.page--active[data-page="gallery"] .gallery-corkboard {
+  animation: gallery-reveal 1.2s cubic-bezier(.2,.02,.4,1) both;
+}
+@keyframes gallery-reveal {
+  0%   { opacity: 0; filter: brightness(.2) saturate(.5); }
+  60%  { opacity: 1; filter: brightness(1) saturate(1); }
+  100% { opacity: 1; filter: none; }
+}
+
+/* 拍立得依次"啪"地贴上来 —— 按 DOM 顺序自动加 delay */
+.page.page--active[data-page="gallery"] .polaroid,
+.page.page--active[data-page="gallery"] .gallery-paper {
+  animation: polaroid-in .55s cubic-bezier(.2,1.4,.4,1) both;
+}
+.page.page--active[data-page="gallery"] .polaroid:nth-child(1)  { animation-delay: .10s; }
+.page.page--active[data-page="gallery"] .polaroid:nth-child(2)  { animation-delay: .18s; }
+.page.page--active[data-page="gallery"] .polaroid:nth-child(3)  { animation-delay: .26s; }
+.page.page--active[data-page="gallery"] .polaroid:nth-child(4)  { animation-delay: .34s; }
+.page.page--active[data-page="gallery"] .polaroid:nth-child(5)  { animation-delay: .42s; }
+.page.page--active[data-page="gallery"] .polaroid:nth-child(6)  { animation-delay: .50s; }
+.page.page--active[data-page="gallery"] .polaroid:nth-child(7)  { animation-delay: .58s; }
+.page.page--active[data-page="gallery"] .gallery-paper          { animation-delay: .32s; }
+@keyframes polaroid-in {
+  0%   { transform: translate(-50%, -50%) rotate(-40deg) scale(.2); opacity: 0; }
+  60%  { transform: translate(-48%, -52%) rotate(calc(var(--r,0deg) * .3)) scale(1.08); opacity: 1; }
+  100% { transform: translate(-50%, -50%) rotate(var(--r, 0deg)) scale(1); opacity: 1; }
+}
+
+/* G-C2: 拖拽时其他拍立得"警觉避让" */
+.gallery-board.is-drag-lock .polaroid:not(.is-dragging),
+.gallery-board.is-drag-lock .gallery-paper:not(.is-dragging) {
+  opacity: .40;
+  transform-origin: center;
+  transition: opacity .2s ease, transform .25s cubic-bezier(.2,1.2,.3,1);
+}
+
+/* ==========================================================================
+   Gallery · G-B 装饰元素
+   ========================================================================== */
+
+/* G-B1: 四个角的画框装饰 */
+.gallery-frame-tip {
+  position: absolute;
+  width: 100px; height: 100px;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(135deg, #8B6914, #5C3D10);
+  border: 4px solid #3A2424;
+  box-shadow:
+    inset 0 0 20px rgba(0,0,0,.40),
+    4px 4px 0 rgba(64,42,42,.25);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-serif); font-size: 28px;
+  color: var(--c-vanilla);
+  filter: grayscale(.15);
+}
+.gallery-frame-tip--tl { top: 14%;  left: 12%;  transform: rotate(-8deg); border-radius: 2px 18px 2px 2px; }
+.gallery-frame-tip--tr { top: 10%;  right: 10%; transform: rotate(6deg);  border-radius: 2px 2px 2px 18px; }
+.gallery-frame-tip--bl { bottom: 14%; left: 8%;  transform: rotate(4deg);  border-radius: 2px 2px 18px 2px; }
+.gallery-frame-tip--br { bottom: 10%; right: 6%; transform: rotate(-5deg); border-radius: 18px 2px 2px 2px; }
+
+/* G-B2: 散落杂物（订书钉/小剪刀/图钉） */
+.gallery-deco {
+  position: absolute;
+  font-size: 18px;
+  color: var(--c-deep-chocolate);
+  opacity: .55;
+  pointer-events: none;
+  z-index: 3;
+  filter: drop-shadow(1px 1px 0 rgba(64,42,42,.20));
+  user-select: none;
+}
+
+/* G-B3: 抬头信笺条（软木板顶部） */
+.gallery-header-strip {
+  position: absolute; top: 36px; left: 50%; transform: translateX(-50%) rotate(-1deg);
+  width: 520px; height: 42px;
+  background: var(--c-vanilla);
+  border-bottom: 2px dashed var(--c-candy-orange);
+  clip-path: polygon(
+    0 0, 100% 0, 100% 78%, 96% 100%, 90% 78%, 84% 100%,
+    78% 78%, 72% 100%, 66% 78%, 60% 100%, 54% 78%, 48% 100%,
+    42% 78%, 36% 100%, 30% 78%, 24% 100%, 18% 78%, 12% 100%,
+    6% 78%, 0 100%
+  );
+  z-index: 1;
+  display: flex; align-items: center; justify-content: center;
+  gap: 12px;
+  box-shadow: 2px 2px 0 rgba(64,42,42,.18);
+  font-family: var(--font-pixel); font-size: 11px; letter-spacing: .15em;
+  color: var(--c-deep-chocolate);
+  text-transform: uppercase;
+}
+.gallery-header-strip .hs-label { font-weight: 800; color: var(--c-candy-orange); letter-spacing: .25em; }
+
+/* G-B4: 中央大标题周围的散碎装饰（伪元素画蕾丝/星星） */
+.gallery-big-title::before,
+.gallery-big-title::after {
+  content: '';
+  position: absolute;
+  width: 36px; height: 36px;
+  background-image:
+    radial-gradient(circle at 50% 50%, var(--c-candy-orange) 0 2px, transparent 2px 100%),
+    radial-gradient(circle at 25% 25%, var(--c-cranberry) 0 1.5px, transparent 1.5px 100%),
+    radial-gradient(circle at 75% 75%, var(--c-mint-lite) 0 1.5px, transparent 1.5px 100%),
+    radial-gradient(circle at 75% 25%, var(--c-deep-chocolate) 0 1px, transparent 1px 100%),
+    radial-gradient(circle at 25% 75%, var(--c-deep-chocolate) 0 1px, transparent 1px 100%);
+  background-size: 36px 36px;
+  opacity: .50;
+  pointer-events: none;
+}
+.gallery-big-title::before { top: -60px; left: -40px; transform: rotate(-18deg); }
+.gallery-big-title::after  { bottom: -60px; right: -40px; transform: rotate(22deg); }
+
+/* ==========================================================================
+   Gallery · G-A 交互增强（放大 Modal + 便签折叠）
+   ========================================================================== */
+
+/* G-A1: 拍立得放大 Modal（与 Archives 复用设计语言） */
+.gallery-modal {
+  position: fixed; inset: 0; z-index: 10000;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(58,36,36,.82);
+  backdrop-filter: blur(8px);
+  opacity: 0; pointer-events: none;
+  transition: opacity .28s ease;
+}
+.gallery-modal.is-open { opacity: 1; pointer-events: auto; }
+.gallery-modal-card {
+  transform-origin: center;
+  animation: gallery-modal-pop .45s cubic-bezier(.2,1.4,.3,1);
+}
+@keyframes gallery-modal-pop {
+  0%   { transform: scale(.5) rotate(-8deg); opacity: 0; }
+  100% { transform: scale(2.2) rotate(-2deg); opacity: 1; }
+}
+.gallery-modal-closes {
+  position: absolute; top: 28px; right: 32px;
+  background: var(--c-candy-orange); color: white;
+  border: none; border-radius: 50%;
+  width: 44px; height: 44px;
+  font-size: 22px; cursor: pointer;
+  box-shadow: 0 6px 14px rgba(0,0,0,.3);
+  font-family: var(--font-serif);
+}
+
+/* G-A4: WORK SHEET 便签折叠 */
+.gallery-paper--torn.is-collapsed {
+  height: 28px; min-height: 28px;
+  overflow: hidden;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 96% 85%, 90% 100%, 84% 85%, 78% 100%, 72% 85%, 66% 100%, 60% 85%, 54% 100%, 48% 85%, 42% 100%, 36% 85%, 30% 100%, 24% 85%, 18% 100%, 12% 85%, 6% 100%, 0 85%);
+}
+.gallery-paper--torn.is-collapsed .gallery-paper-inner > *:not(.gallery-paper-title) { display: none; }
+.gallery-paper--torn { transition: height .3s ease, clip-path .3s ease; }
+
+/* ==========================================================================
+   Gallery · G-D 轻量小游戏
+   ========================================================================== */
+
+/* G-D1: 图钉连连看（右下小面板） */
+.gallery-mini-tack {
+  position: fixed; bottom: 24px; right: 24px; z-index: 20;
+  width: 160px; padding: 10px 12px 12px;
+  background: var(--c-vanilla);
+  border: 2px solid var(--c-deep-chocolate);
+  border-radius: 2px 14px 4px 12px;
+  box-shadow: 3px 3px 0 rgba(64,42,42,.25);
+  transform: rotate(1.5deg);
+  font-family: var(--font-rounded);
+  cursor: pointer;
+  transition: transform .15s;
+}
+.gallery-mini-tack:hover { transform: rotate(0deg) translateY(-2px); }
+.gallery-mini-tack-title {
+  font-family: var(--font-pixel); font-size: 9px; letter-spacing: .2em;
+  color: var(--c-candy-orange); margin-bottom: 6px; text-transform: uppercase;
+}
+.gallery-mini-tack-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+}
+.gallery-mini-tack-btn {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(0,0,0,.30);
+  box-shadow: inset -2px -2px 0 rgba(0,0,0,.25), inset 2px 2px 0 rgba(255,255,255,.35);
+  cursor: pointer;
+  transition: transform .15s, opacity .2s;
+}
+.gallery-mini-tack-btn.is-selected { transform: scale(1.15); box-shadow: 0 0 0 2px var(--c-candy-orange), inset -2px -2px 0 rgba(0,0,0,.25); }
+.gallery-mini-tack-btn.is-matched { opacity: 0; transform: scale(.3); pointer-events: none; }
+.gallery-mini-tack-score {
+  font-family: var(--font-pixel); font-size: 9px; letter-spacing: .15em;
+  color: var(--c-deep-chocolate); margin-top: 6px; text-align: right; opacity: .7;
+}
+
+/* G-D2: 神秘纸条抽取（左侧导航下） */
+.gallery-mini-drawer {
+  position: fixed; top: 230px; left: 24px; z-index: 9;
+  width: 160px; padding: 8px 10px;
+  background: var(--c-candy-orange);
+  color: var(--c-vanilla);
+  border: 2px solid var(--c-deep-chocolate);
+  clip-path: polygon(
+    0 0, 100% 0, 100% 80%, 95% 100%, 88% 82%, 80% 100%,
+    72% 82%, 64% 100%, 56% 82%, 48% 100%, 40% 82%, 32% 100%,
+    24% 82%, 16% 100%, 8% 82%, 0 100%
+  );
+  transform: rotate(-3deg);
+  cursor: pointer;
+  font-family: var(--font-pixel); font-size: 10px; letter-spacing: .15em;
+  text-align: center; text-transform: uppercase;
+  box-shadow: 2px 2px 0 rgba(64,42,42,.25);
+  transition: transform .15s;
+}
+.gallery-mini-drawer:hover { transform: rotate(-1deg) translateY(-2px); }
+.gallery-mini-drawer-label { font-weight: 800; letter-spacing: .25em; }
+
+/* 抽取出来的神秘纸条 */
+.gallery-mystic-note {
+  position: absolute; z-index: 8;
+  width: 180px; padding: 14px 16px;
+  background: var(--c-vanilla);
+  border: 1px solid rgba(64,42,42,.30);
+  font-family: var(--font-serif); font-style: italic; font-size: 12px;
+  color: var(--c-deep-chocolate);
+  clip-path: polygon(
+    0 0, 100% 0, 100% 90%, 92% 100%, 84% 90%, 76% 100%,
+    68% 90%, 60% 100%, 52% 90%, 44% 100%, 36% 90%, 28% 100%,
+    20% 90%, 12% 100%, 4% 90%, 0 100%
+  );
+  box-shadow: 3px 3px 0 rgba(64,42,42,.18);
+  animation: mystic-note-in .5s cubic-bezier(.2,1.4,.4,1) both;
+}
+@keyframes mystic-note-in {
+  0%   { transform: translate(-50%, -30%) rotate(-25deg) scale(.3); opacity: 0; }
+  100% { transform: translate(-50%, -50%) rotate(var(--r, -5deg)) scale(1); opacity: 1; }
+}
+
+/* ==========================================================================
+   Worlds · W-C 进入动效
+   ========================================================================== */
+
+/* W-C1: 日落转场 */
+.page.page--active[data-page="worlds"] .street-scene {
+  animation: worlds-sunset 1.6s cubic-bezier(.15,.02,.4,1) both;
+}
+@keyframes worlds-sunset {
+  0%   { filter: hue-rotate(120deg) brightness(.45) blur(6px); }
+  40%  { filter: hue-rotate(20deg) brightness(.85) blur(1px); }
+  100% { filter: none; }
+}
+
+/* W-C2: 店铺 stagger 进入 */
+.page.page--active[data-page="worlds"] .shop {
+  animation: shop-in .6s cubic-bezier(.2,1.4,.4,1) both;
+}
+.page.page--active[data-page="worlds"] .shop:nth-child(1) { animation-delay: .15s; }
+.page.page--active[data-page="worlds"] .shop:nth-child(2) { animation-delay: .28s; }
+.page.page--active[data-page="worlds"] .shop:nth-child(3) { animation-delay: .41s; }
+.page.page--active[data-page="worlds"] .shop:nth-child(4) { animation-delay: .54s; }
+.page.page--active[data-page="worlds"] .shop:nth-child(5) { animation-delay: .67s; }
+.page.page--active[data-page="worlds"] .street-next-block  { animation-delay: .80s; }
+@keyframes shop-in {
+  0%   { transform: translateY(60px) scale(.6); opacity: 0; filter: saturate(.3); }
+  60%  { transform: translateY(-4px) scale(1.04); opacity: 1; filter: saturate(1); }
+  100% { transform: translateY(0) scale(1); opacity: 1; filter: none; }
+}
+
+/* ==========================================================================
+   Worlds · W-B 装饰元素
+   ========================================================================== */
+
+/* W-B1: Y2K 棉花糖云 */
+.street-cloud {
+  position: absolute;
+  width: 120px; height: 44px;
+  background:
+    radial-gradient(ellipse at 30% 50%, rgba(255,255,255,.75) 0 44px, transparent 45px),
+    radial-gradient(ellipse at 60% 40%, rgba(255,255,255,.65) 0 36px, transparent 37px),
+    radial-gradient(ellipse at 80% 55%, rgba(255,255,255,.60) 0 30px, transparent 31px);
+  border: 2px dashed rgba(240,100,59,.50);
+  border-radius: 40px;
+  pointer-events: none;
+  animation: cloud-drift linear infinite;
+  mix-blend-mode: screen;
+  filter: drop-shadow(2px 3px 0 rgba(240,100,59,.12));
+}
+@keyframes cloud-drift {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(40px); }
+}
+
+/* W-B2: 地面零星落叶/烟蒂/猫脚印 */
+.ground-deco {
+  position: absolute;
+  pointer-events: none;
+  font-size: 16px;
+  filter: drop-shadow(1px 1px 0 rgba(0,0,0,.30));
+  opacity: .75;
+  user-select: none;
+}
+
+/* W-B3: 木牌下方灯泡串（纯 CSS） */
+.shop-sign::after {
+  content: '';
+  position: absolute; left: -6px; right: -6px; bottom: -10px;
+  height: 6px;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 10px,
+      rgba(58,36,36,.60) 10px 12px,
+      transparent 12px 18px
+    );
+}
+.shop-sign::before {
+  content: '';
+  position: absolute; left: -4px; right: -4px; bottom: -14px;
+  height: 8px;
+  background-image:
+    radial-gradient(circle at 10% 50%, var(--c-candy-orange, #F0643B) 0 4px, transparent 4px),
+    radial-gradient(circle at 30% 50%, var(--c-cranberry, #C95770) 0 4px, transparent 4px),
+    radial-gradient(circle at 50% 50%, var(--c-candy-orange, #F0643B) 0 4px, transparent 4px),
+    radial-gradient(circle at 70% 50%, var(--c-mint-lite, #A9C8A8) 0 4px, transparent 4px),
+    radial-gradient(circle at 90% 50%, var(--c-candy-orange, #F0643B) 0 4px, transparent 4px);
+  background-size: 12px 8px;
+  filter: drop-shadow(0 0 4px rgba(240,100,59,.50));
+  animation: bulb-flicker 2.4s steps(6) infinite;
+}
+@keyframes bulb-flicker {
+  0%,100% { opacity: 1; }
+  50%     { opacity: .65; }
+}
+
+/* W-B4: 下一个街区路牌 */
+.street-next-block {
+  position: relative; flex-shrink: 0;
+  width: 200px; height: 160px;
+  background: var(--c-cream);
+  border: 3px solid var(--c-deep-chocolate);
+  clip-path: polygon(
+    0 0, 100% 0, 100% 50%, 70% 50%, 100% 100%, 0 100%,
+    30% 50%, 0 50%
+  );
+  margin: 20px 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-pixel); font-size: 10px; letter-spacing: .15em;
+  color: var(--c-deep-chocolate); text-align: center; line-height: 1.6;
+  box-shadow: 3px 3px 0 rgba(0,0,0,.40);
+  padding-right: 30px;
+}
+
+/* ==========================================================================
+   Worlds · W-A 交互增强
+   ========================================================================== */
+
+/* W-A4: 遮阳篷 hover 抖动（风吹感） */
+.shop:hover .shop-awning {
+  animation: awning-shake .35s ease-in-out;
+}
+@keyframes awning-shake {
+  0%,100% { transform: rotate(0); }
+  25%     { transform: rotate(2deg); }
+  75%     { transform: rotate(-2deg); }
+}
+
+/* W-A3: 街道行人（煤咪露/巡夢姬 chibi） */
+.street-ped {
+  position: absolute; bottom: 18%;
+  display: flex; flex-direction: column; align-items: center;
+  pointer-events: auto;
+  z-index: 5;
+  cursor: help;
+}
+.street-ped img {
+  width: 60px; height: 60px; object-fit: contain;
+  filter: drop-shadow(2px 3px 0 rgba(0,0,0,.35));
+  animation: ped-bob .4s ease-in-out infinite alternate;
+}
+@keyframes ped-bob {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-2px); }
+}
+.street-ped .ped-bubble {
+  position: absolute; top: -38px; left: 50%; transform: translateX(-50%);
+  background: var(--c-vanilla); color: var(--c-deep-chocolate);
+  border: 1.5px solid var(--c-deep-chocolate);
+  border-radius: 10px;
+  padding: 4px 8px; font-family: var(--font-rounded); font-size: 11px;
+  white-space: nowrap;
+  box-shadow: 2px 2px 0 rgba(64,42,42,.20);
+  opacity: 0; transition: opacity .2s, transform .2s;
+  pointer-events: none;
+}
+.street-ped:hover .ped-bubble { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+
+/* ==========================================================================
+   Worlds · W-D 轻量小游戏
+   ========================================================================== */
+
+/* W-D1: 煤咪露躲猫猫 */
+.street-hide-hint {
+  position: fixed; top: 24px; right: 24px; z-index: 20;
+  padding: 8px 14px;
+  background: var(--c-candy-orange); color: white;
+  font-family: var(--font-pixel); font-size: 10px; letter-spacing: .15em;
+  text-transform: uppercase;
+  border: 2px solid var(--c-deep-chocolate);
+  border-radius: 20px;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 rgba(0,0,0,.40);
+  transform: rotate(3deg);
+}
+.street-hide-hint:hover { transform: rotate(1deg) translateY(-2px); }
+
+/* 窗口里探出头的煤咪露 */
+.shop-window.is-peeking { overflow: visible; }
+.shop-window.is-peeking::after {
+  content: '🙀';
+  position: absolute; top: -22px; left: 50%; transform: translateX(-50%);
+  font-size: 28px;
+  animation: peek-bob .6s ease-in-out infinite alternate;
+  filter: drop-shadow(2px 3px 0 rgba(0,0,0,.35));
+}
+@keyframes peek-bob {
+  from { transform: translateX(-50%) translateY(4px); }
+  to   { transform: translateX(-50%) translateY(-2px); }
+}
+
+/* 抓到后的害羞缩回 */
+.shop-window.is-caught::after {
+  content: '😳';
+  animation: caught-hide .8s cubic-bezier(.2,1.4,.4,1) forwards;
+}
+@keyframes caught-hide {
+  0%   { transform: translateX(-50%) translateY(0); }
+  40%  { transform: translateX(-50%) translateY(-4px); }
+  100% { transform: translateX(-50%) translateY(30px); opacity: 0; }
+}
