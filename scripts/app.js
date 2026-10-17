@@ -123,20 +123,20 @@
           </div>
         </div>
 
-        <!-- 复古挂历（撕页） -->
-        <div class="hm-calendar" data-tear-calendar style="position:absolute; right:24px; top:8px; transform:rotate(3deg);">
+        <!-- 复古挂历（撕页 · 放大版） -->
+        <div class="hm-calendar hm-calendar--lg" data-tear-calendar style="position:absolute; right:64px; top:48px; transform:rotate(3deg);">
           <div class="hm-calendar-month" id="hmCalMonth">OCTOBER 2026</div>
           <div class="hm-calendar-day is-today" id="hmCalDay">17</div>
           <div class="hm-calendar-weekday">· FRIDAY ·</div>
           <div class="hm-calendar-tear"></div>
         </div>
 
-        <!-- 桌面工具栏入口按钮（挂在 Gallery 角落） -->
-        <button data-toolbar-toggle="true" style="position:absolute; left:24px; top:12px; z-index:50;
+        <!-- 桌面文具店（底部居中，不挡照片） -->
+        <button data-toolbar-toggle="true" style="position:absolute; left:50%; bottom:24px; transform:translateX(-50%); z-index:50;
           background:#fff8f0; border:2px solid #c48a4e; border-radius:6px;
-          padding:6px 12px; font-weight:700; font-size:11px; letter-spacing:1px;
-          cursor:pointer; box-shadow:2px 2px 8px rgba(0,0,0,.15);">
-          ✂ 桌面文具店
+          padding:8px 16px; font-weight:700; font-size:12px; letter-spacing:2px;
+          cursor:pointer; box-shadow:2px 2px 10px rgba(0,0,0,.15);">
+          ✂ 桌面文具店 · 点我打开
         </button>
 
         <!-- 中央大标题（打字机 + 橘红横线） -->
@@ -486,6 +486,42 @@
             <div class="shop-door" data-shop-open="true">→ OPEN</div>
           </div>
         </div>
+
+        <!-- 店铺 6：Y2K 文具店（占位） -->
+        <div class="shop shop--stationery" data-shop="stationery">
+          <div class="shop-awning shop-awning--mint2"></div>
+          <div class="shop-sign" style="--ws:180px; --s:13px;">
+            <span class="shop-sign-text" style="writing-mode:vertical-rl;">Y2K 文房具店</span>
+          </div>
+          <div class="shop-front">
+            <div class="shop-window">✏<br>📎<br>🖊</div>
+            <div class="shop-door shop-door--soon">COMING</div>
+          </div>
+        </div>
+
+        <!-- 店铺 7：扭蛋专门店（占位） -->
+        <div class="shop shop--gashapon-store" data-shop="gashapon">
+          <div class="shop-awning shop-awning--purple"></div>
+          <div class="shop-sign" style="--ws:180px; --s:13px;">
+            <span class="shop-sign-text" style="writing-mode:vertical-rl;">ガシャポン専門店</span>
+          </div>
+          <div class="shop-front">
+            <div class="shop-window">🎰<br>🪙<br>🎁</div>
+            <div class="shop-door shop-door--soon">COMING</div>
+          </div>
+        </div>
+
+        <!-- 店铺 8：花店（占位） -->
+        <div class="shop shop--florist" data-shop="florist">
+          <div class="shop-awning shop-awning--cream2"></div>
+          <div class="shop-sign" style="--ws:180px; --s:13px;">
+            <span class="shop-sign-text" style="writing-mode:vertical-rl;">蔷薇の花屋</span>
+          </div>
+          <div class="shop-front">
+            <div class="shop-window">🌸<br>🌹<br>💐</div>
+            <div class="shop-door shop-door--soon">COMING</div>
+          </div>
+        </div>
       </div>
 
       <!-- 左右箭头提示横向滚动 -->
@@ -744,136 +780,251 @@ TRACKS · 12
         <a class="gallery-nav-link" data-page-link="studio">🎨 Studio · 工具箱</a>
         <a class="gallery-nav-link" data-page-link="music">🎵 Music · 点唱机</a>
         <a class="gallery-nav-link" data-page-link="archives">📁 Archives · 档案柜</a>
-        <a class="gallery-nav-link" data-page-link="sweets">🍭 Sweets · 糖果店</a>
       </div>
 
-      <div class="hm-sweets-title">🍫 SWEETS SHOP ♡</div>
-      <div class="hm-sweets-subtitle">Y2K CANDY STORE · SINCE 2026</div>
+      <div class="hm-sweets-header">
+        <div class="hm-sweets-title">🍫 SWEETS SHOP ♡</div>
+        <div class="hm-sweets-subtitle">Y2K CANDY STORE · SINCE 2026 · お菓子屋さん</div>
+      </div>
 
-      <div class="hm-sweets-stage">
-        <!-- 万花筒（角落装饰） -->
-        <div class="hm-kaleidoscope" style="position:absolute; right:20px; top:20px;">
-          <div class="hm-kaleidoscope-barrel">
-            <div class="hm-kaleidoscope-lens" id="hmKaleiLens">
-              <div class="hm-kaleidoscope-sector" style="transform: rotate(0deg);">
-                <div><div class="hm-kaleidoscope-inner"><div class="hm-kaleidoscope-colors" id="hmKaleiColors">
-                  <span style="background:#ff6b9d"></span><span style="background:#ffd93d"></span><span style="background:#6bcb77"></span><span style="background:#4d96ff"></span>
-                  <span style="background:#d4c1ec"></span><span style="background:#f7d774"></span><span style="background:#ff9ec4"></span><span style="background:#b8e0d2"></span>
-                  <span style="background:#ff6b9d"></span><span style="background:#ffd93d"></span><span style="background:#6bcb77"></span><span style="background:#4d96ff"></span>
-                  <span style="background:#d4c1ec"></span><span style="background:#f7d774"></span><span style="background:#ff9ec4"></span><span style="background:#b8e0d2"></span>
-                </div></div></div>
+      <!-- Sub-view 切换 Tab -->
+      <div class="hm-sweets-tabs">
+        <button class="hm-sweets-tab is-active" data-sweets-view="shop">🍬 お菓子屋 · Shop</button>
+        <button class="hm-sweets-tab" data-sweets-view="icecream">🍦 アイスクリーム屋 · DIY Ice Cream</button>
+      </div>
+
+      <!-- === View 1: Shop（糖果店 · 3 柜台） === -->
+      <div class="hm-sweets-view is-active" data-sweets-view="shop">
+        <!-- 糖果店 3 区柜台布局 -->
+        <div class="hm-sweets-counter">
+        <!-- 左区：甜品展示柜 -->
+        <div class="hm-counter hm-counter--sweets">
+          <div class="hm-counter-top"></div>
+          <div class="hm-counter-label">🍬 ディスプレイ · DISPLAY</div>
+          <div class="hm-counter-body">
+            <div class="hm-shelf">
+              <div class="hm-choco-bar bitten" style="transform:rotate(-5deg); width:150px; height:75px;"></div>
+              <div class="hm-choco-bar" style="transform:rotate(3deg); width:150px; height:75px;"></div>
+              <div class="hm-lollipop" style="transform:rotate(-2deg); width:78px; height:78px;">
+                <div class="hm-lollipop-stick"></div>
               </div>
-              <div class="hm-kaleidoscope-sector" style="transform: rotate(60deg) scaleX(-1);">
-                <div><div class="hm-kaleidoscope-inner"><div class="hm-kaleidoscope-colors">
-                  <span style="background:#6bcb77"></span><span style="background:#ff6b9d"></span><span style="background:#d4c1ec"></span><span style="background:#ffd93d"></span>
-                  <span style="background:#4d96ff"></span><span style="background:#ff9ec4"></span><span style="background:#b8e0d2"></span><span style="background:#f7d774"></span>
-                  <span style="background:#6bcb77"></span><span style="background:#ff6b9d"></span><span style="background:#d4c1ec"></span><span style="background:#ffd93d"></span>
-                  <span style="background:#4d96ff"></span><span style="background:#ff9ec4"></span><span style="background:#b8e0d2"></span><span style="background:#f7d774"></span>
-                </div></div></div>
+            </div>
+            <div class="hm-shelf">
+              <div class="hm-macaron pink" style="transform:rotate(-4deg); width:90px; height:40px;"><div class="hm-macaron-fill"></div></div>
+              <div class="hm-macaron mint" style="transform:rotate(5deg); width:90px; height:40px;"><div class="hm-macaron-fill"></div></div>
+              <div class="hm-macaron lavender" style="transform:rotate(-2deg); width:90px; height:40px;"><div class="hm-macaron-fill"></div></div>
+            </div>
+            <div class="hm-shelf">
+              <div class="hm-candy-jar" style="width:100px; height:128px;">
+                <div class="hm-candy-jar-lid"></div>
+                <div class="hm-candy-jar-body"></div>
               </div>
-              <div class="hm-kaleidoscope-sector" style="transform: rotate(120deg);">
-                <div><div class="hm-kaleidoscope-inner"><div class="hm-kaleidoscope-colors">
-                  <span style="background:#ffd93d"></span><span style="background:#d4c1ec"></span><span style="background:#ff6b9d"></span><span style="background:#6bcb77"></span>
-                  <span style="background:#ff9ec4"></span><span style="background:#4d96ff"></span><span style="background:#f7d774"></span><span style="background:#b8e0d2"></span>
-                  <span style="background:#ffd93d"></span><span style="background:#d4c1ec"></span><span style="background:#ff6b9d"></span><span style="background:#6bcb77"></span>
-                  <span style="background:#ff9ec4"></span><span style="background:#4d96ff"></span><span style="background:#f7d774"></span><span style="background:#b8e0d2"></span>
-                </div></div></div>
-              </div>
-              <div class="hm-kaleidoscope-sector" style="transform: rotate(180deg) scaleX(-1);">
-                <div><div class="hm-kaleidoscope-inner"><div class="hm-kaleidoscope-colors">
-                  <span style="background:#4d96ff"></span><span style="background:#b8e0d2"></span><span style="background:#ffd93d"></span><span style="background:#f7d774"></span>
-                  <span style="background:#ff6b9d"></span><span style="background:#ff9ec4"></span><span style="background:#d4c1ec"></span><span style="background:#6bcb77"></span>
-                  <span style="background:#4d96ff"></span><span style="background:#b8e0d2"></span><span style="background:#ffd93d"></span><span style="background:#f7d774"></span>
-                  <span style="background:#ff6b9d"></span><span style="background:#ff9ec4"></span><span style="background:#d4c1ec"></span><span style="background:#6bcb77"></span>
-                </div></div></div>
-              </div>
-              <div class="hm-kaleidoscope-sector" style="transform: rotate(240deg);">
-                <div><div class="hm-kaleidoscope-inner"><div class="hm-kaleidoscope-colors">
-                  <span style="background:#d4c1ec"></span><span style="background:#6bcb77"></span><span style="background:#4d96ff"></span><span style="background:#b8e0d2"></span>
-                  <span style="background:#f7d774"></span><span style="background:#ff6b9d"></span><span style="background:#ff9ec4"></span><span style="background:#ffd93d"></span>
-                  <span style="background:#d4c1ec"></span><span style="background:#6bcb77"></span><span style="background:#4d96ff"></span><span style="background:#b8e0d2"></span>
-                  <span style="background:#f7d774"></span><span style="background:#ff6b9d"></span><span style="background:#ff9ec4"></span><span style="background:#ffd93d"></span>
-                </div></div></div>
-              </div>
-              <div class="hm-kaleidoscope-sector" style="transform: rotate(300deg) scaleX(-1);">
-                <div><div class="hm-kaleidoscope-inner"><div class="hm-kaleidoscope-colors">
-                  <span style="background:#b8e0d2"></span><span style="background:#4d96ff"></span><span style="background:#f7d774"></span><span style="background:#d4c1ec"></span>
-                  <span style="background:#6bcb77"></span><span style="background:#ffd93d"></span><span style="background:#ff6b9d"></span><span style="background:#ff9ec4"></span>
-                  <span style="background:#b8e0d2"></span><span style="background:#4d96ff"></span><span style="background:#f7d774"></span><span style="background:#d4c1ec"></span>
-                  <span style="background:#6bcb77"></span><span style="background:#ffd93d"></span><span style="background:#ff6b9d"></span><span style="background:#ff9ec4"></span>
-                </div></div></div>
+              <div class="hm-gummy-heart" style="transform:rotate(8deg); width:72px; height:66px;"><div class="gummy-bottom"></div></div>
+              <div class="hm-choco-coin" style="transform:rotate(-10deg); width:52px; height:52px;"></div>
+              <div class="hm-choco-coin" style="transform:rotate(6deg); width:52px; height:52px;"></div>
+            </div>
+          </div>
+          <!-- 万花筒（角落摆件） -->
+          <div class="hm-kaleidoscope hm-kaleidoscope--corner">
+            <div class="hm-kaleidoscope-barrel">
+              <div class="hm-kaleidoscope-lens" id="hmKaleiLens">
+                <div class="hm-kaleidoscope-sector" style="transform: rotate(0deg);">
+                  <div><div class="hm-kaleidoscope-inner"><div class="hm-kaleidoscope-colors" id="hmKaleiColors">
+                    <span style="background:#ff6b9d"></span><span style="background:#ffd93d"></span><span style="background:#6bcb77"></span><span style="background:#4d96ff"></span>
+                    <span style="background:#d4c1ec"></span><span style="background:#f7d774"></span><span style="background:#ff9ec4"></span><span style="background:#b8e0d2"></span>
+                    <span style="background:#ff6b9d"></span><span style="background:#ffd93d"></span><span style="background:#6bcb77"></span><span style="background:#4d96ff"></span>
+                    <span style="background:#d4c1ec"></span><span style="background:#f7d774"></span><span style="background:#ff9ec4"></span><span style="background:#b8e0d2"></span>
+                  </div></div></div>
+                </div>
+                <div class="hm-kaleidoscope-sector" style="transform: rotate(60deg) scaleX(-1);">
+                  <div><div class="hm-kaleidoscope-inner"><div class="hm-kaleidoscope-colors">
+                    <span style="background:#6bcb77"></span><span style="background:#ff6b9d"></span><span style="background:#d4c1ec"></span><span style="background:#ffd93d"></span>
+                    <span style="background:#4d96ff"></span><span style="background:#ff9ec4"></span><span style="background:#b8e0d2"></span><span style="background:#f7d774"></span>
+                    <span style="background:#6bcb77"></span><span style="background:#ff6b9d"></span><span style="background:#d4c1ec"></span><span style="background:#ffd93d"></span>
+                    <span style="background:#4d96ff"></span><span style="background:#ff9ec4"></span><span style="background:#b8e0d2"></span><span style="background:#f7d774"></span>
+                  </div></div></div>
+                </div>
+                <div class="hm-kaleidoscope-sector" style="transform: rotate(120deg);">
+                  <div><div class="hm-kaleidoscope-inner"><div class="hm-kaleidoscope-colors">
+                    <span style="background:#ffd93d"></span><span style="background:#d4c1ec"></span><span style="background:#ff6b9d"></span><span style="background:#6bcb77"></span>
+                    <span style="background:#ff9ec4"></span><span style="background:#4d96ff"></span><span style="background:#f7d774"></span><span style="background:#b8e0d2"></span>
+                    <span style="background:#ffd93d"></span><span style="background:#d4c1ec"></span><span style="background:#ff6b9d"></span><span style="background:#6bcb77"></span>
+                    <span style="background:#ff9ec4"></span><span style="background:#4d96ff"></span><span style="background:#f7d774"></span><span style="background:#b8e0d2"></span>
+                  </div></div></div>
+                </div>
+                <div class="hm-kaleidoscope-sector" style="transform: rotate(180deg) scaleX(-1);">
+                  <div><div class="hm-kaleidoscope-inner"><div class="hm-kaleidoscope-colors">
+                    <span style="background:#4d96ff"></span><span style="background:#b8e0d2"></span><span style="background:#ffd93d"></span><span style="background:#f7d774"></span>
+                    <span style="background:#ff6b9d"></span><span style="background:#ff9ec4"></span><span style="background:#d4c1ec"></span><span style="background:#6bcb77"></span>
+                    <span style="background:#4d96ff"></span><span style="background:#b8e0d2"></span><span style="background:#ffd93d"></span><span style="background:#f7d774"></span>
+                    <span style="background:#ff6b9d"></span><span style="background:#ff9ec4"></span><span style="background:#d4c1ec"></span><span style="background:#6bcb77"></span>
+                  </div></div></div>
+                </div>
+                <div class="hm-kaleidoscope-sector" style="transform: rotate(240deg);">
+                  <div><div class="hm-kaleidoscope-inner"><div class="hm-kaleidoscope-colors">
+                    <span style="background:#d4c1ec"></span><span style="background:#6bcb77"></span><span style="background:#4d96ff"></span><span style="background:#b8e0d2"></span>
+                    <span style="background:#f7d774"></span><span style="background:#ff6b9d"></span><span style="background:#ff9ec4"></span><span style="background:#ffd93d"></span>
+                    <span style="background:#d4c1ec"></span><span style="background:#6bcb77"></span><span style="background:#4d96ff"></span><span style="background:#b8e0d2"></span>
+                    <span style="background:#f7d774"></span><span style="background:#ff6b9d"></span><span style="background:#ff9ec4"></span><span style="background:#ffd93d"></span>
+                  </div></div></div>
+                </div>
+                <div class="hm-kaleidoscope-sector" style="transform: rotate(300deg) scaleX(-1);">
+                  <div><div class="hm-kaleidoscope-inner"><div class="hm-kaleidoscope-colors">
+                    <span style="background:#b8e0d2"></span><span style="background:#4d96ff"></span><span style="background:#f7d774"></span><span style="background:#d4c1ec"></span>
+                    <span style="background:#6bcb77"></span><span style="background:#ffd93d"></span><span style="background:#ff6b9d"></span><span style="background:#ff9ec4"></span>
+                    <span style="background:#b8e0d2"></span><span style="background:#4d96ff"></span><span style="background:#f7d774"></span><span style="background:#d4c1ec"></span>
+                    <span style="background:#6bcb77"></span><span style="background:#ffd93d"></span><span style="background:#ff6b9d"></span><span style="background:#ff9ec4"></span>
+                  </div></div></div>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- 🍫 散点甜品装饰 -->
-        <div class="hm-choco-bar bitten"   style="position:absolute; left:60px; top:60px;  --r:-5deg; transform: rotate(-5deg);"></div>
-        <div class="hm-choco-bar"          style="position:absolute; left:240px; top:180px; transform: rotate(4deg);"></div>
-        <div class="hm-macaron pink"       style="position:absolute; left:130px; top:310px; transform: rotate(-8deg);"><div class="hm-macaron-fill"></div></div>
-        <div class="hm-macaron mint"       style="position:absolute; left:320px; top:380px; transform: rotate(6deg);"><div class="hm-macaron-fill"></div></div>
-        <div class="hm-macaron lavender"   style="position:absolute; left:80px;  top:440px; transform: rotate(3deg);"><div class="hm-macaron-fill"></div></div>
-        <div class="hm-lollipop"           style="position:absolute; left:420px; top:100px;">
-          <div class="hm-lollipop-stick"></div>
-        </div>
-        <div class="hm-candy-jar"          style="position:absolute; left:170px; top:140px;">
-          <div class="hm-candy-jar-lid"></div>
-          <div class="hm-candy-jar-body"></div>
-        </div>
-        <div class="hm-gummy-heart"        style="position:absolute; left:480px; top:350px;">
-          <div class="gummy-bottom"></div>
-        </div>
-        <div class="hm-choco-coin"         style="position:absolute; left:340px; top:470px; transform: rotate(-12deg);"></div>
-        <div class="hm-choco-coin"         style="position:absolute; left:370px; top:485px; transform: rotate(8deg);"></div>
-        <div class="hm-choco-coin"         style="position:absolute; left:310px; top:480px; transform: rotate(-3deg);"></div>
-
-        <!-- 🎰 Y2K 扭蛋机 -->
-        <div class="hm-gashapon" id="hmGashapon" style="position:absolute; right:160px; top:300px;">
-          <div class="hm-gashapon-label">GASHAPON · 100円</div>
-          <div class="hm-gashapon-top">
-            <div class="hm-gashapon-window"><div class="hm-gashapon-eggs"></div></div>
-          </div>
-          <div class="hm-gashapon-base">
-            <div class="hm-gashapon-knob" id="hmGashaponKnob" title="点击扭蛋！"></div>
-            <div class="hm-gashapon-chute"></div>
-          </div>
-          <div class="hm-gashapon-egg-drop"></div>
-          <div class="hm-gashapon-egg-burst"></div>
-        </div>
-
-        <!-- 💰 愿望投币罐 -->
-        <div class="hm-wish-jar" id="hmWishJar" style="position:absolute; left:540px; top:300px;">
-          <div class="hm-wish-jar-input">
-            <input type="text" id="hmWishInput" maxlength="24" placeholder="输入愿望..." />
-            <button id="hmWishBtn">投币许愿 ♡</button>
-          </div>
-          <div class="hm-wish-jar-lid"></div>
-          <div class="hm-wish-jar-body">
-            <div class="hm-wish-jar-coins" id="hmWishCoins"></div>
-          </div>
-          <div class="hm-wish-note" id="hmWishNote">
-            <div style="font-size:10px; color:#8a6e1a; letter-spacing:2px;">WISH · 願い事</div>
-            <div style="font-size:14px; margin:8px 0; color:#4a2c1a;" id="hmWishText">— — —</div>
-            <div class="hm-wish-note-stamp">魔法封印</div>
+        <!-- 中区：扭蛋机 -->
+        <div class="hm-counter hm-counter--gashapon">
+          <div class="hm-counter-top"></div>
+          <div class="hm-counter-label">🎰 ガシャポン · GASHAPON</div>
+          <div class="hm-counter-body hm-counter-body--center">
+            <div class="hm-gashapon hm-gashapon--lg" id="hmGashapon">
+              <div class="hm-gashapon-label">GASHAPON · 100円</div>
+              <div class="hm-gashapon-top">
+                <div class="hm-gashapon-window"><div class="hm-gashapon-eggs"></div></div>
+              </div>
+              <div class="hm-gashapon-base">
+                <div class="hm-gashapon-knob" id="hmGashaponKnob" title="点击扭蛋！"></div>
+                <div class="hm-gashapon-chute"></div>
+              </div>
+              <div class="hm-gashapon-egg-drop"></div>
+              <div class="hm-gashapon-egg-burst"></div>
+            </div>
+            <!-- 价格便签 -->
+            <div class="hm-price-tag hm-price-tag--pink">100円 1回</div>
           </div>
         </div>
 
-        <!-- 手写价格便签（胶带固定） -->
-        <div style="position:absolute; left:200px; top:250px; transform:rotate(-6deg);
-          background:#fff3d6; padding:10px 14px; font-family:cursive; font-size:12px;
-          border-radius:2px; box-shadow:2px 3px 8px rgba(0,0,0,.15);">
-          🍫 黑巧克力 ¥88<br>
-          🌸 马卡龙 ¥120<br>
-          🍭 棒棒糖 ¥50<br>
-          🎰 扭蛋 ¥100
-        </div>
-        <div style="position:absolute; right:40px; bottom:20px; transform:rotate(4deg);
-          background:#fde2e4; padding:8px 12px; font-family:cursive; font-size:11px;
-          border-radius:2px; box-shadow:2px 3px 8px rgba(0,0,0,.15);">
-          ✦ 今日限定 ♡<br>
-          愿望投币罐开放中
+        <!-- 右区：愿望投币罐 -->
+        <div class="hm-counter hm-counter--wish">
+          <div class="hm-counter-top"></div>
+          <div class="hm-counter-label">💰 願い事 · WISH JAR</div>
+          <div class="hm-counter-body hm-counter-body--center">
+            <div class="hm-wish-jar hm-wish-jar--lg" id="hmWishJar">
+              <div class="hm-wish-jar-input">
+                <input type="text" id="hmWishInput" maxlength="24" placeholder="输入愿望..." />
+                <button id="hmWishBtn">投币许愿 ♡</button>
+              </div>
+              <div class="hm-wish-jar-lid"></div>
+              <div class="hm-wish-jar-body">
+                <div class="hm-wish-jar-coins" id="hmWishCoins"></div>
+              </div>
+              <div class="hm-wish-note" id="hmWishNote">
+                <div style="font-size:10px; color:#8a6e1a; letter-spacing:2px;">WISH · 願い事</div>
+                <div style="font-size:14px; margin:8px 0; color:#4a2c1a;" id="hmWishText">— — —</div>
+                <div class="hm-wish-note-stamp">魔法封印</div>
+              </div>
+            </div>
+            <!-- 金币计数便签 -->
+            <div class="hm-price-tag hm-price-tag--gold">🪙 今日の金币: <span id="hmWishCounter">0</span></div>
+          </div>
         </div>
       </div>
+
+      <!-- 柜台底部散点装饰 + 手写便签 -->
+      <div class="hm-sweets-footer-decor">
+        <div class="hm-choco-coin" style="transform:rotate(-15deg);"></div>
+        <div class="hm-choco-coin" style="transform:rotate(8deg);"></div>
+        <div class="hm-choco-coin" style="transform:rotate(-3deg);"></div>
+        <div class="hm-choco-coin" style="transform:rotate(12deg);"></div>
+        <div class="hm-choco-coin" style="transform:rotate(-7deg);"></div>
+        <div class="hm-hand-note hm-hand-note--menu">
+          <div class="hm-hand-note-title">★ 本日のメニュー ★</div>
+          <div class="hm-hand-note-item">🍫 黑巧克力 ¥88</div>
+          <div class="hm-hand-note-item">🌸 马卡龙 ¥120</div>
+          <div class="hm-hand-note-item">🍭 棒棒糖 ¥50</div>
+          <div class="hm-hand-note-item">🍬 糖果罐 ¥180</div>
+          <div class="hm-hand-note-item">🎰 扭蛋 ¥100</div>
+        </div>
+        <div class="hm-hand-note hm-hand-note--special">
+          ✦ 今日限定 ♡<br>
+          愿望投币罐开放中<br>
+          金箔巧克力 先着10名様
+        </div>
+      </div>
+      </div><!-- / View 1 shop -->
+
+      <!-- === View 2: DIY Ice Cream 安静书 === -->
+      <div class="hm-sweets-view" data-sweets-view="icecream">
+        <div class="hm-icecream-scene">
+          <!-- 左：冰箱/素材库 -->
+          <div class="hm-ic-inventory">
+            <div class="hm-ic-fridge">
+              <div class="hm-ic-fridge-door" id="hmIcFridgeDoor">
+                <div class="hm-ic-fridge-handle"></div>
+                <span class="hm-ic-fridge-label">REFRIGERATOR</span>
+              </div>
+              <div class="hm-ic-fridge-inside" id="hmIcFridgeInside">
+                <div class="hm-ic-category"><div class="hm-ic-cat-title">🍦 アイス · Ice Cream</div>
+                  <div class="hm-ic-item" data-ic-type="ball" data-flavor="vanilla">🍨</div>
+                  <div class="hm-ic-item" data-ic-type="ball" data-flavor="strawberry">🍓</div>
+                  <div class="hm-ic-item" data-ic-type="ball" data-flavor="chocolate">🍫</div>
+                  <div class="hm-ic-item" data-ic-type="ball" data-flavor="matcha">🍵</div>
+                </div>
+                <div class="hm-ic-category"><div class="hm-ic-cat-title">🍬 トッピング · Toppings</div>
+                  <div class="hm-ic-item" data-ic-type="topping" data-flavor="sprinkles">🌈</div>
+                  <div class="hm-ic-item" data-ic-type="topping" data-flavor="choco-sauce">💧</div>
+                  <div class="hm-ic-item" data-ic-type="topping" data-flavor="cherry">🍒</div>
+                  <div class="hm-ic-item" data-ic-type="topping" data-flavor="oreo">🟤</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 中：操作台 -->
+          <div class="hm-ic-canvas" id="hmIcCanvas">
+            <div class="hm-ic-canvas-label">操作台 · DIY Desk</div>
+            <!-- Zone 1: 甜筒 -->
+            <div class="hm-ic-zone hm-ic-zone--cone" data-ic-zone="cone">
+              <div class="hm-ic-cone"></div>
+              <div class="hm-ic-zone-label">コーン</div>
+              <div class="hm-ic-zone-items"></div>
+            </div>
+            <!-- Zone 2: 纸杯 -->
+            <div class="hm-ic-zone hm-ic-zone--cup" data-ic-zone="cup">
+              <div class="hm-ic-cup"></div>
+              <div class="hm-ic-zone-label">カップ</div>
+              <div class="hm-ic-zone-items"></div>
+            </div>
+            <!-- Zone 3: 空盘子 -->
+            <div class="hm-ic-zone hm-ic-zone--plate" data-ic-zone="plate">
+              <div class="hm-ic-plate"></div>
+              <div class="hm-ic-zone-label">プレート</div>
+              <div class="hm-ic-zone-items"></div>
+            </div>
+          </div>
+
+          <!-- 右：操作面板 -->
+          <div class="hm-ic-actions">
+            <div class="hm-ic-action-btn hm-ic-action--eat" id="hmIcEatBtn">🍴 开吃</div>
+            <div class="hm-ic-action-btn hm-ic-action--photo" id="hmIcPhotoBtn">📷 拍照</div>
+            <div class="hm-ic-action-btn hm-ic-action--reset" id="hmIcResetBtn">♻ 重做</div>
+            <div class="hm-ic-hint">
+              拖拽冰淇淋球和配料 →<br>
+              靠近甜筒/纸杯/盘子自动吸附<br>
+              想吃几个叠几个 ♡
+            </div>
+          </div>
+
+          <!-- 拖拽中的 item 渲染层 -->
+          <div class="hm-ic-drag-layer" id="hmIcDragLayer"></div>
+        </div>
+      </div>
+
+      <!-- 浮动气泡装饰 -->
+      <div class="hm-bubble hm-bubble--1"></div>
+      <div class="hm-bubble hm-bubble--2"></div>
+      <div class="hm-bubble hm-bubble--3"></div>
+      <div class="hm-bubble hm-bubble--4"></div>
+      <div class="hm-bubble hm-bubble--5"></div>
     </div>
   `;
   document.body.appendChild(sweets);
@@ -1170,7 +1321,37 @@ document.querySelectorAll('[data-page-link]').forEach(el => {
     future: { title: '???', sub: 'COMING SOON',
       body: '还在装修……可能是糖果店？可能是猫咖？煤咪露说要保密，巡夢姬说她早就知道了但不说。' },
     sweets: { title: 'HIMEMIRO スイーツ店', sub: 'Y2K Candy Shop · since 2026',
-      body: '整条街最甜的角落。黑巧克力排配咬痕、粉色马卡龙、彩虹棒棒糖、玻璃糖果罐、Y2K 塑料扭蛋机和复古愿望投币罐。点扭蛋试试手气，或往愿望罐里投一枚巧克力金币许愿 ♡' }
+      body: `
+        <p style="margin:0 0 14px 0;">整条街最甜的角落。黑巧克力排配咬痕、粉色马卡龙、彩虹棒棒糖、玻璃糖果罐、Y2K 塑料扭蛋机和复古愿望投币罐。</p>
+        <div style="display:flex; gap:10px; align-items:center; margin:10px 0; flex-wrap:wrap;">
+          <div class="hm-choco-bar bitten" style="width:80px; height:40px; transform:rotate(-5deg);"></div>
+          <div class="hm-macaron pink" style="width:44px; height:20px; transform:rotate(3deg);"><div class="hm-macaron-fill"></div></div>
+          <div class="hm-lollipop" style="width:38px; height:38px; transform:rotate(-3deg);"><div class="hm-lollipop-stick"></div></div>
+          <div class="hm-gummy-heart" style="width:42px; height:40px; transform:rotate(6deg);"><div class="gummy-bottom"></div></div>
+          <div class="hm-choco-coin" style="width:28px; height:28px; transform:rotate(-8deg);"></div>
+        </div>
+        <div style="display:flex; gap:12px; margin-top:10px;">
+          <div style="background:#fff3d6; padding:8px 12px; border-radius:4px; font-family:cursive; font-size:12px; transform:rotate(-3deg); box-shadow:2px 2px 6px rgba(0,0,0,.1);">
+            🍫 黑巧克力 ¥88<br>🌸 马卡龙 ¥120<br>🍭 棒棒糖 ¥50
+          </div>
+          <div style="background:#fde2e4; padding:8px 12px; border-radius:4px; font-family:cursive; font-size:11px; transform:rotate(4deg); box-shadow:2px 2px 6px rgba(0,0,0,.1);">
+            🎰 扭蛋 ¥100<br>💰 愿望罐 投币自由
+          </div>
+        </div>
+        <p style="margin:14px 0 0 0; font-size:12px; color:#c48a4e; font-weight:700;">→ 点顶栏 SWEETS 进入全屏糖果店 ♡</p>
+      ` },
+    stationery: { title: 'Y2K 文房具店', sub: 'Coming Soon · 2026 Winter',
+      body: `<p>整条街最安静的角落，卖 90s-00s 的复古文具。彩色水笔、金属直尺、贴纸簿、修正带、半透明便签。</p>
+             <p style="color:#d6336c; font-weight:700;">✦ 开发中 · 即将登场 ✦</p>
+             <p style="font-size:11px; color:#888;">未来计划：彩笔涂鸦功能 + 贴纸簿克隆</p>` },
+    gashapon: { title: 'ガシャポン専門店', sub: 'Coming Soon · 2026 Winter',
+      body: `<p>整条街最吵的角落（扭蛋机马达声 24h）。100円 1回，每天限定 5 签运势卡。</p>
+             <p style="color:#d6336c; font-weight:700;">✦ 糖果店已经有扭蛋机了，这里会有更大的 ✦</p>
+             <p style="font-size:11px; color:#888;">未来计划：多台扭蛋机排列 + 运势卡收集册</p>` },
+    florist: { title: '蔷薇の花屋', sub: 'Coming Soon · 2027 Spring',
+      body: `<p>巡夢姬最喜欢的角落。门口永远摆着新鲜的玫瑰、马卡龙色满天星、薰衣草花束。</p>
+             <p style="color:#d6336c; font-weight:700;">✦ 还在策划中 ✦</p>
+             <p style="font-size:11px; color:#888;">未来计划：SVG 花朵贴纸 + 花束组合玩法</p>` }
   };
 
   function closeAllPanels() {
@@ -1179,25 +1360,33 @@ document.querySelectorAll('[data-page-link]').forEach(el => {
     document.querySelectorAll('.shop-window.is-reveal').forEach(w => w.classList.remove('is-reveal'));
   }
 
-  // 事件委托
+  // 事件委托（点整个 shop div 都能弹 modal，包括 COMING SOON 店铺）
   document.addEventListener('click', (e) => {
-    const door = e.target.closest('.shop-door[data-shop-open]');
-    if (door) {
-      const shop = door.closest('.shop');
-      const key = shop?.dataset.shop;
+    const shopEl = e.target.closest('.shop');
+    // 排除 panel 内部的点击
+    if (e.target.closest('.shop-panel')) {
+      // 点 panel 内的 ✕ → 关闭
+      if (e.target.closest('.shop-panel-closes')) {
+        closeAllPanels();
+        return;
+      }
+      return;
+    }
+    if (shopEl) {
+      const key = shopEl.dataset.shop;
       if (!key || !SHOP_DATA[key]) return;
       window.playClickSound?.();
       closeAllPanels();
 
-      door.classList.add('is-open');
-      const win = shop.querySelector('.shop-window');
+      // door 高亮（如果有）
+      const door = shopEl.querySelector('.shop-door');
+      if (door && !door.classList.contains('shop-door--soon')) door.classList.add('is-open');
+      const win = shopEl.querySelector('.shop-window');
       if (win) win.classList.add('is-reveal');
 
-      // 确保 shop 有 position: relative
-      shop.style.position = 'relative';
+      shopEl.style.position = 'relative';
 
-      // 如果没有 panel 就创建一个
-      let panel = shop.querySelector('.shop-panel');
+      let panel = shopEl.querySelector('.shop-panel');
       if (!panel) {
         const d = SHOP_DATA[key];
         panel = document.createElement('div');

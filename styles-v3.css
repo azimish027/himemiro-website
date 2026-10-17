@@ -1288,6 +1288,43 @@
 }
 .shop--sweets .shop-door { background: linear-gradient(180deg, #ff6b9d, #d6336c); color: #fff; }
 
+/* ---------- 占位店铺 COMING SOON ---------- */
+.shop-door--soon {
+  background: linear-gradient(180deg, #e0e0e0, #b0b0b0) !important;
+  color: #666 !important;
+  opacity: .7;
+  cursor: default;
+}
+.shop-door--soon::after {
+  content: '🔒';
+  display: block;
+  font-size: 10px;
+  margin-top: 2px;
+}
+/* 店铺 6：Y2K 文具店（薄荷绿 awning） */
+.shop-awning--mint2 { background: linear-gradient(180deg, #c6ecd9, #7bc79f); }
+.shop--stationery .shop-window {
+  background: linear-gradient(135deg, #f0fff4, #e0f5e8);
+  box-shadow: inset 0 0 16px rgba(123,199,159,.2);
+}
+.shop--stationery .shop-sign-text { color: #3a8a5c; }
+
+/* 店铺 7：扭蛋专门店（薰衣草紫 awning） */
+.shop-awning--purple { background: linear-gradient(180deg, #e4d4f7, #a889d4); }
+.shop--gashapon-store .shop-window {
+  background: linear-gradient(135deg, #f8f0ff, #ede0f7);
+  box-shadow: inset 0 0 16px rgba(168,137,212,.25);
+}
+.shop--gashapon-store .shop-sign-text { color: #7c4aa8; }
+
+/* 店铺 8：花店（奶油 awning） */
+.shop-awning--cream2 { background: linear-gradient(180deg, #fff3d6, #f0c674); }
+.shop--florist .shop-window {
+  background: linear-gradient(135deg, #fff8f0, #fff0d8);
+  box-shadow: inset 0 0 16px rgba(196,138,78,.15);
+}
+.shop--florist .shop-sign-text { color: #a06830; }
+
 /* ---------- Sweets SPA 全屏页 ---------- */
 .page--sweets {
   background:
@@ -1530,4 +1567,545 @@
 }
 .hm-tool-cursor {
   cursor: none;
+}
+
+/* ================================================================
+   Sweets SPA · 3 分区柜台 + 货架 + 气泡 + 放大组件变体
+   ================================================================ */
+
+/* ---------- Header ---------- */
+.hm-sweets-header {
+  max-width: 1400px; margin: 0 auto;
+  padding: 48px 48px 0 196px;
+  text-align: center;
+}
+.hm-sweets-header .hm-sweets-title {
+  font-size: 48px; letter-spacing: 6px;
+}
+.hm-sweets-header .hm-sweets-subtitle {
+  font-size: 13px; letter-spacing: 7px; margin-top: 8px;
+}
+
+/* ---------- 3 分区柜台 flex ---------- */
+.hm-sweets-counter {
+  display: flex;
+  gap: 36px;
+  max-width: 1400px;
+  margin: 36px auto 0;
+  padding: 0 48px 0 196px;
+  min-height: 560px;
+}
+
+.hm-counter {
+  flex: 1;
+  min-width: 320px;
+  position: relative;
+  background: linear-gradient(180deg, #fff 0%, #fff8f0 20%, #fdf0d8 100%);
+  border-radius: 14px;
+  border: 2px solid #c48a4e;
+  box-shadow:
+    0 8px 24px rgba(160,80,120,.12),
+    inset 0 2px 0 rgba(255,255,255,.8),
+    inset 0 -16px 24px rgba(196,138,78,.08);
+  padding-top: 32px;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 柜台顶部玻璃高光条 */
+.hm-counter-top {
+  position: absolute; top: 0; left: 0; right: 0; height: 14px;
+  background: linear-gradient(180deg, #fff, #fff8);
+  border-radius: 12px 12px 0 0;
+  border-bottom: 2px solid rgba(196,138,78,.15);
+}
+
+.hm-counter-label {
+  position: absolute; top: 18px; left: 50%; transform: translateX(-50%);
+  font-size: 11px; font-weight: 900; letter-spacing: 3px;
+  color: #c48a4e; background: #fff8f0;
+  padding: 2px 12px; border-radius: 10px;
+  border: 1px solid rgba(196,138,78,.3);
+  white-space: nowrap;
+}
+
+.hm-counter-body {
+  flex: 1;
+  padding: 28px 20px 16px;
+  display: flex; flex-direction: column;
+  gap: 16px;
+}
+.hm-counter-body--center {
+  align-items: center; justify-content: flex-end;
+}
+
+/* 3 个柜台的差异化配色 */
+.hm-counter--sweets { border-color: #f48a9e; background: linear-gradient(180deg, #fff 0%, #fff0f3 20%, #fde2e4 100%); }
+.hm-counter--sweets .hm-counter-label { color: #d6336c; border-color: rgba(214,51,108,.3); background: #fff0f3; }
+.hm-counter--sweets .hm-counter-top { background: linear-gradient(180deg, #fff, #ffe4ea); }
+
+.hm-counter--gashapon { border-color: #ff6b9d; background: linear-gradient(180deg, #fff 0%, #fff0f5 20%, #ffe0eb 100%); }
+.hm-counter--gashapon .hm-counter-label { color: #d6336c; border-color: rgba(214,51,108,.3); background: #fff0f5; }
+
+.hm-counter--wish { border-color: #f7d774; background: linear-gradient(180deg, #fff 0%, #fffbe8 20%, #fff3d6 100%); }
+.hm-counter--wish .hm-counter-label { color: #8a6e1a; border-color: rgba(138,110,26,.3); background: #fffbe8; }
+
+/* ---------- 货架 ---------- */
+.hm-shelf {
+  display: flex; gap: 12px; align-items: flex-end; justify-content: center;
+  padding: 10px 6px;
+  background:
+    linear-gradient(180deg, transparent 0%, transparent 60%, rgba(196,138,78,.1) 60%, rgba(196,138,78,.15) 64%, transparent 64%);
+  position: relative;
+}
+.hm-shelf::after {
+  content: ''; position: absolute; left: 4px; right: 4px; bottom: 0; height: 4px;
+  background: linear-gradient(180deg, #d4a574, #b8854a);
+  border-radius: 2px;
+  box-shadow: 0 2px 4px rgba(0,0,0,.1);
+}
+
+/* ---------- 放大组件变体 ---------- */
+.hm-kaleidoscope--corner {
+  position: absolute;
+  bottom: -40px; right: -24px;
+  transform: rotate(8deg) scale(.9);
+  z-index: 10;
+}
+
+.hm-gashapon--lg {
+  width: 180px; height: 270px;
+}
+.hm-gashapon--lg .hm-gashapon-top { height: 130px; }
+.hm-gashapon--lg .hm-gashapon-window {
+  top: 18px; left: 18px; right: 18px; bottom: 14px;
+}
+.hm-gashapon--lg .hm-gashapon-eggs {
+  background-image:
+    radial-gradient(circle at 25% 30%, #ff6b9d 0 15px, transparent 16px),
+    radial-gradient(circle at 60% 20%, #6bcb77 0 15px, transparent 16px),
+    radial-gradient(circle at 75% 60%, #ffd93d 0 15px, transparent 16px),
+    radial-gradient(circle at 30% 70%, #4d96ff 0 15px, transparent 16px),
+    radial-gradient(circle at 55% 50%, #d4c1ec 0 15px, transparent 16px);
+}
+.hm-gashapon--lg .hm-gashapon-base { height: 140px; }
+.hm-gashapon--lg .hm-gashapon-knob { width: 54px; height: 54px; }
+.hm-gashapon--lg .hm-gashapon-label { top: 134px; font-size: 10px; }
+
+.hm-wish-jar--lg {
+  width: 150px; height: 185px;
+}
+.hm-wish-jar--lg .hm-wish-jar-lid { height: 28px; }
+.hm-wish-jar--lg .hm-wish-jar-body { top: 28px; }
+.hm-wish-jar--lg .hm-wish-jar-input { width: 150px; top: 28px; left: -160px; }
+
+/* ---------- 价格标签 ---------- */
+.hm-price-tag {
+  position: relative;
+  margin-top: 12px;
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-family: 'Georgia', serif;
+  font-weight: 700; font-size: 13px;
+  letter-spacing: 2px;
+  text-align: center;
+  box-shadow: 2px 3px 8px rgba(0,0,0,.12);
+  transform: rotate(-3deg);
+}
+.hm-price-tag--pink {
+  background: linear-gradient(180deg, #fff0f5, #ffc8d4);
+  color: #d6336c;
+  border: 2px solid #f48a9e;
+}
+.hm-price-tag--gold {
+  background: linear-gradient(180deg, #fffbe8, #f7d774);
+  color: #8a6e1a;
+  border: 2px solid #d4a574;
+}
+
+/* ---------- 底部散点 + 手写便签 ---------- */
+.hm-sweets-footer-decor {
+  max-width: 1280px;
+  margin: 12px auto 40px;
+  padding: 28px 40px 28px 180px;
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  background: rgba(255,255,255,.4);
+  border-radius: 10px;
+  border-top: 1px dashed rgba(196,138,78,.3);
+}
+.hm-hand-note {
+  padding: 14px 18px;
+  font-family: cursive;
+  border-radius: 4px;
+  box-shadow: 3px 4px 12px rgba(0,0,0,.12);
+  position: relative;
+  flex-shrink: 0;
+}
+.hm-hand-note--menu {
+  background: #fff3d6;
+  color: #4a2c1a;
+  font-size: 13px;
+  transform: rotate(-4deg);
+  margin-left: 30px;
+}
+.hm-hand-note--menu::before {
+  content: '★';
+  position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
+  color: #c48a4e; font-size: 18px;
+}
+.hm-hand-note-title {
+  font-weight: 900; font-size: 14px; margin-bottom: 8px;
+  color: #8a6e1a; text-align: center;
+  border-bottom: 1px dashed rgba(138,110,26,.3); padding-bottom: 4px;
+}
+.hm-hand-note-item { margin: 3px 0; }
+.hm-hand-note--special {
+  background: #fde2e4;
+  color: #d6336c;
+  font-size: 12px;
+  transform: rotate(5deg);
+  margin-left: 20px;
+}
+.hm-hand-note--special::before {
+  content: ''; position: absolute; top: -6px; left: 20px;
+  width: 40px; height: 14px;
+  background: rgba(200,200,200,.5);
+  box-shadow: 0 2px 4px rgba(0,0,0,.1);
+  clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%);
+}
+
+/* ---------- 浮动气泡装饰 ---------- */
+.hm-bubble {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  animation: hm-bubble-float 14s ease-in-out infinite;
+  filter: blur(.5px);
+}
+.hm-bubble::before {
+  content: ''; position: absolute; top: 20%; left: 20%;
+  width: 30%; height: 30%;
+  background: rgba(255,255,255,.6);
+  border-radius: 50%;
+}
+@keyframes hm-bubble-float {
+  0%,100% { transform: translateY(0) translateX(0) scale(1); opacity: .7; }
+  50%     { transform: translateY(-30px) translateX(10px) scale(1.08); opacity: .9; }
+}
+.hm-bubble--1 { width: 60px; height: 60px; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.8), rgba(255,200,212,.4)); top: 10%; left: 30%; animation-delay: 0s; }
+.hm-bubble--2 { width: 40px; height: 40px; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.8), rgba(212,193,236,.4)); top: 25%; left: 70%; animation-delay: 2s; }
+.hm-bubble--3 { width: 50px; height: 50px; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.8), rgba(184,224,210,.4)); top: 60%; left: 15%; animation-delay: 4s; }
+.hm-bubble--4 { width: 30px; height: 30px; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.8), rgba(255,217,61,.4)); top: 45%; left: 85%; animation-delay: 6s; }
+.hm-bubble--5 { width: 45px; height: 45px; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.8), rgba(255,107,157,.4)); top: 75%; left: 55%; animation-delay: 3s; }
+
+/* 隐藏旧的 hm-sweets-stage */
+.hm-sweets-stage { display: none; }
+
+/* 放大版挂历 */
+.hm-calendar--lg { width: 200px; }
+.hm-calendar--lg .hm-calendar-month { font-size: 13px; padding-bottom: 6px; }
+.hm-calendar--lg .hm-calendar-day { font-size: 60px; }
+.hm-calendar--lg .hm-calendar-weekday { font-size: 11px; margin-top: 6px; }
+.hm-calendar--lg .hm-calendar-day.is-today::after { width: 74px; height: 68px; }
+
+/* ================================================================
+   DIY Ice Cream · 安静书拖拽吸附组件
+   ================================================================ */
+
+/* --- sub-view 切换 --- */
+.hm-sweets-tabs {
+  display: flex; gap: 12px; justify-content: center;
+  max-width: 1400px; margin: 0 auto; padding: 20px 48px 0 196px;
+}
+.hm-sweets-tab {
+  padding: 8px 20px; border-radius: 20px;
+  border: 2px solid rgba(214,51,108,.3);
+  background: #fff; color: #666; font-weight: 700; font-size: 12px;
+  letter-spacing: 2px; cursor: pointer;
+  transition: all .18s;
+}
+.hm-sweets-tab:hover { border-color: #d6336c; color: #d6336c; }
+.hm-sweets-tab.is-active {
+  background: linear-gradient(180deg, #ff6b9d, #d6336c);
+  color: #fff; border-color: #d6336c;
+  box-shadow: 0 4px 12px rgba(214,51,108,.3);
+}
+.hm-sweets-view { display: none; }
+.hm-sweets-view.is-active { display: block; animation: hm-fade-in .3s ease; }
+@keyframes hm-fade-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* --- 冰淇淋店场景 --- */
+.hm-icecream-scene {
+  display: grid;
+  grid-template-columns: 240px 1fr 160px;
+  gap: 24px;
+  max-width: 1400px;
+  margin: 24px auto 48px;
+  padding: 0 48px 0 196px;
+  min-height: 600px;
+  position: relative;
+}
+
+/* 冰箱 */
+.hm-ic-inventory { position: relative; z-index: 2; }
+.hm-ic-fridge {
+  background: linear-gradient(180deg, #e8f4ff, #c8e4f5);
+  border: 3px solid #7ab0d4;
+  border-radius: 14px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.15), inset 0 2px 0 rgba(255,255,255,.6);
+  overflow: hidden;
+}
+.hm-ic-fridge-door {
+  padding: 20px; text-align: center; cursor: pointer;
+  position: relative; z-index: 2;
+  background: linear-gradient(180deg, #f0faff, #d8ecf8);
+  border-bottom: 2px solid rgba(122,176,212,.3);
+  transition: transform .3s;
+}
+.hm-ic-fridge.is-open .hm-ic-fridge-door {
+  transform: rotateX(-110deg); transform-origin: top center;
+}
+.hm-ic-fridge-label {
+  font-size: 10px; font-weight: 900; letter-spacing: 3px; color: #4a7898;
+}
+.hm-ic-fridge-handle {
+  width: 24px; height: 6px; background: #888; border-radius: 3px;
+  margin: 0 auto 8px; box-shadow: inset 0 -1px 2px rgba(0,0,0,.3);
+}
+.hm-ic-fridge-inside {
+  padding: 14px 12px 20px;
+  min-height: 320px;
+  background: #fff;
+  display: none;
+}
+.hm-ic-fridge.is-open .hm-ic-fridge-inside { display: block; animation: hm-fade-in .3s ease; }
+.hm-ic-category { margin-bottom: 14px; }
+.hm-ic-cat-title {
+  font-size: 10px; font-weight: 900; letter-spacing: 1px;
+  color: #d6336c; margin-bottom: 8px;
+  padding-bottom: 2px; border-bottom: 1px dashed rgba(214,51,108,.2);
+}
+.hm-ic-item {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 48px; height: 48px; margin: 4px;
+  font-size: 22px; cursor: grab;
+  background: #fff;
+  border: 2px solid rgba(0,0,0,.12);
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,.1), inset 0 -2px 4px rgba(0,0,0,.05);
+  transition: transform .15s, box-shadow .15s;
+  user-select: none; -webkit-user-drag: none;
+  touch-action: none;
+}
+.hm-ic-item:hover { transform: scale(1.08); box-shadow: 0 4px 10px rgba(0,0,0,.18); }
+.hm-ic-item.hm-ic-item--dragging {
+  cursor: grabbing; transform: scale(1.12);
+  box-shadow: 0 12px 30px rgba(214,51,108,.35), 0 0 0 3px #ff6b9d;
+  z-index: 9999;
+}
+
+/* 操作台 */
+.hm-ic-canvas {
+  position: relative;
+  background:
+    repeating-linear-gradient(45deg, #fff8f0 0 8px, #fdf0d8 8px 16px);
+  border: 3px solid #c48a4e;
+  border-radius: 14px;
+  min-height: 560px;
+  box-shadow: inset 0 0 40px rgba(196,138,78,.12), 0 4px 16px rgba(0,0,0,.08);
+  overflow: hidden;
+}
+.hm-ic-canvas-label {
+  position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+  font-size: 9px; font-weight: 900; letter-spacing: 3px;
+  color: #c48a4e; background: #fff8f0; padding: 2px 14px;
+  border-radius: 10px; border: 1px dashed rgba(196,138,78,.3);
+  z-index: 3;
+}
+/* Zone 通用 */
+.hm-ic-zone {
+  position: absolute; bottom: 40px;
+  width: 140px; height: 200px;
+  display: flex; flex-direction: column; align-items: center;
+  transition: box-shadow .2s, transform .2s;
+}
+.hm-ic-zone.is-hover {
+  box-shadow: 0 0 0 3px #ff6b9d, 0 0 30px rgba(255,107,157,.4);
+  transform: scale(1.05);
+  border-radius: 10px;
+}
+.hm-ic-zone-label {
+  font-size: 9px; font-weight: 700; letter-spacing: 2px;
+  color: #c48a4e; margin-top: 4px; background: rgba(255,248,240,.9); padding: 1px 8px; border-radius: 6px;
+}
+/* Zone 位置 */
+.hm-ic-zone--cone  { left: 18%; }
+.hm-ic-zone--cup   { left: 45%; }
+.hm-ic-zone--plate { left: 72%; }
+
+/* Zone 视觉元素（纯 CSS 材质） */
+.hm-ic-cone {
+  width: 70px; height: 90px;
+  background: linear-gradient(180deg, #e8c49a 0%, #c48a4e 60%, #a06830 100%);
+  clip-path: polygon(50% 100%, 0 0, 100% 0);
+  box-shadow: inset -4px -4px 8px rgba(0,0,0,.2), 2px 2px 6px rgba(0,0,0,.15);
+  position: relative;
+}
+.hm-ic-cup {
+  width: 90px; height: 110px;
+  background: linear-gradient(180deg, #fff 0%, #f0f0f0 100%);
+  border-radius: 6px 6px 12px 12px;
+  border: 3px solid #ff6b9d;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0,0,0,.12);
+}
+.hm-ic-cup::before {
+  content: '♥'; position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%); color: #ff6b9d; font-size: 18px;
+}
+.hm-ic-plate {
+  width: 120px; height: 26px;
+  background: radial-gradient(ellipse at center, #fff 0%, #f8f0e0 100%);
+  border-radius: 50%;
+  border: 2px solid #d4c4a8;
+  box-shadow: 0 4px 12px rgba(0,0,0,.12), inset 0 -2px 4px rgba(0,0,0,.05);
+  position: relative; margin-top: 80px;
+}
+.hm-ic-plate::before {
+  content: ''; position: absolute; inset: 4px;
+  border-radius: 50%; border: 1px solid rgba(212,196,168,.3);
+}
+
+/* Zone 内吸附后的堆叠容器 */
+.hm-ic-zone-items {
+  position: absolute; top: -40px; left: 50%; transform: translateX(-50%);
+  width: 70px; display: flex; flex-direction: column-reverse; align-items: center;
+}
+/* 吸附后的 item 样式（真实堆叠） */
+.hm-ic-snap-item {
+  position: relative;
+  width: 42px; height: 42px; margin-top: -12px;
+  border-radius: 50%;
+  background: var(--ic-color, #fff);
+  box-shadow:
+    inset -3px -3px 6px rgba(0,0,0,.15),
+    inset 3px 3px 6px rgba(255,255,255,.5),
+    0 4px 8px rgba(0,0,0,.2),
+    0 0 0 2px #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  animation: hm-snap-pop .25s cubic-bezier(.3,1.5,.6,1.1);
+  cursor: grab;
+  user-select: none;
+}
+.hm-ic-snap-item.topping {
+  border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+  font-size: 18px;
+  width: 32px; height: 32px; margin-top: -8px;
+}
+@keyframes hm-snap-pop {
+  0%   { transform: scale(.4) translateY(20px); opacity: 0; }
+  70%  { transform: scale(1.15) translateY(0); opacity: 1; }
+  100% { transform: scale(1) translateY(0); }
+}
+
+/* 操作面板 */
+.hm-ic-actions {
+  display: flex; flex-direction: column; gap: 12px;
+}
+.hm-ic-action-btn {
+  padding: 12px 16px; text-align: center;
+  font-weight: 700; font-size: 12px; letter-spacing: 2px;
+  border-radius: 10px; cursor: pointer;
+  box-shadow: 0 3px 10px rgba(0,0,0,.12);
+  transition: transform .15s;
+}
+.hm-ic-action-btn:hover { transform: translateY(-2px); }
+.hm-ic-action--eat   { background: linear-gradient(180deg, #ff9ec4, #d6336c); color: #fff; }
+.hm-ic-action--photo { background: linear-gradient(180deg, #6bcb77, #3a8a5c); color: #fff; }
+.hm-ic-action--reset { background: linear-gradient(180deg, #ccc, #888); color: #fff; }
+.hm-ic-hint {
+  margin-top: 16px; padding: 12px;
+  background: rgba(255,255,255,.6);
+  border-radius: 8px;
+  font-size: 11px; color: #666; line-height: 1.7;
+  border: 1px dashed rgba(0,0,0,.15);
+}
+
+/* 拖拽层（独立 overlay，全屏） */
+.hm-ic-drag-layer {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none; z-index: 10000;
+}
+.hm-ic-drag-item {
+  position: absolute;
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: var(--ic-color, #fff);
+  box-shadow:
+    inset -3px -3px 6px rgba(0,0,0,.15),
+    inset 3px 3px 6px rgba(255,255,255,.5),
+    0 12px 30px rgba(214,51,108,.35),
+    0 0 0 3px #ff6b9d;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px;
+  transform: translate(-50%,-50%) scale(1.15);
+  pointer-events: none;
+}
+.hm-ic-drag-item.topping {
+  border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+  font-size: 20px; width: 42px; height: 42px;
+}
+
+/* Flavor 颜色映射 */
+.hm-ic-flavor-vanilla    { background: radial-gradient(circle at 35% 35%, #fff, #fff3d6); --ic-color: #fff3d6; }
+.hm-ic-flavor-strawberry { background: radial-gradient(circle at 35% 35%, #ffc8d4, #f48a9e); --ic-color: #f48a9e; }
+.hm-ic-flavor-chocolate  { background: radial-gradient(circle at 35% 35%, #8b5a2b, #4a2410); --ic-color: #4a2410; color: #fff; }
+.hm-ic-flavor-matcha     { background: radial-gradient(circle at 35% 35%, #c6ecd9, #7bc79f); --ic-color: #7bc79f; }
+.hm-ic-topping-sprinkles { background: repeating-linear-gradient(45deg, #ff6b9d 0 4px, #ffd93d 4px 8px, #6bcb77 8px 12px, #4d96ff 12px 16px); --ic-color: #fff; }
+.hm-ic-topping-choco-sauce { background: radial-gradient(circle, #4a2410, #2d1810); --ic-color: #4a2410; }
+.hm-ic-topping-cherry    { background: radial-gradient(circle, #ff6b9d, #c41e3a); --ic-color: #c41e3a; }
+.hm-ic-topping-oreo      { background: linear-gradient(180deg, #4a2410 40%, #fff 42%, #fff 58%, #4a2410 60%); --ic-color: #4a2410; }
+
+/* 开吃动画：zone 内物品逐个缩小消失 */
+.hm-ic-zone.is-eating .hm-ic-snap-item {
+  animation: hm-eat-pop .6s ease forwards;
+  animation-delay: calc(var(--i,0) * .12s);
+}
+@keyframes hm-eat-pop {
+  0%   { transform: scale(1); opacity: 1; }
+  60%  { transform: scale(.3) translateY(10px); opacity: .6; }
+  100% { transform: scale(0) translateY(40px); opacity: 0; }
+}
+
+/* Mua~ 弹出文字 */
+.hm-ic-mua {
+  position: absolute; font-family: monospace; font-weight: 900; font-size: 28px;
+  color: #d6336c; text-shadow: 2px 2px 0 #fff, 4px 4px 0 rgba(0,0,0,.1);
+  pointer-events: none; z-index: 1000;
+  animation: hm-mua-fly 1.5s ease forwards;
+}
+@keyframes hm-mua-fly {
+  0%   { transform: translate(-50%, -50%) scale(.3); opacity: 0; }
+  30%  { transform: translate(-50%, -80%) scale(1.2); opacity: 1; }
+  100% { transform: translate(-50%, -200%) scale(.8); opacity: 0; }
+}
+
+/* 拍照 toast */
+.hm-ic-photo-toast {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%) scale(0);
+  background: #fff; border: 3px solid #333; padding: 24px 32px;
+  font-size: 14px; font-weight: 700; text-align: center;
+  box-shadow: 0 10px 40px rgba(0,0,0,.3); z-index: 10001;
+  animation: hm-photo-pop .5s cubic-bezier(.3,1.5,.6,1.1) forwards;
+}
+@keyframes hm-photo-pop {
+  0%   { transform: translate(-50%,-50%) scale(0) rotate(-6deg); }
+  100% { transform: translate(-50%,-50%) scale(1) rotate(0deg); }
 }

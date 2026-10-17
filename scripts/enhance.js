@@ -897,6 +897,10 @@
     const total = parseInt(localStorage.getItem('himemiro_wish_coins') || '0', 10) + 1;
     localStorage.setItem('himemiro_wish_coins', total);
 
+    // 更新 UI 计数标签
+    const counter = document.getElementById('hmWishCounter');
+    if (counter) counter.textContent = total;
+
     const coin = document.createElement('span');
     const offset = (Math.random() * 30 - 15).toFixed(1);
     coin.style.left = `calc(50% + ${offset}px)`;
@@ -972,6 +976,281 @@
     </div>
   `;
   document.body.insertAdjacentHTML('beforeend', trainHTML);
+
+})();
+
+/* =========================================================================
+   DIY Ice Cream 安静书 · 拖拽吸附引擎 + sub-view 切换
+   ========================================================================= */
+(() => {
+  const SNAP_DIST = 60; // 吸附阈值（px）
+  const ZONE_OFFSET = {
+    cone:  { x: 0, y: -40 },   // 甜筒球的初始堆叠偏移
+    cup:   { x: 0, y: -50 },
+    plate: { x: 0, y: -20 }
+  };
+
+  // Flavor → 颜色类映射
+  const FLAVOR_CLASS = {
+    vanilla:    'hm-ic-flavor-vanilla',
+    strawberry: 'hm-ic-flavor-strawberry',
+    chocolate:  'hm-ic-flavor-chocolate',
+    matcha:     'hm-ic-flavor-matcha'
+  };
+  const TOPPING_CLASS = {
+    'sprinkles':    'hm-ic-topping-sprinkles',
+    'choco-sauce':  'hm-ic-topping-choco-sauce',
+    'cherry':       'hm-ic-topping-cherry',
+    'oreo':         'hm-ic-topping-oreo'
+  };
+
+  // ---------- sub-view tab 切换 ----------
+  document.addEventListener('click', (e) => {
+    const tab = e.target.closest('.hm-sweets-tab');
+    if (!tab) return;
+    const target = tab.dataset.sweetsView;
+    document.querySelectorAll('.hm-sweets-tab').forEach(t => t.classList.toggle('is-active', t === tab));
+    document.querySelectorAll('.hm-sweets-view').forEach(v => {
+      v.classList.toggle('is-active', v.dataset.sweetsView === target);
+    });
+    if (target === 'icecream') {
+      setTimeout(() => initDragEngine(), 200);
+    }
+  });
+
+  // ---------- 冰箱开门 ----------
+  document.addEventListener('click', (e) => {
+    const door = e.target.closest('#hmIcFridgeDoor');
+    if (door) door.closest('.hm-ic-fridge').classList.toggle('is-open');
+  });
+
+  // ---------- 全局拖拽状态 ----------
+  let drag = null; // { itemEl, flavor, type, dragEl, startX, startY, offsetX, offsetY }
+
+  function initDragEngine() {
+    // 给冰箱里所有 item 绑 pointerdown
+    document.querySelectorAll('.hm-ic-item').forEach(el => {
+      el.addEventListener('pointerdown', onItemDown);
+    });
+    document.querySelectorAll('.hm-ic-snap-item').forEach(el => {
+      el.addEventListener('pointerdown', onSnapItemDown);
+    });
+    // 每次进冰淇淋店自动打开冰箱门（方便）
+    const fridge = document.querySelector('.hm-ic-fridge');
+    if (fridge && !fridge.classList.contains('is-open')) fridge.classList.add('is-open');
+  }
+
+  // 新建拖拽（从冰箱拿）
+  function onItemDown(e) {
+    if (drag) return;
+    const el = e.currentTarget;
+    const flavor = el.dataset.flavor;
+    const type = el.dataset.icType; // 'ball' | 'topping'
+    el.setPointerCapture?.(e.pointerId);
+
+    drag = {
+      source: 'inventory',
+      itemEl: el,
+      flavor, type,
+      icon: el.textContent.trim(),
+      colorClass: type === 'ball' ? FLAVOR_CLASS[flavor] : TOPPING_CLASS[flavor],
+      dragEl: createDragGhost(flavor, type, el.textContent.trim()),
+      startX: e.clientX, startY: e.clientY,
+      x: e.clientX, y: e.clientY,
+      count: 0
+    };
+    window.playClickSound?.();
+    document.addEventListener('pointermove', onDragMove);
+    document.addEventListener('pointerup', onDragUp);
+  }
+
+  // 从 zone 内已吸附的 item 再拖（移除）
+  function onSnapItemDown(e) {
+    const el = e.currentTarget;
+    el.setPointerCapture?.(e.pointerId);
+    const zone = el.closest('.hm-ic-zone');
+    const zoneKey = zone?.dataset.icZone;
+
+    drag = {
+      source: 'zone',
+      snapItemEl: el,
+      zoneKey,
+      dragEl: createDragGhost(el.dataset.flavor, el.dataset.type, el.textContent.trim()),
+      startX: e.clientX, startY: e.clientY,
+      x: e.clientX, y: e.clientY,
+      offsetX: 26, offsetY: 26,
+      count: 0,
+      type: el.dataset.type,
+      flavor: el.dataset.flavor
+    };
+    el.remove(); // 先从 zone 移除，drag 结束再决定
+    document.addEventListener('pointermove', onDragMove);
+    document.addEventListener('pointerup', onDragUp);
+  }
+
+  function createDragGhost(flavor, type, icon) {
+    const layer = document.getElementById('hmIcDragLayer');
+    if (!layer) return null;
+    const d = document.createElement('div');
+    d.className = 'hm-ic-drag-item ' + (type === 'topping' ? 'topping' : '');
+    d.classList.add(FLAVOR_CLASS[flavor] || TOPPING_CLASS[flavor] || '');
+    d.textContent = icon || '';
+    d.style.left = drag?.x + 'px' || '0';
+    d.style.top  = drag?.y + 'px' || '0';
+    layer.appendChild(d);
+    return d;
+  }
+
+  function onDragMove(e) {
+    if (!drag) return;
+    drag.x = e.clientX; drag.y = e.clientY;
+    if (drag.dragEl) drag.dragEl.style.left = e.clientX + 'px', drag.dragEl.style.top = e.clientY + 'px';
+
+    // Zone hover 高亮
+    document.querySelectorAll('.hm-ic-zone').forEach(z => z.classList.remove('is-hover'));
+    const hoveredZone = findZoneAt(e.clientX, e.clientY);
+    if (hoveredZone) hoveredZone.classList.add('is-hover');
+  }
+
+  function findZoneAt(cx, cy) {
+    const zones = document.querySelectorAll('.hm-ic-zone');
+    let closest = null, minD = Infinity;
+    zones.forEach(z => {
+      const r = z.getBoundingClientRect();
+      const zx = r.left + r.width / 2 + 20; // zone-items 容器位置
+      const zy = r.top + r.height - 40;
+      const d = Math.hypot(cx - zx, cy - zy);
+      if (d < minD) { minD = d; closest = z; }
+    });
+    return minD < SNAP_DIST ? closest : null;
+  }
+
+  function onDragUp(e) {
+    document.removeEventListener('pointermove', onDragMove);
+    document.removeEventListener('pointerup', onDragUp);
+
+    // 清除 zone hover
+    document.querySelectorAll('.hm-ic-zone').forEach(z => z.classList.remove('is-hover'));
+
+    if (!drag) return;
+
+    const hovered = findZoneAt(e.clientX, e.clientY);
+    if (hovered) {
+      snapToZone(hovered);
+    } else {
+      // 丢到桌面 — 不吸附，删除 ghost 即可（简化版）
+      // 或者：在 canvas 上自由漂浮（留给后续）
+    }
+
+    if (drag.dragEl) drag.dragEl.remove();
+    drag = null;
+  }
+
+  function snapToZone(zone) {
+    const key = zone.dataset.icZone;
+    const container = zone.querySelector('.hm-ic-zone-items');
+    if (!container) return;
+
+    const snap = document.createElement('div');
+    snap.className = 'hm-ic-snap-item ' + (drag.type === 'topping' ? 'topping' : '');
+    snap.classList.add(drag.colorClass || '');
+    snap.textContent = drag.icon || '';
+    snap.dataset.type = drag.type;
+    snap.dataset.flavor = drag.flavor;
+    snap.style.setProperty('--i', container.children.length);
+
+    // 在 cone 上只能放 balls（topping 会自动放到最上面）
+    // 不做严格限制，所有组合都允许
+    container.appendChild(snap);
+
+    // 新 item 在最上
+    snap.addEventListener('pointerdown', onSnapItemDown);
+
+    window.playClickSound?.();
+
+    // 移除冰箱里的 item（但只移除 source=inventory 的，source=zone 的已经被 remove 了）
+    if (drag.source === 'inventory') drag.itemEl.remove();
+  }
+
+  // ---------- 操作按钮 ----------
+  document.addEventListener('click', (e) => {
+    const canvas = document.getElementById('hmIcCanvas');
+    if (!canvas) return;
+
+    // 开吃
+    if (e.target.closest('#hmIcEatBtn')) {
+      let anyItem = false;
+      document.querySelectorAll('.hm-ic-snap-item').forEach(el => {
+        anyItem = true;
+        // 让它自己 zone.is-eating 触发动画
+        const zone = el.closest('.hm-ic-zone');
+        if (zone) zone.classList.add('is-eating');
+      });
+      // Mua~ 文字
+      const mua = document.createElement('div');
+      mua.className = 'hm-ic-mua';
+      mua.textContent = anyItem ? 'Mua~' : '🫗 还没装呢';
+      mua.style.left = '50%'; mua.style.top = '40%';
+      canvas.appendChild(mua);
+      setTimeout(() => { mua.remove(); document.querySelectorAll('.hm-ic-zone').forEach(z => z.classList.remove('is-eating')); }, 1500);
+      // 吃完清空
+      if (anyItem) {
+        setTimeout(() => {
+          document.querySelectorAll('.hm-ic-zone-items').forEach(c => c.innerHTML = '');
+        }, 800);
+      }
+    }
+
+    // 拍照 —— 生成拍立得贴到 Gallery
+    if (e.target.closest('#hmIcPhotoBtn')) {
+      // 简单 toast
+      const toast = document.createElement('div');
+      toast.className = 'hm-ic-photo-toast';
+      toast.innerHTML = '📷 拍立得已生成！<br><span style="font-size:11px; color:#888;">去 Gallery 看看 ♡</span>';
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 1800);
+      // 简化版：把 canvas 上的 items 计数存 localStorage
+      const count = document.querySelectorAll('.hm-ic-snap-item').length;
+      if (count > 0) {
+        const photos = JSON.parse(localStorage.getItem('himemiro_icecream_photos') || '[]');
+        photos.unshift({ count, ts: Date.now() });
+        localStorage.setItem('himemiro_icecream_photos', JSON.stringify(photos.slice(0, 10)));
+      }
+    }
+
+    // 重做
+    if (e.target.closest('#hmIcResetBtn')) {
+      document.querySelectorAll('.hm-ic-zone-items').forEach(c => c.innerHTML = '');
+      // 冰箱重新渲染（从 photos 恢复 inventory？简化：重新 append HTML）
+      const fridgeInside = document.getElementById('hmIcFridgeInside');
+      if (fridgeInside && !fridgeInside.querySelector('.hm-ic-item')) {
+        fridgeInside.innerHTML = `
+          <div class="hm-ic-category"><div class="hm-ic-cat-title">🍦 アイス · Ice Cream</div>
+            <div class="hm-ic-item" data-ic-type="ball" data-flavor="vanilla">🍨</div>
+            <div class="hm-ic-item" data-ic-type="ball" data-flavor="strawberry">🍓</div>
+            <div class="hm-ic-item" data-ic-type="ball" data-flavor="chocolate">🍫</div>
+            <div class="hm-ic-item" data-ic-type="ball" data-flavor="matcha">🍵</div>
+          </div>
+          <div class="hm-ic-category"><div class="hm-ic-cat-title">🍬 トッピング · Toppings</div>
+            <div class="hm-ic-item" data-ic-type="topping" data-flavor="sprinkles">🌈</div>
+            <div class="hm-ic-item" data-ic-type="topping" data-flavor="choco-sauce">💧</div>
+            <div class="hm-ic-item" data-ic-type="topping" data-flavor="cherry">🍒</div>
+            <div class="hm-ic-item" data-ic-type="topping" data-flavor="oreo">🟤</div>
+          </div>
+        `;
+        initDragEngine();
+      }
+    }
+  });
+
+  // 进 SPA sweets 时，如果上次在 icecream 视图，恢复
+  window.__onPage('sweets', () => {
+    setTimeout(() => {
+      initDragEngine();
+      const fridge = document.querySelector('.hm-ic-fridge');
+      if (fridge && !fridge.classList.contains('is-open')) fridge.classList.add('is-open');
+    }, 600);
+  });
 
 })();
 
