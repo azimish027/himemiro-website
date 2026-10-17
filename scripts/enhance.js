@@ -479,3 +479,751 @@
   window.__onPage('gallery', () => { setTimeout(inject, 500); });
 })();
 
+/* =========================================================================
+   Space Jam Games Hub — 嵌套子页面切换
+   ========================================================================= */
+(() => {
+  function switchView(viewName) {
+    const views = document.querySelectorAll('.sj-view');
+    const planets = document.querySelectorAll('.sj-planet');
+    if (!views.length) return;
+
+    views.forEach(v => v.classList.toggle('is-active', v.dataset.gameView === viewName));
+    planets.forEach(p => p.classList.toggle('is-current', p.dataset.gameView === viewName));
+  }
+
+  // 事件委托：星球按钮 + Site Map 卡片点击
+  document.addEventListener('click', (e) => {
+    const planet = e.target.closest('.sj-planet[data-game-view]');
+    if (planet) {
+      e.preventDefault(); e.stopPropagation();
+      switchView(planet.dataset.gameView);
+      return;
+    }
+    const sitemapCard = e.target.closest('.sj-sitemap-card[data-game-view]');
+    if (sitemapCard) {
+      e.preventDefault(); e.stopPropagation();
+      switchView(sitemapCard.dataset.gameView);
+      return;
+    }
+  });
+
+  // SPA 切到 Games page 时重置回 Hub 视图
+  window.__onPage('games', () => switchView('hub'));
+})();
+
+/* =========================================================================
+   Gallery · 真实上传功能（localStorage + Canvas 压缩）
+   - 隐藏 <input type="file" accept="image/*" multiple>
+   - Canvas 等比缩放（max 800px 长边，JPEG 0.8）→ 避免 localStorage 5MB 上限
+   - localStorage key: "himemiro_gallery_user" — JSON array
+   - 动态生成 .polaroid 到 .gallery-board，附随机位置/旋转 + 删除按钮
+   ========================================================================= */
+(() => {
+  const LS_KEY = 'himemiro_gallery_user';
+  let fileInput = null;
+
+  function ensureFileInput() {
+    if (fileInput) return fileInput;
+    fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+    fileInput.multiple = true;
+    fileInput.style.display = 'none';
+    fileInput.addEventListener('change', onFilesSelected);
+    document.body.appendChild(fileInput);
+    return fileInput;
+  }
+
+  // Canvas 压缩图片 — 最长边 800px，JPEG 0.8
+  function compressImage(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error('FileReader failed'));
+      reader.onload = () => {
+        const img = new Image();
+        img.onerror = () => reject(new Error('Image load failed'));
+        img.onload = () => {
+          const MAX = 800;
+          let { width: w, height: h } = img;
+          if (w > MAX || h > MAX) {
+            const ratio = Math.min(MAX / w, MAX / h);
+            w = Math.round(w * ratio);
+            h = Math.round(h * ratio);
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, w, h);
+          ctx.drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', 0.8));
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function loadAll() {
+    try { return JSON.parse(localStorage.getItem(LS_KEY)) || []; } catch { return []; }
+  }
+  function saveAll(arr) {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(arr)); } catch(e) {
+      alert('localStorage 存储已满！请删除一些照片后重试。');
+      console.warn('localStorage quota exceeded:', e);
+    }
+  }
+
+  // 生成随机位置（避开边缘 + 避开标题区域 top 60%）
+  function randomPos() {
+    const r = (Math.random() * 16 - 8).toFixed(1); // -8 ~ +8 deg
+    const x = (5 + Math.random() * 60).toFixed(1);  // 5% ~ 65%（避开右侧）
+    const y = (5 + Math.random() * 50).toFixed(1);  // 5% ~ 55%（避开底部标题）
+    return { r, x, y };
+  }
+
+  function pinColor() {
+    const colors = ['pin--red', 'pin--blue', 'pin--yellow'];
+    return colors[Math.floor(Math.random() * colors.length)];
+  }
+
+  // 单张 polaroid DOM
+  function buildPolaroid(item) {
+    const pos = item.x !== undefined ? item : randomPos();
+    const el = document.createElement('div');
+    el.className = 'polaroid polaroid--user';
+    el.dataset.galleryId = item.id;
+    el.style.setProperty('--r', `${pos.r}deg`);
+    el.style.setProperty('--x', `${pos.x}%`);
+    el.style.setProperty('--y', `${pos.y}%`);
+    el.style.setProperty('--transition', 'opacity .4s ease');
+    el.style.opacity = '0';
+    el.innerHTML = `
+      <div class="pin ${pinColor()}"></div>
+      <button class="hm-polaroid-del" aria-label="删除" title="从相册移除">✕</button>
+      <div class="polaroid-frame">
+        <div class="polaroid-photo">
+          <img src="${item.dataUrl}" alt="${item.caption || '上传照片'}" loading="lazy">
+        </div>
+        <div class="polaroid-caption">${item.caption || '— my photo —'}</div>
+      </div>
+    `;
+    requestAnimationFrame(() => { el.style.opacity = '1'; });
+    return el;
+  }
+
+  // 渲染所有用户照片到 board
+  function renderAll() {
+    const board = document.querySelector('.page.page--active[data-page="gallery"] .gallery-board');
+    if (!board) return;
+    board.querySelectorAll('.polaroid--user').forEach(n => n.remove());
+    const items = loadAll();
+    items.forEach(item => board.appendChild(buildPolaroid(item)));
+  }
+
+  async function onFilesSelected(e) {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    const existing = loadAll();
+    let saved = 0, failed = 0;
+    for (const file of files) {
+      if (!file.type.startsWith('image/')) { failed++; continue; }
+      try {
+        const dataUrl = await compressImage(file);
+        existing.push({
+          id: 'u_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+          dataUrl,
+          caption: '— ' + (file.name.replace(/\.[^.]+$/, '').slice(0, 14) || 'photo') + ' —',
+          ...randomPos(),
+          createdAt: Date.now()
+        });
+        saved++;
+      } catch(err) { failed++; console.warn('Upload fail:', err); }
+    }
+    saveAll(existing);
+    renderAll();
+    e.target.value = ''; // 重置，允许重复选同一文件
+    if (saved) flashToast(`✅ 已上传 ${saved} 张${failed ? `（失败 ${failed}）` : ''}`);
+    else if (failed) flashToast(`❌ ${failed} 张上传失败`);
+  }
+
+  // 浮动提示条
+  function flashToast(msg) {
+    const t = document.createElement('div');
+    t.className = 'hm-toast';
+    t.textContent = msg;
+    Object.assign(t.style, {
+      position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)',
+      background: 'rgba(0,0,0,.85)', color: '#fff', padding: '10px 18px',
+      borderRadius: '8px', fontSize: '14px', zIndex: 9999,
+      boxShadow: '0 4px 20px rgba(0,0,0,.3)', opacity: '0',
+      transition: 'opacity .25s ease, transform .25s ease'
+    });
+    document.body.appendChild(t);
+    requestAnimationFrame(() => { t.style.opacity = '1'; t.style.transform = 'translateX(-50%) translateY(-4px)'; });
+    setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 280); }, 2200);
+  }
+
+  // 删除单张
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.hm-polaroid-del');
+    if (!btn) return;
+    e.stopPropagation();
+    const polaroid = btn.closest('.polaroid--user');
+    if (!polaroid) return;
+    if (!confirm('从相册中删除这张照片？')) return;
+    const id = polaroid.dataset.galleryId;
+    const arr = loadAll().filter(i => i.id !== id);
+    saveAll(arr);
+    polaroid.style.opacity = '0';
+    polaroid.style.transform += ' scale(.85)';
+    setTimeout(() => polaroid.remove(), 300);
+  });
+
+  // 暴露 trigger 给占位按钮的 handler 调用
+  window.__galleryTriggerUpload = () => { ensureFileInput(); fileInput.click(); };
+
+  // SPA 切到 Gallery 时渲染
+  window.__onPage('gallery', () => { setTimeout(renderAll, 500); });
+})();
+
+/* =========================================================================
+   各模块占位按钮（Gallery 上传 / Worlds 文档 / Music MP3 / Studio 跳转）
+   纯 UI，无后端逻辑 — 后续接后端时替换即可
+   ========================================================================= */
+(() => {
+  // SPA 切页面时，隐藏所有非 active 页面里的 hm-placeholder-bar
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('[data-page-link]')) {
+      setTimeout(() => {
+        document.querySelectorAll('.hm-placeholder-bar').forEach(bar => {
+          const page = bar.closest('.page');
+          if (page) bar.style.display = page.classList.contains('page--active') ? '' : 'none';
+        });
+      }, 80);
+    }
+  });
+
+  window.__onPage('gallery', () => {
+    setTimeout(() => {
+      const board = document.querySelector('.gallery-board, .gallery-corkboard');
+      if (!board || board.querySelector('.hm-placeholder-bar')) return;
+      const bar = document.createElement('div');
+      bar.className = 'hm-placeholder-bar';
+      bar.style.cssText = `
+        position:absolute; top:12px; right:12px; z-index:50;
+        display:flex; gap:8px; align-items:center;
+      `;
+      bar.innerHTML = `
+        <button class="hm-placeholder-btn" data-hm-action="gallery-upload">📤 Upload Photos</button>
+        <span class="hm-placeholder-badge hm-badge-live">READY · localStorage</span>
+      `;
+      board.style.position = board.style.position || 'relative';
+      board.appendChild(bar);
+    }, 400);
+  });
+
+  window.__onPage('worlds', () => {
+    setTimeout(() => {
+      const scene = document.querySelector('.street-scene');
+      if (!scene || scene.querySelector('.hm-placeholder-bar')) return;
+      const bar = document.createElement('div');
+      bar.className = 'hm-placeholder-bar';
+      bar.style.cssText = `
+        position:absolute; top:12px; right:12px; z-index:50;
+        display:flex; gap:8px; align-items:center;
+      `;
+      bar.innerHTML = `
+        <button class="hm-placeholder-btn" data-hm-action="worlds-doc">📝 Upload Doc</button>
+        <button class="hm-placeholder-btn" data-hm-action="worlds-workshop">⚙ Link Workshop</button>
+        <span class="hm-placeholder-badge">PLACEHOLDERS</span>
+      `;
+      scene.style.position = scene.style.position || 'relative';
+      scene.appendChild(bar);
+    }, 400);
+  });
+
+  window.__onPage('studio', () => {
+    setTimeout(() => {
+      const scene = document.querySelector('.page[data-page="studio"]');
+      if (!scene || scene.querySelector('.hm-placeholder-bar')) return;
+      scene.style.position = 'relative';
+      const bar = document.createElement('div');
+      bar.className = 'hm-placeholder-bar';
+      bar.style.cssText = `
+        position:absolute; top:12px; right:12px; z-index:999;
+        display:flex; gap:8px; align-items:center;
+      `;
+      bar.innerHTML = `
+        <button class="hm-placeholder-btn" data-hm-action="studio-workshop">⚙ Open Workshop Editor</button>
+        <span class="hm-placeholder-badge">PLACEHOLDER</span>
+      `;
+      scene.appendChild(bar);
+    }, 400);
+  });
+
+  window.__onPage('music', () => {
+    setTimeout(() => {
+      const scene = document.querySelector('.page[data-page="music"]');
+      if (!scene || scene.querySelector('.hm-placeholder-bar')) return;
+      scene.style.position = 'relative';
+      const bar = document.createElement('div');
+      bar.className = 'hm-placeholder-bar';
+      bar.style.cssText = `
+        position:absolute; top:12px; right:12px; z-index:999;
+        display:flex; gap:8px; align-items:center;
+      `;
+      bar.innerHTML = `
+        <button class="hm-placeholder-btn" data-hm-action="music-upload">🎵 Upload MP3</button>
+        <span class="hm-placeholder-badge">PLACEHOLDER</span>
+      `;
+      scene.appendChild(bar);
+    }, 400);
+  });
+
+  // 占位按钮统一事件委托 — Gallery 上传已升级为真实功能，其余仍 alert
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-hm-action]');
+    if (!btn) return;
+    const action = btn.dataset.hmAction;
+    if (action === 'gallery-upload') {
+      e.preventDefault(); e.stopPropagation();
+      if (window.__galleryTriggerUpload) window.__galleryTriggerUpload();
+      return;
+    }
+    const map = {
+      'worlds-doc':       '📝 Worlds 上传文档功能 — 等后端方案确认后实现',
+      'worlds-workshop':  '⚙ 链接 Workshop 编辑器 — 等 Workshop 部署后填入真实 URL',
+      'studio-workshop':  '⚙ 链接 Workshop 编辑器 — 等 Workshop 部署后填入真实 URL',
+      'music-upload':     '🎵 Music MP3 上传 — 准备好 MP3 文件后填入 src 或 localStorage'
+    };
+    alert(map[action] || 'Coming Soon');
+  });
+})();
+
+/* =========================================================================
+   Sweets Shop Init — 万花筒换色 + 扭蛋机抽卡 + 愿望投币罐 + 小火车
+   ========================================================================= */
+(() => {
+  const LUCKY_TAGS = [
+    '大吉 · 今日の運勢は最高 ♡',
+    '中吉 · ちょっといいことあるかも',
+    '小吉 · 普通の一日です',
+    '吉 · 推しに会えるかもしれない',
+    '恋愛運 ↑ ↑ ↑ · 勇気出して',
+    '金運 ↑ · ちりも積もれば山となる',
+    '願い事 · 少しずつ叶う',
+    '今日のスイーツ · チョコレートが吉'
+  ];
+
+  const KALEI_PALETTES = [
+    ['#ff6b9d','#ffd93d','#6bcb77','#4d96ff','#d4c1ec','#f7d774','#ff9ec4','#b8e0d2'],
+    ['#00f5d4','#00bbf9','#fee440','#f15bb5','#9b5de5','#ff006e','#8338ec','#3a86ff'],
+    ['#ffadad','#ffd6a5','#fdffb6','#caffbf','#9bf6ff','#a0c4ff','#bdb2ff','#ffc6ff'],
+    ['#ff0a54','#ff477e','#ff7096','#ff85a1','#fbb1bd','#f9bec7','#f7cad0','#fae0e4'],
+    ['#264653','#2a9d8f','#e9c46a','#f4a261','#e76f51','#2b2d42','#8d99ae','#edf2f4']
+  ];
+
+  // ---------- 万花筒换色 ----------
+  document.addEventListener('click', (e) => {
+    const kalei = e.target.closest('.hm-kaleidoscope');
+    if (!kalei) return;
+    const colors = kalei.querySelectorAll('.hm-kaleidoscope-colors');
+    if (!colors.length) return;
+    const palette = KALEI_PALETTES[Math.floor(Math.random() * KALEI_PALETTES.length)];
+    colors.forEach((grid, gi) => {
+      grid.querySelectorAll('span').forEach((sp, i) => {
+        sp.style.background = palette[(i + gi * 2) % palette.length];
+      });
+    });
+    window.playClickSound?.();
+  });
+
+  // ---------- 扭蛋机抽卡 ----------
+  document.addEventListener('click', (e) => {
+    const knob = e.target.closest('#hmGashaponKnob');
+    if (!knob) return;
+    const gashapon = knob.closest('.hm-gashapon');
+    if (!gashapon || gashapon.classList.contains('is-dropping')) return;
+
+    gashapon.classList.add('is-dropping');
+    window.playClickSound?.();
+
+    setTimeout(() => {
+      gashapon.classList.remove('is-dropping');
+      gashapon.classList.add('is-bursting');
+
+      const lucky = LUCKY_TAGS[Math.floor(Math.random() * LUCKY_TAGS.length)];
+      // 弹 toast 显示运势
+      flashLucky(lucky);
+      // 愿望罐金币 +1
+      addWishCoin();
+
+      setTimeout(() => gashapon.classList.remove('is-bursting'), 600);
+    }, 1200);
+  });
+
+  function flashLucky(text) {
+    const t = document.createElement('div');
+    t.style.cssText = `
+      position:fixed; top:30%; left:50%; transform:translate(-50%,-50%) scale(.5);
+      background:linear-gradient(180deg,#fff8f0,#fff0e0);
+      border:2px solid #c48a4e; border-radius:6px; padding:18px 28px;
+      color:#4a2c1a; font-size:16px; font-weight:700;
+      box-shadow:0 8px 30px rgba(0,0,0,.25); text-align:center;
+      opacity:0; z-index:10000; font-family:cursive;
+    `;
+    t.innerHTML = `🎰 おみくじ ♡<br><span style="font-size:14px; color:#c48a4e; margin-top:6px; display:block;">${text}</span>`;
+    document.body.appendChild(t);
+    requestAnimationFrame(() => {
+      t.style.opacity = '1';
+      t.style.transform = 'translate(-50%,-50%) scale(1)';
+    });
+    setTimeout(() => {
+      t.style.opacity = '0';
+      t.style.transform = 'translate(-50%,-50%) scale(.9)';
+      setTimeout(() => t.remove(), 300);
+    }, 2800);
+  }
+
+  // ---------- 愿望投币罐 ----------
+  function addWishCoin() {
+    const jar = document.getElementById('hmWishJar');
+    if (!jar) return;
+    const coinsContainer = document.getElementById('hmWishCoins');
+    if (!coinsContainer) return;
+
+    const total = parseInt(localStorage.getItem('himemiro_wish_coins') || '0', 10) + 1;
+    localStorage.setItem('himemiro_wish_coins', total);
+
+    const coin = document.createElement('span');
+    const offset = (Math.random() * 30 - 15).toFixed(1);
+    coin.style.left = `calc(50% + ${offset}px)`;
+    coin.style.bottom = (10 + coinsContainer.children.length * 2) + 'px';
+    coin.style.animation = 'hm-coin-fall 1s ease-out forwards';
+    coin.style.setProperty('--x', offset + 'px');
+    coinsContainer.appendChild(coin);
+
+    jar.classList.add('is-glowing');
+    setTimeout(() => jar.classList.remove('is-glowing'), 600);
+  }
+
+  // 愿望罐输入框提交
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('#hmWishBtn');
+    if (!btn) return;
+    const jar = document.getElementById('hmWishJar');
+    const input = document.getElementById('hmWishInput');
+    const note = document.getElementById('hmWishNote');
+    const textEl = document.getElementById('hmWishText');
+    if (!jar || !input || !note || !textEl) return;
+
+    const text = input.value.trim() || 'なんでも願い事...';
+    textEl.textContent = text;
+    input.value = '';
+
+    addWishCoin();
+
+    // 弹出许愿签
+    note.style.opacity = '0';
+    note.style.transform = 'translate(-50%, -50%) scale(.4) rotate(-8deg)';
+    jar.classList.add('is-popping');
+    setTimeout(() => {
+      jar.classList.remove('is-popping');
+      note.style.opacity = '';
+      note.style.transform = '';
+    }, 500);
+
+    // 持久化最近愿望
+    try {
+      const wishes = JSON.parse(localStorage.getItem('himemiro_wishes') || '[]');
+      wishes.unshift({ text, ts: Date.now() });
+      localStorage.setItem('himemiro_wishes', JSON.stringify(wishes.slice(0, 5)));
+    } catch {}
+
+    window.playClickSound?.();
+  });
+
+  // 初始化愿望罐金币堆积（从 localStorage 恢复）
+  window.__onPage('sweets', () => {
+    setTimeout(() => {
+      const coinsContainer = document.getElementById('hmWishCoins');
+      if (!coinsContainer) return;
+      const total = parseInt(localStorage.getItem('himemiro_wish_coins') || '0', 10);
+      coinsContainer.innerHTML = '';
+      for (let i = 0; i < Math.min(total, 30); i++) {
+        const c = document.createElement('span');
+        c.style.left = `calc(50% + ${(Math.random() * 40 - 20).toFixed(1)}px)`;
+        c.style.bottom = (10 + (i % 10) * 2) + 'px';
+        coinsContainer.appendChild(c);
+      }
+    }, 500);
+  });
+
+  // ---------- 小火车 ----------
+  const trainHTML = `
+    <div class="hm-train">
+      <div class="hm-train-body">
+        <div class="hm-train-coach hm-train-engine"></div>
+        <div class="hm-train-coach"></div>
+        <div class="hm-train-coach"></div>
+      </div>
+    </div>
+  `;
+  document.body.insertAdjacentHTML('beforeend', trainHTML);
+
+})();
+
+/* =========================================================================
+   R1 · 复古挂历 · 撕页 + 废纸山堆积
+   ========================================================================= */
+(() => {
+  const MONTHS = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+  const WEEKDAYS = ['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
+  let currentDay = 17, currentMonth = 9, currentYear = 2026;
+
+  // 初始化挂历日期（用系统真实日期）
+  window.__onPage('gallery', () => {
+    setTimeout(() => {
+      const cal = document.querySelector('[data-tear-calendar]');
+      if (!cal) return;
+      const now = new Date();
+      currentDay = now.getDate(); currentMonth = now.getMonth(); currentYear = now.getFullYear();
+      document.getElementById('hmCalMonth').textContent = MONTHS[currentMonth] + ' ' + currentYear;
+      document.getElementById('hmCalDay').textContent = currentDay;
+      document.querySelector('.hm-calendar-weekday').textContent = '· ' + WEEKDAYS[now.getDay()] + ' ·';
+    }, 500);
+  });
+
+  // 挂历点击撕页
+  document.addEventListener('click', (e) => {
+    const cal = e.target.closest('[data-tear-calendar]');
+    if (!cal || cal.classList.contains('is-tearing')) return;
+
+    cal.classList.add('is-tearing');
+    window.playClickSound?.();
+
+    setTimeout(() => {
+      cal.classList.remove('is-tearing');
+      // 更新日期
+      currentDay++;
+      if (currentDay > new Date(currentYear, currentMonth + 1, 0).getDate()) {
+        currentDay = 1; currentMonth++;
+        if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+      }
+      document.getElementById('hmCalDay').textContent = currentDay;
+      document.getElementById('hmCalMonth').textContent = MONTHS[currentMonth] + ' ' + currentYear;
+      const wd = new Date(currentYear, currentMonth, currentDay).getDay();
+      document.querySelector('.hm-calendar-weekday').textContent = '· ' + WEEKDAYS[wd] + ' ·';
+      // 新的一天都是红圈重点
+      document.getElementById('hmCalDay').classList.add('is-today');
+      // 废纸山 +1
+      addTrashPiece();
+    }, 1400);
+  });
+
+  // 废纸山
+  function addTrashPiece() {
+    let pile = document.querySelector('.hm-trash-pile');
+    if (!pile) {
+      pile = document.createElement('div');
+      pile.className = 'hm-trash-pile';
+      document.body.appendChild(pile);
+    }
+    const s = document.createElement('span');
+    const w = 18 + Math.random() * 18;
+    s.style.width = w + 'px';
+    s.style.height = (w * .6) + 'px';
+    s.style.left = (Math.random() * 260 + 20) + 'px';
+    s.style.bottom = (Math.random() * 40) + 'px';
+    s.style.transform = `rotate(${(Math.random()*60-30).toFixed(1)}deg)`;
+    pile.appendChild(s);
+  }
+
+})();
+
+/* =========================================================================
+   R2+R3 · 桌面文具店 — 彩笔涂鸦 + 橡皮擦 + 打孔机 + 剪刀
+   ========================================================================= */
+(() => {
+  let activeTool = null; // 'crayon' | 'eraser' | 'puncher' | 'scissors' | null
+  let activeColor = '#ff6b9d';
+  let canvasEl = null, ctx2d = null, isDrawing = false, lastX = 0, lastY = 0;
+  let tempLine = null, tempLinePoints = [];
+
+  const CRAYON_COLORS = ['#ff6b9d','#ffd93d','#6bcb77','#4d96ff','#d4c1ec','#ff9ec4','#2d1810','#fff'];
+
+  function toggleToolbar() {
+    let tb = document.querySelector('.hm-toolbar');
+    if (tb) { tb.remove(); closeDoodle(); return; }
+    tb = document.createElement('div');
+    tb.className = 'hm-toolbar';
+    tb.innerHTML = `
+      <button class="hm-tool-btn hm-tool-crayon is-active" data-tool="crayon" style="--crayon:${activeColor}" title="彩笔">🎨</button>
+      <button class="hm-tool-btn hm-tool-eraser" data-tool="eraser" title="橡皮">🧽</button>
+      <button class="hm-tool-btn hm-tool-puncher" data-tool="puncher" title="打孔">⭕</button>
+      <button class="hm-tool-btn hm-tool-scissors" data-tool="scissors" title="剪刀">✂</button>
+      ${CRAYON_COLORS.map(c => `<button class="hm-tool-btn hm-tool-crayon-color" data-color="${c}" style="--crayon:${c}; background:${c}" title="选色"></button>`).join('')}
+      <button class="hm-tool-btn hm-tool-close" data-tool="close" title="关闭">✕</button>
+    `;
+    document.body.appendChild(tb);
+  }
+
+  document.addEventListener('click', (e) => {
+    // 入口按钮
+    if (e.target.closest('[data-toolbar-toggle]')) { toggleToolbar(); return; }
+
+    // 工具栏按钮
+    const btn = e.target.closest('.hm-tool-btn');
+    if (!btn) return;
+    const tool = btn.dataset.tool;
+
+    if (tool === 'close') { toggleToolbar(); return; }
+    if (tool === 'eraser' || tool === 'puncher' || tool === 'scissors' || tool === 'crayon') {
+      document.querySelectorAll('.hm-tool-btn').forEach(b => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
+      activeTool = tool;
+      if (tool === 'crayon' || tool === 'eraser') openDoodle(); else closeDoodle();
+      return;
+    }
+    if (btn.dataset.color) {
+      activeColor = btn.dataset.color;
+      document.querySelectorAll('[data-tool="crayon"]').forEach(b => b.style.setProperty('--crayon', activeColor));
+      if (canvasEl) canvasEl.style.cursor = 'crosshair';
+    }
+  });
+
+  function openDoodle() {
+    if (canvasEl) return;
+    canvasEl = document.createElement('canvas');
+    canvasEl.className = 'hm-doodle-canvas';
+    canvasEl.width = window.innerWidth;
+    canvasEl.height = window.innerHeight;
+    canvasEl.style.cursor = activeTool === 'eraser' ? 'cell' : 'crosshair';
+    document.body.appendChild(canvasEl);
+    ctx2d = canvasEl.getContext('2d');
+    ctx2d.lineCap = 'round';
+    ctx2d.lineJoin = 'round';
+  }
+
+  function closeDoodle() {
+    if (canvasEl) { canvasEl.remove(); canvasEl = null; ctx2d = null; }
+    isDrawing = false; activeTool = null;
+  }
+
+  // 窗口 resize 时 canvas 自适应
+  window.addEventListener('resize', () => {
+    if (canvasEl) {
+      const data = canvasEl.toDataURL();
+      canvasEl.width = window.innerWidth;
+      canvasEl.height = window.innerHeight;
+      const img = new Image();
+      img.onload = () => ctx2d.drawImage(img, 0, 0);
+      img.src = data;
+    }
+  });
+
+  // 涂鸦 / 橡皮 / 打孔 / 剪刀 交互
+  document.addEventListener('pointerdown', (e) => {
+    if (!activeTool) return;
+    const x = e.clientX, y = e.clientY;
+
+    if (activeTool === 'crayon' && canvasEl) {
+      isDrawing = true; lastX = x; lastY = y;
+      drawCrayon(x, y, x, y); // 起点画一个点
+      canvasEl.setPointerCapture?.(e.pointerId);
+    } else if (activeTool === 'eraser') {
+      spawnCrumbs(x, y);
+      // 橡皮效果：在 canvas 上擦除一小块区域（半透明）
+      if (canvasEl) {
+        ctx2d.globalCompositeOperation = 'destination-out';
+        ctx2d.beginPath(); ctx2d.arc(x, y, 24, 0, Math.PI * 2); ctx2d.fill();
+        ctx2d.globalCompositeOperation = 'source-over';
+      }
+      isDrawing = true; lastX = x; lastY = y;
+    } else if (activeTool === 'puncher') {
+      const hole = document.createElement('div');
+      hole.className = 'hm-hole-punch';
+      hole.style.left = (x - 12) + 'px'; hole.style.top = (y - 12) + 'px';
+      document.body.appendChild(hole);
+      setTimeout(() => hole.remove(), 400);
+      window.playClickSound?.();
+    } else if (activeTool === 'scissors') {
+      // 开始画剪裁线
+      tempLinePoints = [{ x, y }];
+    }
+  });
+
+  document.addEventListener('pointermove', (e) => {
+    if (!activeTool) return;
+    const x = e.clientX, y = e.clientY;
+
+    if (activeTool === 'crayon' && canvasEl && isDrawing) {
+      drawCrayon(lastX, lastY, x, y);
+      lastX = x; lastY = y;
+    } else if (activeTool === 'eraser' && isDrawing && canvasEl) {
+      ctx2d.globalCompositeOperation = 'destination-out';
+      ctx2d.beginPath(); ctx2d.arc(x, y, 24, 0, Math.PI * 2); ctx2d.fill();
+      ctx2d.globalCompositeOperation = 'source-over';
+      spawnCrumbs(x, y);
+      lastX = x; lastY = y;
+    } else if (activeTool === 'scissors' && tempLinePoints.length) {
+      tempLinePoints.push({ x, y });
+    }
+  });
+
+  document.addEventListener('pointerup', () => {
+    if (activeTool === 'crayon' || activeTool === 'eraser') isDrawing = false;
+    if (activeTool === 'scissors' && tempLinePoints.length >= 2) {
+      // 画一条红色剪裁线
+      for (let i = 1; i < tempLinePoints.length; i++) {
+        const p1 = tempLinePoints[i-1], p2 = tempLinePoints[i];
+        const line = document.createElement('div');
+        line.className = 'hm-cut-line';
+        const dx = p2.x - p1.x, dy = p2.y - p1.y;
+        const len = Math.sqrt(dx*dx + dy*dy);
+        const ang = Math.atan2(dy, dx) * 180 / Math.PI;
+        line.style.left = p1.x + 'px';
+        line.style.top = p1.y + 'px';
+        line.style.width = len + 'px';
+        line.style.transform = `rotate(${ang}deg)`;
+        line.style.transformOrigin = '0 50%';
+        document.body.appendChild(line);
+        setTimeout(() => line.remove(), 1200);
+      }
+      tempLinePoints = [];
+    }
+  });
+
+  // 彩笔效果：粗糙边缘（多层淡线叠加）
+  function drawCrayon(x1, y1, x2, y2) {
+    if (!ctx2d) return;
+    ctx2d.strokeStyle = activeColor;
+    ctx2d.lineWidth = 3;
+    for (let i = 0; i < 3; i++) {
+      ctx2d.globalAlpha = 1 - i * 0.25;
+      ctx2d.lineWidth = 3 - i * 0.8;
+      ctx2d.beginPath();
+      ctx2d.moveTo(x1 + (Math.random()*1.5-0.75), y1 + (Math.random()*1.5-0.75));
+      ctx2d.lineTo(x2 + (Math.random()*1.5-0.75), y2 + (Math.random()*1.5-0.75));
+      ctx2d.stroke();
+    }
+    ctx2d.globalAlpha = 1;
+  }
+
+  // 橡皮屑粒子
+  function spawnCrumbs(x, y) {
+    for (let i = 0; i < 6; i++) {
+      const c = document.createElement('div');
+      c.className = 'hm-crumb';
+      c.style.left = (x + Math.random()*20-10) + 'px';
+      c.style.top  = (y + Math.random()*10) + 'px';
+      c.style.background = ['#f48a9e','#ff6b9d','#ff9ec4'][Math.floor(Math.random()*3)];
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 1500);
+    }
+  }
+
+})();
+

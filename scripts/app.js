@@ -32,7 +32,7 @@
         <div class="gallery-nav-title">· MUSEUM MAP ·</div>
         <a class="gallery-nav-link" data-page-link="worlds">🏘 Worlds &amp; IP · 商业街</a>
         <a class="gallery-nav-link is-current">📸 Gallery · 公告栏</a>
-        <a class="gallery-nav-link" data-page-link="games">📺 Games · CRT 电脑</a>
+        <a class="gallery-nav-link" data-page-link="games">🎮 Games · Space Jam Hub</a>
         <a class="gallery-nav-link" data-page-link="studio">🎨 Studio · 工具箱</a>
         <a class="gallery-nav-link" data-page-link="music">🎵 Music · 点唱机</a>
         <a class="gallery-nav-link" data-page-link="archives">📁 Archives · 档案柜</a>
@@ -123,6 +123,22 @@
           </div>
         </div>
 
+        <!-- 复古挂历（撕页） -->
+        <div class="hm-calendar" data-tear-calendar style="position:absolute; right:24px; top:8px; transform:rotate(3deg);">
+          <div class="hm-calendar-month" id="hmCalMonth">OCTOBER 2026</div>
+          <div class="hm-calendar-day is-today" id="hmCalDay">17</div>
+          <div class="hm-calendar-weekday">· FRIDAY ·</div>
+          <div class="hm-calendar-tear"></div>
+        </div>
+
+        <!-- 桌面工具栏入口按钮（挂在 Gallery 角落） -->
+        <button data-toolbar-toggle="true" style="position:absolute; left:24px; top:12px; z-index:50;
+          background:#fff8f0; border:2px solid #c48a4e; border-radius:6px;
+          padding:6px 12px; font-weight:700; font-size:11px; letter-spacing:1px;
+          cursor:pointer; box-shadow:2px 2px 8px rgba(0,0,0,.15);">
+          ✂ 桌面文具店
+        </button>
+
         <!-- 中央大标题（打字机 + 橘红横线） -->
         <div class="gallery-big-title">
           <h1 class="gallery-title-main">GALLERY</h1>
@@ -134,103 +150,250 @@
   `;
   document.body.appendChild(gallery);
 
-  // 3. 注入 Games · CRT 电脑
+  // 3. 注入 Games · Space Jam Hub（替换原 CRT 电脑）
   const games = document.createElement('div');
-  games.className = 'page'; games.dataset.page = 'games';
+  games.className = 'page page--games-sj'; games.dataset.page = 'games';
   games.innerHTML = `
-    <div class="crt-scene" aria-label="Games · CRT 电脑">
-      <!-- 左侧导航（复用 Gallery 侧栏结构） -->
-      <div class="gallery-sidebar">
-        <div class="gallery-return" data-return-home="true">
-          <span class="return-scissors">✂</span>
-          <span class="return-label">返回桌面</span>
-        </div>
-        <div class="gallery-nav-title">· MUSEUM MAP ·</div>
-        <a class="gallery-nav-link" data-page-link="worlds">🏘 Worlds &amp; IP · 商业街</a>
-        <a class="gallery-nav-link" data-page-link="gallery">📸 Gallery · 公告栏</a>
-        <a class="gallery-nav-link is-current">📺 Games · CRT 电脑</a>
-        <a class="gallery-nav-link" data-page-link="studio">🎨 Studio · 工具箱</a>
-        <a class="gallery-nav-link" data-page-link="music">🎵 Music · 点唱机</a>
-        <a class="gallery-nav-link" data-page-link="archives">📁 Archives · 档案柜</a>
-      </div>
+    <div class="sj-scene" aria-label="Games · Space Jam Hub">
+      <!-- 主品牌顶栏 -->
+      <header class="sj-topbar">
+        <span class="sj-brand">◆ HIMEMIRO GAMES ◆</span>
+        <nav class="sj-topbar-nav">
+          <a data-page-link="home">MUSEUM</a>
+          <a data-page-link="gallery">GALLERY</a>
+          <a data-page-link="worlds">WORLDS</a>
+          <a data-page-link="sweets">SWEETS</a>
+          <a data-page-link="studio">STUDIO</a>
+          <a class="is-current">GAMES</a>
+          <a data-page-link="music">MUSIC</a>
+          <a data-page-link="archives">ARCHIVES</a>
+        </nav>
+      </header>
 
-      <!-- CRT 电脑外壳 + 屏幕 -->
-      <div class="crt-wrapper">
-        <!-- 显示器外壳 -->
-        <div class="crt-monitor">
-          <div class="crt-bezel">
-            <!-- CRT 屏幕 -->
-            <div class="crt-screen">
-              <!-- 扫描线 + 玻璃反光 -->
-              <div class="crt-scanlines" aria-hidden="true"></div>
-              <div class="crt-glow" aria-hidden="true"></div>
-              <!-- 屏幕内容（频道切换） -->
-              <div class="crt-content" id="crtContent">
-                <div class="crt-channel crt-channel--0 is-channel">
-                  <div class="crt-pong">
-                    <div class="pong-paddle pong-left"></div>
-                    <div class="pong-paddle pong-right"></div>
-                    <div class="pong-ball"></div>
-                    <div class="pong-score">00 · 00</div>
-                    <div class="crt-label">▶ PONG · 1972</div>
-                  </div>
-                </div>
-                <div class="crt-channel crt-channel--1">
-                  <div class="crt-tetris">
-                    <div class="tetris-grid">
-                      ${Array.from({length:20}).map((_,i)=>`<div class="tetris-cell ${Math.random()<.3?'is-block':''}" style="--d:${i%4};"></div>`).join('')}
-                    </div>
-                    <div class="crt-label">▶ BLOCKS · 1984</div>
-                  </div>
-                </div>
-                <div class="crt-channel crt-channel--2">
-                  <div class="crt-snake">
-                    ${Array.from({length:16}).map((_,i)=>`<div class="snake-seg" style="left:${10+i*14}px;top:${60+Math.sin(i)*20}px;animation-delay:${i*.1}s;"></div>`).join('')}
-                    <div class="crt-label">▶ SNAKE · 1997</div>
-                  </div>
-                </div>
-                <div class="crt-channel crt-channel--3">
-                  <div class="crt-demo">
-                    <pre class="crt-demo-text">
- HIMEMIRO COMPUTER v0.1
- -----------------------
- > HELLO, DREAMER...
- > WELCOME TO THE MUSEUM
- > CURRENT EXHIBIT: GALLERY
- > PRESS [SPACE] TO PLAY
-                    </pre>
-                  </div>
-                </div>
-              </div>
-              <!-- 雪花噪点（切换时出现） -->
-              <div class="crt-static" id="crtStatic"></div>
-              <!-- 频道号显示 -->
-              <div class="crt-channel-indicator" id="crtChNum">CH 01</div>
+      <!-- 左侧垂直星球导航 -->
+      <aside class="sj-planet-nav">
+        <button class="sj-planet sj-planet--jam is-current" data-game-view="hub">
+          <span class="sj-planet-label">JAM<br>CENTRAL</span>
+        </button>
+        <button class="sj-planet sj-planet--games" data-game-view="mygames">
+          <span class="sj-planet-label">MY<br>GAMES</span>
+        </button>
+        <button class="sj-planet sj-planet--flash" data-game-view="flash">
+          <span class="sj-planet-label">FLASH<br>ARCHIVE</span>
+        </button>
+        <button class="sj-planet sj-planet--external" data-game-view="external">
+          <span class="sj-planet-label">EXTERNAL<br>LINKS</span>
+        </button>
+      </aside>
+
+      <!-- 主内容区：内部嵌套子页面 -->
+      <main class="sj-main">
+
+        <!-- 视图 0: Hub（Space Jam Site Map 风格）-->
+        <section class="sj-view sj-view--hub is-active" data-game-view="hub">
+          <div class="sj-hero-title">
+            <div class="sj-ellipse sj-ellipse--purple">
+              <span class="sj-ellipse-text">JAM CENTRAL</span>
             </div>
-            <!-- 屏幕边框小标签 -->
-            <div class="crt-brand">HIMEMIRO · COLOR</div>
           </div>
-          <!-- 显示器底座 -->
-          <div class="crt-base"></div>
-          <!-- 旋钮区 -->
-          <div class="crt-knobs">
-            <button class="crt-knob crt-knob--left" data-channel-prev="true" aria-label="上一个频道"></button>
-            <span class="crt-knob-label">CHANNEL</span>
-            <button class="crt-knob crt-knob--right" data-channel-next="true" aria-label="下一个频道"></button>
-            <button class="crt-power" id="crtPower" aria-label="电源">⚡</button>
+          <p class="sj-body">Welcome to the Games Hub — your portal to the HIMEMIRO arcade. Explore original creations, browse the flash archive, and jump out to external collections.</p>
+          <div class="sj-sitemap">
+            <!-- Row 1 -->
+            <a class="sj-sitemap-card sj-sitemap-card--games" data-game-view="mygames">
+              <div class="sj-sitemap-planet sj-planet--games"></div>
+              <div class="sj-sitemap-info">
+                <div class="sj-sitemap-title">MY GAMES</div>
+                <div class="sj-sitemap-desc">Original HIMEMIRO creations + upcoming titles</div>
+              </div>
+            </a>
+            <a class="sj-sitemap-card sj-sitemap-card--flash" data-game-view="flash">
+              <div class="sj-sitemap-planet sj-planet--flash"></div>
+              <div class="sj-sitemap-info">
+                <div class="sj-sitemap-title">FLASH ARCHIVE</div>
+                <div class="sj-sitemap-desc">Curated collection of classic 2000s flash games</div>
+              </div>
+            </a>
+            <a class="sj-sitemap-card sj-sitemap-card--external" data-game-view="external">
+              <div class="sj-sitemap-planet sj-planet--external"></div>
+              <div class="sj-sitemap-info">
+                <div class="sj-sitemap-title">EXTERNAL LINKS</div>
+                <div class="sj-sitemap-desc">Hand-picked indie game portfolios &amp; archives</div>
+              </div>
+            </a>
+            <!-- Row 2 -->
+            <a class="sj-sitemap-card sj-sitemap-card--behind" href="#" onclick="return false;">
+              <div class="sj-sitemap-planet sj-planet--behind"></div>
+              <div class="sj-sitemap-info">
+                <div class="sj-sitemap-title">BEHIND THE SCENES</div>
+                <div class="sj-sitemap-desc">→ Coming Soon — development diaries &amp; lore</div>
+              </div>
+            </a>
+            <a class="sj-sitemap-card sj-sitemap-card--community" href="#" onclick="return false;">
+              <div class="sj-sitemap-planet sj-planet--community"></div>
+              <div class="sj-sitemap-info">
+                <div class="sj-sitemap-title">COMMUNITY ZONE</div>
+                <div class="sj-sitemap-desc">→ Coming Soon — guestbook &amp; doodle wall</div>
+              </div>
+            </a>
+            <a class="sj-sitemap-card sj-sitemap-card--merch" href="#" onclick="return false;">
+              <div class="sj-sitemap-planet sj-planet--merch"></div>
+              <div class="sj-sitemap-info">
+                <div class="sj-sitemap-title">STELLAR SOUVENIRS</div>
+                <div class="sj-sitemap-desc">→ Coming Soon — printable stickers &amp; assets</div>
+              </div>
+            </a>
           </div>
-        </div>
+        </section>
 
-        <!-- 桌面（屏幕下方） -->
-        <div class="crt-desk">
-          <div class="crt-icon" data-page-link="gallery">📸 Gallery</div>
-          <div class="crt-icon" data-page-link="worlds">🏘 Worlds</div>
-          <div class="crt-icon" data-page-link="studio">🎨 Studio</div>
-          <div class="crt-icon crt-icon--trash">🗑 TRASH</div>
-          <!-- 开始菜单 -->
-          <div class="crt-start">▶ START</div>
-        </div>
-      </div>
+        <!-- 视图 1: My Games（Planet B-Ball 风格）-->
+        <section class="sj-view sj-view--mygames" data-game-view="mygames">
+          <div class="sj-hero-title">
+            <div class="sj-ellipse sj-ellipse--green">
+              <span class="sj-ellipse-text">MY GAMES</span>
+            </div>
+          </div>
+          <p class="sj-body">Games made or curated by the HIMEMIRO studio. One released, many more in development.</p>
+          <div class="sj-game-grid">
+            <!-- 占位 1: 你已有的游戏（mmm 文件夹那个）-->
+            <a class="sj-game-card" href="#" target="_blank" rel="noopener" data-placeholder="game">
+              <div class="sj-game-thumb sj-game-thumb--placeholder">
+                <span class="sj-game-placeholder-emoji">🎮</span>
+              </div>
+              <div class="sj-game-info">
+                <div class="sj-game-title">YOUR GAME</div>
+                <div class="sj-game-meta">Release · 2026 · [LINK PENDING]</div>
+                <div class="sj-game-desc">Your original game — replace this placeholder with the real link &amp; screenshot.</div>
+              </div>
+              <div class="sj-game-badge sj-badge--green">PLAY</div>
+            </a>
+            <!-- 占位 2: Coming Soon -->
+            <div class="sj-game-card sj-game-card--coming">
+              <div class="sj-game-thumb sj-game-thumb--placeholder">
+                <span class="sj-game-placeholder-emoji">👻</span>
+              </div>
+              <div class="sj-game-info">
+                <div class="sj-game-title">TITLE TBD</div>
+                <div class="sj-game-meta">In Development</div>
+                <div class="sj-game-desc">A new HIMEMIRO original — concept &amp; mechanics in progress.</div>
+              </div>
+              <div class="sj-game-badge sj-badge--yellow">SOON</div>
+            </div>
+            <!-- 占位 3: Coming Soon -->
+            <div class="sj-game-card sj-game-card--coming">
+              <div class="sj-game-thumb sj-game-thumb--placeholder">
+                <span class="sj-game-placeholder-emoji">✨</span>
+              </div>
+              <div class="sj-game-info">
+                <div class="sj-game-title">TITLE TBD</div>
+                <div class="sj-game-meta">In Development</div>
+                <div class="sj-game-desc">Another slot reserved for a future release.</div>
+              </div>
+              <div class="sj-game-badge sj-badge--yellow">SOON</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 视图 2: Flash Archive（Photos from the Film 风格）-->
+        <section class="sj-view sj-view--flash" data-game-view="flash">
+          <div class="sj-hero-title">
+            <div class="sj-ellipse sj-ellipse--orange">
+              <span class="sj-ellipse-text">FLASH ARCHIVE</span>
+            </div>
+          </div>
+          <p class="sj-body">Curated classics from the Web Design Museum. All open in a new tab — click to jump.</p>
+          <div class="sj-flash-grid">
+            <a class="sj-flash-card" href="https://www.webdesignmuseum.org/flash-games/my-new-room-in-2008" target="_blank" rel="noopener">
+              <div class="sj-flash-thumb sj-flash-thumb--placeholder">🛋️</div>
+              <div class="sj-flash-title">MY NEW ROOM</div>
+              <div class="sj-flash-meta">2008 · Miniclip · Dress-up</div>
+              <div class="sj-flash-external">↗ WEBDESIGNMUSEUM.ORG</div>
+            </a>
+            <a class="sj-flash-card" href="https://www.webdesignmuseum.org/flash-games/goofys-silly-slide-in-2006" target="_blank" rel="noopener">
+              <div class="sj-flash-thumb sj-flash-thumb--placeholder">🏄</div>
+              <div class="sj-flash-title">GOOFY'S SILLY SLIDE</div>
+              <div class="sj-flash-meta">2006 · Disney · Platform</div>
+              <div class="sj-flash-external">↗ WEBDESIGNMUSEUM.ORG</div>
+            </a>
+            <a class="sj-flash-card" href="https://www.webdesignmuseum.org/flash-games/happy-tree-friends-cuddles-pet-smoochie-in-2003" target="_blank" rel="noopener">
+              <div class="sj-flash-thumb sj-flash-thumb--placeholder">🌳</div>
+              <div class="sj-flash-title">HAPPY TREE FRIENDS</div>
+              <div class="sj-flash-meta">2003 · Mondo · Arcade</div>
+              <div class="sj-flash-external">↗ WEBDESIGNMUSEUM.ORG</div>
+            </a>
+            <a class="sj-flash-card" href="https://www.webdesignmuseum.org/flash-game-exhibitions/spongebob-coloring-book-in-2000" target="_blank" rel="noopener">
+              <div class="sj-flash-thumb sj-flash-thumb--placeholder">🧽</div>
+              <div class="sj-flash-title">SPONGEBOB COLORING</div>
+              <div class="sj-flash-meta">2000 · Nickelodeon · Art</div>
+              <div class="sj-flash-external">↗ WEBDESIGNMUSEUM.ORG</div>
+            </a>
+            <a class="sj-flash-card" href="https://www.webdesignmuseum.org/flash-games/doras-matching-game-in-2003" target="_blank" rel="noopener">
+              <div class="sj-flash-thumb sj-flash-thumb--placeholder">🗺️</div>
+              <div class="sj-flash-title">DORA'S MATCHING</div>
+              <div class="sj-flash-meta">2003 · Nickelodeon · Puzzle</div>
+              <div class="sj-flash-external">↗ WEBDESIGNMUSEUM.ORG</div>
+            </a>
+            <a class="sj-flash-card" href="https://www.webdesignmuseum.org/flash-games/sushi-cat-2-in-2011" target="_blank" rel="noopener">
+              <div class="sj-flash-thumb sj-flash-thumb--placeholder">🍣</div>
+              <div class="sj-flash-title">SUSHI CAT 2</div>
+              <div class="sj-flash-meta">2011 · Freeware · Casual</div>
+              <div class="sj-flash-external">↗ WEBDESIGNMUSEUM.ORG</div>
+            </a>
+            <a class="sj-flash-card" href="https://www.webdesignmuseum.org/flash-games/bear-in-the-big-blue-house-cake-bake-in-2001" target="_blank" rel="noopener">
+              <div class="sj-flash-thumb sj-flash-thumb--placeholder">🧁</div>
+              <div class="sj-flash-title">BEAR'S CAKE BAKE</div>
+              <div class="sj-flash-meta">2001 · Jim Henson · Cooking</div>
+              <div class="sj-flash-external">↗ WEBDESIGNMUSEUM.ORG</div>
+            </a>
+            <a class="sj-flash-card" href="https://www.webdesignmuseum.org/flash-games/kindergarten-in-2007" target="_blank" rel="noopener">
+              <div class="sj-flash-thumb sj-flash-thumb--placeholder">🎨</div>
+              <div class="sj-flash-title">KINDERGARTEN</div>
+              <div class="sj-flash-meta">2007 · Freeware · Education</div>
+              <div class="sj-flash-external">↗ WEBDESIGNMUSEUM.ORG</div>
+            </a>
+          </div>
+        </section>
+
+        <!-- 视图 3: External Links（Lunar Tunes 风格）-->
+        <section class="sj-view sj-view--external" data-game-view="external">
+          <div class="sj-hero-title">
+            <div class="sj-ellipse sj-ellipse--red">
+              <span class="sj-ellipse-text">EXTERNAL LINKS</span>
+            </div>
+          </div>
+          <p class="sj-body">Hand-picked links to sites that inspired HIMEMIRO — indie collections, museum archives, and developer diaries.</p>
+          <div class="sj-ext-grid">
+            <div class="sj-ext-card">
+              <div class="sj-ext-thumb sj-ext-thumb--placeholder">📚</div>
+              <div class="sj-ext-title">WEBDESIGNMUSEUM.ORG</div>
+              <div class="sj-ext-meta">Web design &amp; flash game archive</div>
+              <a class="sj-ext-link" href="https://www.webdesignmuseum.org" target="_blank" rel="noopener">VISIT →</a>
+            </div>
+            <div class="sj-ext-card">
+              <div class="sj-ext-thumb sj-ext-thumb--placeholder">🎪</div>
+              <div class="sj-ext-title">[ADD YOUR LINK]</div>
+              <div class="sj-ext-meta">Placeholder slot — edit to add more</div>
+              <span class="sj-ext-link sj-ext-link--disabled">PENDING</span>
+            </div>
+            <div class="sj-ext-card">
+              <div class="sj-ext-thumb sj-ext-thumb--placeholder">🔗</div>
+              <div class="sj-ext-title">[ADD YOUR LINK]</div>
+              <div class="sj-ext-meta">Placeholder slot — edit to add more</div>
+              <span class="sj-ext-link sj-ext-link--disabled">PENDING</span>
+            </div>
+            <div class="sj-ext-card">
+              <div class="sj-ext-thumb sj-ext-thumb--placeholder">🌟</div>
+              <div class="sj-ext-title">[ADD YOUR LINK]</div>
+              <div class="sj-ext-meta">Placeholder slot — edit to add more</div>
+              <span class="sj-ext-link sj-ext-link--disabled">PENDING</span>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- 底部版权 -->
+      <footer class="sj-footer">
+        SPACE JAM IN HIMEMIRO — © 2026 HIMEMIRO STUDIO
+      </footer>
     </div>
   `;
   document.body.appendChild(games);
@@ -249,7 +412,7 @@
         <div class="gallery-nav-title">· MUSEUM MAP ·</div>
         <a class="gallery-nav-link is-current">🏘 Worlds &amp; IP · 商业街</a>
         <a class="gallery-nav-link" data-page-link="gallery">📸 Gallery · 公告栏</a>
-        <a class="gallery-nav-link" data-page-link="games">📺 Games · CRT 电脑</a>
+        <a class="gallery-nav-link" data-page-link="games">🎮 Games · Space Jam Hub</a>
         <a class="gallery-nav-link" data-page-link="studio">🎨 Studio · 工具箱</a>
         <a class="gallery-nav-link" data-page-link="music">🎵 Music · 点唱机</a>
         <a class="gallery-nav-link" data-page-link="archives">📁 Archives · 档案柜</a>
@@ -312,15 +475,15 @@
           </div>
         </div>
 
-        <!-- 店铺 5：未来的空格 -->
-        <div class="shop shop--empty" data-shop="future">
-          <div class="shop-awning shop-awning--cream"></div>
-          <div class="shop-sign" style="--ws:180px; --s:13px;">
-            <span class="shop-sign-text" style="writing-mode:vertical-rl;">募集中...</span>
+        <!-- 店铺 5：糖果店 HIMEMIRO スイーツ店 -->
+        <div class="shop shop--sweets" data-shop="sweets">
+          <div class="shop-awning shop-awning--pink"></div>
+          <div class="shop-sign" style="--ws:200px; --s:14px;">
+            <span class="shop-sign-text" style="writing-mode:vertical-rl;">HIMEMIRO スイーツ店</span>
           </div>
           <div class="shop-front">
-            <div class="shop-window">?</div>
-            <div class="shop-door" style="opacity:.3;">COMING</div>
+            <div class="shop-window">🍫<br>🍭<br>🎰</div>
+            <div class="shop-door" data-shop-open="true">→ OPEN</div>
           </div>
         </div>
       </div>
@@ -563,6 +726,157 @@ TRACKS · 12
     </div>
   `;
   document.body.appendChild(archives);
+
+  // 6. 注入 Sweets Shop · 糖果店（纯 CSS 甜品 + 扭蛋 + 愿望罐 + 万花筒）
+  const sweets = document.createElement('div');
+  sweets.className = 'page page--sweets'; sweets.dataset.page = 'sweets';
+  sweets.innerHTML = `
+    <div class="sweets-scene" aria-label="Sweets Shop · 糖果店">
+      <div class="gallery-sidebar">
+        <div class="gallery-return" data-return-home="true">
+          <span class="return-scissors">✂</span><span class="return-label">返回桌面</span>
+        </div>
+        <div class="gallery-nav-title">· MUSEUM MAP ·</div>
+        <a class="gallery-nav-link" data-page-link="gallery">📸 Gallery · 公告栏</a>
+        <a class="gallery-nav-link" data-page-link="worlds">🏘 Worlds · 商业街</a>
+        <a class="gallery-nav-link is-current">🍭 Sweets · 糖果店</a>
+        <a class="gallery-nav-link" data-page-link="games">🎮 Games · Space Jam Hub</a>
+        <a class="gallery-nav-link" data-page-link="studio">🎨 Studio · 工具箱</a>
+        <a class="gallery-nav-link" data-page-link="music">🎵 Music · 点唱机</a>
+        <a class="gallery-nav-link" data-page-link="archives">📁 Archives · 档案柜</a>
+        <a class="gallery-nav-link" data-page-link="sweets">🍭 Sweets · 糖果店</a>
+      </div>
+
+      <div class="hm-sweets-title">🍫 SWEETS SHOP ♡</div>
+      <div class="hm-sweets-subtitle">Y2K CANDY STORE · SINCE 2026</div>
+
+      <div class="hm-sweets-stage">
+        <!-- 万花筒（角落装饰） -->
+        <div class="hm-kaleidoscope" style="position:absolute; right:20px; top:20px;">
+          <div class="hm-kaleidoscope-barrel">
+            <div class="hm-kaleidoscope-lens" id="hmKaleiLens">
+              <div class="hm-kaleidoscope-sector" style="transform: rotate(0deg);">
+                <div><div class="hm-kaleidoscope-inner"><div class="hm-kaleidoscope-colors" id="hmKaleiColors">
+                  <span style="background:#ff6b9d"></span><span style="background:#ffd93d"></span><span style="background:#6bcb77"></span><span style="background:#4d96ff"></span>
+                  <span style="background:#d4c1ec"></span><span style="background:#f7d774"></span><span style="background:#ff9ec4"></span><span style="background:#b8e0d2"></span>
+                  <span style="background:#ff6b9d"></span><span style="background:#ffd93d"></span><span style="background:#6bcb77"></span><span style="background:#4d96ff"></span>
+                  <span style="background:#d4c1ec"></span><span style="background:#f7d774"></span><span style="background:#ff9ec4"></span><span style="background:#b8e0d2"></span>
+                </div></div></div>
+              </div>
+              <div class="hm-kaleidoscope-sector" style="transform: rotate(60deg) scaleX(-1);">
+                <div><div class="hm-kaleidoscope-inner"><div class="hm-kaleidoscope-colors">
+                  <span style="background:#6bcb77"></span><span style="background:#ff6b9d"></span><span style="background:#d4c1ec"></span><span style="background:#ffd93d"></span>
+                  <span style="background:#4d96ff"></span><span style="background:#ff9ec4"></span><span style="background:#b8e0d2"></span><span style="background:#f7d774"></span>
+                  <span style="background:#6bcb77"></span><span style="background:#ff6b9d"></span><span style="background:#d4c1ec"></span><span style="background:#ffd93d"></span>
+                  <span style="background:#4d96ff"></span><span style="background:#ff9ec4"></span><span style="background:#b8e0d2"></span><span style="background:#f7d774"></span>
+                </div></div></div>
+              </div>
+              <div class="hm-kaleidoscope-sector" style="transform: rotate(120deg);">
+                <div><div class="hm-kaleidoscope-inner"><div class="hm-kaleidoscope-colors">
+                  <span style="background:#ffd93d"></span><span style="background:#d4c1ec"></span><span style="background:#ff6b9d"></span><span style="background:#6bcb77"></span>
+                  <span style="background:#ff9ec4"></span><span style="background:#4d96ff"></span><span style="background:#f7d774"></span><span style="background:#b8e0d2"></span>
+                  <span style="background:#ffd93d"></span><span style="background:#d4c1ec"></span><span style="background:#ff6b9d"></span><span style="background:#6bcb77"></span>
+                  <span style="background:#ff9ec4"></span><span style="background:#4d96ff"></span><span style="background:#f7d774"></span><span style="background:#b8e0d2"></span>
+                </div></div></div>
+              </div>
+              <div class="hm-kaleidoscope-sector" style="transform: rotate(180deg) scaleX(-1);">
+                <div><div class="hm-kaleidoscope-inner"><div class="hm-kaleidoscope-colors">
+                  <span style="background:#4d96ff"></span><span style="background:#b8e0d2"></span><span style="background:#ffd93d"></span><span style="background:#f7d774"></span>
+                  <span style="background:#ff6b9d"></span><span style="background:#ff9ec4"></span><span style="background:#d4c1ec"></span><span style="background:#6bcb77"></span>
+                  <span style="background:#4d96ff"></span><span style="background:#b8e0d2"></span><span style="background:#ffd93d"></span><span style="background:#f7d774"></span>
+                  <span style="background:#ff6b9d"></span><span style="background:#ff9ec4"></span><span style="background:#d4c1ec"></span><span style="background:#6bcb77"></span>
+                </div></div></div>
+              </div>
+              <div class="hm-kaleidoscope-sector" style="transform: rotate(240deg);">
+                <div><div class="hm-kaleidoscope-inner"><div class="hm-kaleidoscope-colors">
+                  <span style="background:#d4c1ec"></span><span style="background:#6bcb77"></span><span style="background:#4d96ff"></span><span style="background:#b8e0d2"></span>
+                  <span style="background:#f7d774"></span><span style="background:#ff6b9d"></span><span style="background:#ff9ec4"></span><span style="background:#ffd93d"></span>
+                  <span style="background:#d4c1ec"></span><span style="background:#6bcb77"></span><span style="background:#4d96ff"></span><span style="background:#b8e0d2"></span>
+                  <span style="background:#f7d774"></span><span style="background:#ff6b9d"></span><span style="background:#ff9ec4"></span><span style="background:#ffd93d"></span>
+                </div></div></div>
+              </div>
+              <div class="hm-kaleidoscope-sector" style="transform: rotate(300deg) scaleX(-1);">
+                <div><div class="hm-kaleidoscope-inner"><div class="hm-kaleidoscope-colors">
+                  <span style="background:#b8e0d2"></span><span style="background:#4d96ff"></span><span style="background:#f7d774"></span><span style="background:#d4c1ec"></span>
+                  <span style="background:#6bcb77"></span><span style="background:#ffd93d"></span><span style="background:#ff6b9d"></span><span style="background:#ff9ec4"></span>
+                  <span style="background:#b8e0d2"></span><span style="background:#4d96ff"></span><span style="background:#f7d774"></span><span style="background:#d4c1ec"></span>
+                  <span style="background:#6bcb77"></span><span style="background:#ffd93d"></span><span style="background:#ff6b9d"></span><span style="background:#ff9ec4"></span>
+                </div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 🍫 散点甜品装饰 -->
+        <div class="hm-choco-bar bitten"   style="position:absolute; left:60px; top:60px;  --r:-5deg; transform: rotate(-5deg);"></div>
+        <div class="hm-choco-bar"          style="position:absolute; left:240px; top:180px; transform: rotate(4deg);"></div>
+        <div class="hm-macaron pink"       style="position:absolute; left:130px; top:310px; transform: rotate(-8deg);"><div class="hm-macaron-fill"></div></div>
+        <div class="hm-macaron mint"       style="position:absolute; left:320px; top:380px; transform: rotate(6deg);"><div class="hm-macaron-fill"></div></div>
+        <div class="hm-macaron lavender"   style="position:absolute; left:80px;  top:440px; transform: rotate(3deg);"><div class="hm-macaron-fill"></div></div>
+        <div class="hm-lollipop"           style="position:absolute; left:420px; top:100px;">
+          <div class="hm-lollipop-stick"></div>
+        </div>
+        <div class="hm-candy-jar"          style="position:absolute; left:170px; top:140px;">
+          <div class="hm-candy-jar-lid"></div>
+          <div class="hm-candy-jar-body"></div>
+        </div>
+        <div class="hm-gummy-heart"        style="position:absolute; left:480px; top:350px;">
+          <div class="gummy-bottom"></div>
+        </div>
+        <div class="hm-choco-coin"         style="position:absolute; left:340px; top:470px; transform: rotate(-12deg);"></div>
+        <div class="hm-choco-coin"         style="position:absolute; left:370px; top:485px; transform: rotate(8deg);"></div>
+        <div class="hm-choco-coin"         style="position:absolute; left:310px; top:480px; transform: rotate(-3deg);"></div>
+
+        <!-- 🎰 Y2K 扭蛋机 -->
+        <div class="hm-gashapon" id="hmGashapon" style="position:absolute; right:160px; top:300px;">
+          <div class="hm-gashapon-label">GASHAPON · 100円</div>
+          <div class="hm-gashapon-top">
+            <div class="hm-gashapon-window"><div class="hm-gashapon-eggs"></div></div>
+          </div>
+          <div class="hm-gashapon-base">
+            <div class="hm-gashapon-knob" id="hmGashaponKnob" title="点击扭蛋！"></div>
+            <div class="hm-gashapon-chute"></div>
+          </div>
+          <div class="hm-gashapon-egg-drop"></div>
+          <div class="hm-gashapon-egg-burst"></div>
+        </div>
+
+        <!-- 💰 愿望投币罐 -->
+        <div class="hm-wish-jar" id="hmWishJar" style="position:absolute; left:540px; top:300px;">
+          <div class="hm-wish-jar-input">
+            <input type="text" id="hmWishInput" maxlength="24" placeholder="输入愿望..." />
+            <button id="hmWishBtn">投币许愿 ♡</button>
+          </div>
+          <div class="hm-wish-jar-lid"></div>
+          <div class="hm-wish-jar-body">
+            <div class="hm-wish-jar-coins" id="hmWishCoins"></div>
+          </div>
+          <div class="hm-wish-note" id="hmWishNote">
+            <div style="font-size:10px; color:#8a6e1a; letter-spacing:2px;">WISH · 願い事</div>
+            <div style="font-size:14px; margin:8px 0; color:#4a2c1a;" id="hmWishText">— — —</div>
+            <div class="hm-wish-note-stamp">魔法封印</div>
+          </div>
+        </div>
+
+        <!-- 手写价格便签（胶带固定） -->
+        <div style="position:absolute; left:200px; top:250px; transform:rotate(-6deg);
+          background:#fff3d6; padding:10px 14px; font-family:cursive; font-size:12px;
+          border-radius:2px; box-shadow:2px 3px 8px rgba(0,0,0,.15);">
+          🍫 黑巧克力 ¥88<br>
+          🌸 马卡龙 ¥120<br>
+          🍭 棒棒糖 ¥50<br>
+          🎰 扭蛋 ¥100
+        </div>
+        <div style="position:absolute; right:40px; bottom:20px; transform:rotate(4deg);
+          background:#fde2e4; padding:8px 12px; font-family:cursive; font-size:11px;
+          border-radius:2px; box-shadow:2px 3px 8px rgba(0,0,0,.15);">
+          ✦ 今日限定 ♡<br>
+          愿望投币罐开放中
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(sweets);
 
   // 3. SPA 切换逻辑
   const allPages = document.querySelectorAll('.page');
@@ -855,6 +1169,8 @@ document.querySelectorAll('[data-page-link]').forEach(el => {
       body: '只收现金，不挂招牌，推门要敲三下。店主一个人守着 3000 张黑胶，什么都能聊，就是不卖 CD。点唱机免费，随你播。' },
     future: { title: '???', sub: 'COMING SOON',
       body: '还在装修……可能是糖果店？可能是猫咖？煤咪露说要保密，巡夢姬说她早就知道了但不说。' },
+    sweets: { title: 'HIMEMIRO スイーツ店', sub: 'Y2K Candy Shop · since 2026',
+      body: '整条街最甜的角落。黑巧克力排配咬痕、粉色马卡龙、彩虹棒棒糖、玻璃糖果罐、Y2K 塑料扭蛋机和复古愿望投币罐。点扭蛋试试手气，或往愿望罐里投一枚巧克力金币许愿 ♡' }
   };
 
   function closeAllPanels() {

@@ -132,6 +132,34 @@
   /* ===== 降低动画偏好（accessibility） ===== */
   --transition-reduced: 0ms;
 
+  /* ===== Space Jam 1996 风格扩展（Games Hub 专用）===== */
+  --sj-bg:            #05050a;
+  --sj-star:          rgba(255,255,255,0.75);
+  --sj-star-soft:     rgba(255,255,255,0.40);
+  --sj-text-red:      #e63041;
+  --sj-text-red-dark: #8b1a24;
+  --sj-text-yellow:   #ffd54f;
+  --sj-text-gold:     #ffb74d;
+  --sj-title-purple:  #5b3d8a;
+  --sj-title-green:   #3da55b;
+  --sj-title-orange:  #ff7a2e;
+  --sj-title-red:     #c0392b;
+  --sj-border-dark:   #1a1a2e;
+  --sj-glow:          0 0 24px rgba(230,48,65,0.35);
+
+  /* ===== HIMEMIRO Sweets Shop · 马卡龙色系 ===== */
+  --sw-pink-soft:     #fde2e4;   /* 奶油粉 */
+  --sw-pink-deep:     #f8b4c4;   /* 草莓粉 */
+  --sw-mint:          #b8e0d2;   /* 薄荷绿 */
+  --sw-matcha:        #9cb37d;   /* 抹茶绿 */
+  --sw-caramel:       #c48a4e;   /* 焦糖棕 */
+  --sw-cocoa:         #4a2c1a;   /* 可可深棕 */
+  --sw-choco-dark:    #2d1810;   /* 黑巧克力 */
+  --sw-cream:         #fff8f0;   /* 奶白 */
+  --sw-gold:          #f7d774;   /* 糖纸金 */
+  --sw-vanilla:       #fff3d6;   /* 香草奶油 */
+  --sw-marshmallow:   #f4d6e2;   /* 棉花糖粉 */
+  --sw-lavender:      #d4c1ec;   /* 薰衣草紫 */
 }
 
 /* reduced-motion：系统设了就停掉所有过渡（工坊和官网共用） */
