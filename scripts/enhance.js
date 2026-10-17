@@ -985,10 +985,224 @@
 (() => {
   const SNAP_DIST = 60; // 吸附阈值（px）
   const ZONE_OFFSET = {
-    cone:  { x: 0, y: -40 },   // 甜筒球的初始堆叠偏移
+    cone:  { x: 0, y: -40 },
     cup:   { x: 0, y: -50 },
     plate: { x: 0, y: -20 }
   };
+
+  /* ---------- Web Audio · 音效 ---------- */
+  let _audCtx = null;
+  function aud() {
+    if (!_audCtx) _audCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return _audCtx;
+  }
+  // 短促 POP 吸附声
+  function playPop() {
+    try {
+      const c = aud(); const t = c.currentTime;
+      const o = c.createOscillator(); const g = c.createGain();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(900, t);
+      o.frequency.exponentialRampToValueAtTime(280, t + 0.12);
+      g.gain.setValueAtTime(0.35, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+      o.connect(g).connect(c.destination);
+      o.start(t); o.stop(t + 0.2);
+    } catch(e){}
+  }
+  // 开心 Mua~ 开吃声（三连 beep 渐弱）
+  function playMua() {
+    try {
+      const c = aud();
+      [0, 0.12, 0.26].forEach((delay, i) => {
+        const t = c.currentTime + delay;
+        const o = c.createOscillator(); const g = c.createGain();
+        o.type = 'triangle';
+        o.frequency.setValueAtTime(660 - i*80, t);
+        g.gain.setValueAtTime(0.25 - i*0.06, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+        o.connect(g).connect(c.destination);
+        o.start(t); o.stop(t + 0.22);
+      });
+    } catch(e){}
+  }
+  // 拍照咔哒声
+  function playSnap() {
+    try {
+      const c = aud(); const t = c.currentTime;
+      // 短促白噪声模拟快门
+      const buf = c.createBuffer(1, c.sampleRate * 0.08, c.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = (Math.random()*2-1) * (1 - i/d.length);
+      const src = c.createBufferSource(); src.buffer = buf;
+      const g = c.createGain(); g.gain.value = 0.5;
+      src.connect(g).connect(c.destination); src.start(t);
+      // 高频叮
+      const o = c.createOscillator(); const g2 = c.createGain();
+      o.type = 'sine'; o.frequency.setValueAtTime(1800, t+0.06);
+      g2.gain.setValueAtTime(0.2, t+0.06);
+      g2.gain.exponentialRampToValueAtTime(0.001, t+0.2);
+      o.connect(g2).connect(c.destination);
+      o.start(t+0.06); o.stop(t+0.25);
+    } catch(e){}
+  }
+
+  /* ---------- 素材数据（名称 + 价格 ¥） ---------- */
+  const FLAVOR_NAME = {
+    vanilla: '香草', strawberry: '草莓', chocolate: '巧克力', matcha: '抹茶'
+  };
+  const TOPPING_NAME = {
+    sprinkles: '彩虹糖针', 'choco-sauce': '巧克力酱', cherry: '樱桃', oreo: '奥利奥碎'
+  };
+  const ITEM_PRICE = {
+    vanilla: 15, strawberry: 16, chocolate: 18, matcha: 20,
+    sprinkles: 3, 'choco-sauce': 5, cherry: 4, oreo: 6
+  };
+
+  /* ---------- Zone 状态更新 ---------- */
+  const ZONE_MAX = 7;       // 最多 7 层
+  const ZONE_WOBBLY = 5;    // ≥5 层开始倾斜
+
+  function updateZoneStates() {
+    document.querySelectorAll('.hm-ic-zone').forEach(zone => {
+      const count = zone.querySelectorAll('.hm-ic-snap-item').length;
+      zone.classList.toggle('is-empty', count === 0);
+      zone.classList.toggle('is-full', count >= ZONE_MAX);
+      zone.classList.toggle('is-wobbly', count >= ZONE_WOBBLY && count < ZONE_MAX);
+    });
+  }
+
+  /* ---------- 冰箱剩余数量 badge ---------- */
+  function updateFridgeCount() {
+    const fridge = document.querySelector('.hm-ic-fridge');
+    if (!fridge) return;
+    let badge = fridge.querySelector('.hm-ic-fridge-count');
+    const remaining = fridge.querySelectorAll('.hm-ic-item').length;
+    if (remaining === 8) {
+      if (badge) badge.remove();
+      return;
+    }
+    if (!badge) {
+      badge = document.createElement('div');
+      badge.className = 'hm-ic-fridge-count';
+      fridge.appendChild(badge);
+    }
+    badge.textContent = remaining;
+    badge.style.display = remaining > 0 ? 'flex' : 'none';
+    // 最后 2 个变淡
+    fridge.querySelectorAll('.hm-ic-item').forEach((el, i, arr) => {
+      el.classList.toggle('hm-ic-item--last', arr.length - i <= 2);
+    });
+  }
+
+  /* ---------- 订单小票（动态生成在 zone 底部） ---------- */
+  function updateReceipt(zone) {
+    let receipt = zone.querySelector('.hm-ic-receipt');
+    const items = zone.querySelectorAll('.hm-ic-snap-item');
+    if (items.length === 0) { if (receipt) receipt.remove(); return; }
+    if (!receipt) {
+      receipt = document.createElement('div');
+      receipt.className = 'hm-ic-receipt';
+      zone.style.position = 'relative';
+      zone.appendChild(receipt);
+    }
+    const lines = []; let total = 0;
+    items.forEach((el, idx) => {
+      const flavor = el.dataset.flavor; const type = el.dataset.type;
+      const name = type === 'ball' ? (FLAVOR_NAME[flavor] || flavor) + '球' : (TOPPING_NAME[flavor] || flavor);
+      const price = ITEM_PRICE[flavor] || 5;
+      lines.push(`<div class="hm-ic-receipt-line"><span>${idx+1}. ${name}</span><span>¥${price}</span></div>`);
+      total += price;
+    });
+    receipt.innerHTML = `
+      <div class="hm-ic-receipt-title">★ HIMEMIRO ★</div>
+      ${lines.join('')}
+      <div class="hm-ic-receipt-total">合計 ¥${total}</div>
+    `;
+  }
+
+  /* ---------- Drop hint（拖拽时显示层级/位置） ---------- */
+  let _dropHint = null;
+  function showDropHint(x, y, zone, nextIdx) {
+    if (!_dropHint) {
+      _dropHint = document.createElement('div');
+      _dropHint.className = 'hm-ic-drop-hint';
+      document.body.appendChild(_dropHint);
+    }
+    _dropHint.style.left = x + 'px'; _dropHint.style.top = (y - 36) + 'px';
+    if (zone) {
+      _dropHint.classList.add('is-target');
+      _dropHint.textContent = `↓ 第 ${nextIdx + 1} 层 · SNAP!`;
+    } else {
+      _dropHint.classList.remove('is-target');
+      _dropHint.textContent = '🖐️ 松开丢弃';
+    }
+  }
+  function hideDropHint() { if (_dropHint) { _dropHint.remove(); _dropHint = null; } }
+
+  /* ---------- 真实拍立得生成 ---------- */
+  function generatePolaroidFromCanvas() {
+    const canvas = document.getElementById('hmIcCanvas');
+    if (!canvas) return;
+    const zones = canvas.querySelectorAll('.hm-ic-zone');
+    let totalItems = 0;
+    const photos = [];
+    zones.forEach((zone, zi) => {
+      const zoneKey = zone.dataset.icZone;
+      const zoneItems = zone.querySelectorAll('.hm-ic-snap-item');
+      if (zoneItems.length === 0) return;
+      totalItems += zoneItems.length;
+      zoneItems.forEach(item => {
+        photos.push({
+          zone: zoneKey,
+          type: item.dataset.type,
+          flavor: item.dataset.flavor,
+          icon: item.textContent.trim()
+        });
+      });
+    });
+    if (totalItems === 0) return null;
+    // 保存到 localStorage
+    const store = JSON.parse(localStorage.getItem('himemiro_icecream_photos') || '[]');
+    const entry = { ts: Date.now(), items: photos };
+    store.unshift(entry);
+    localStorage.setItem('himemiro_icecream_photos', JSON.stringify(store.slice(0, 10)));
+
+    // 在 canvas 里生成 DOM 版拍立得（不是真拍照，是视觉效果）
+    const pol = document.createElement('div');
+    pol.style.cssText = `
+      position:absolute; right:-20px; top:-10px; width:120px;
+      background:#fff; padding:8px 8px 28px;
+      box-shadow: 4px 6px 16px rgba(0,0,0,.2);
+      transform: rotate(-8deg); z-index: 10;
+      border-radius: 2px;
+      font-family: monospace;
+    `;
+    // 拍立得内容：emoji 堆叠显示最终作品
+    const zoneEmojis = {};
+    photos.forEach(p => { zoneEmojis[p.zone] = (zoneEmojis[p.zone] || '') + p.icon; });
+    const emojiStr = photos.map(p => p.icon).join('');
+    pol.innerHTML = `
+      <div style="background:#fdf4e4; height:90px; border:1px solid #eee;
+        display:flex; align-items:center; justify-content:center;
+        font-size:28px; letter-spacing:4px; line-height:1.1;
+        text-align:center; padding:4px;">
+        ${emojiStr.slice(0,16)}
+      </div>
+      <div style="text-align:center; color:#d6336c; font-size:10px; margin-top:4px;">
+        ✦ ${new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})} ✦
+      </div>
+    `;
+    canvas.appendChild(pol);
+    // 3 秒后飞走
+    setTimeout(() => {
+      pol.style.transition = 'all 1s cubic-bezier(.3,1.5,.6,1)';
+      pol.style.transform = 'translate(200px, -120px) rotate(25deg)';
+      pol.style.opacity = '0';
+    }, 1800);
+    setTimeout(() => pol.remove(), 2900);
+    return true;
+  }
 
   // Flavor → 颜色类映射
   const FLAVOR_CLASS = {
@@ -1038,6 +1252,10 @@
     // 每次进冰淇淋店自动打开冰箱门（方便）
     const fridge = document.querySelector('.hm-ic-fridge');
     if (fridge && !fridge.classList.contains('is-open')) fridge.classList.add('is-open');
+    // 初始状态刷新
+    updateZoneStates();
+    updateFridgeCount();
+    document.querySelectorAll('.hm-ic-zone').forEach(z => updateReceipt(z));
   }
 
   // 新建拖拽（从冰箱拿）
@@ -1110,6 +1328,14 @@
     document.querySelectorAll('.hm-ic-zone').forEach(z => z.classList.remove('is-hover'));
     const hoveredZone = findZoneAt(e.clientX, e.clientY);
     if (hoveredZone) hoveredZone.classList.add('is-hover');
+
+    // Drop hint 跟随
+    if (hoveredZone) {
+      const nextIdx = hoveredZone.querySelectorAll('.hm-ic-snap-item').length;
+      showDropHint(e.clientX, e.clientY, hoveredZone, nextIdx);
+    } else {
+      showDropHint(e.clientX, e.clientY, null, 0);
+    }
   }
 
   function findZoneAt(cx, cy) {
@@ -1129,8 +1355,9 @@
     document.removeEventListener('pointermove', onDragMove);
     document.removeEventListener('pointerup', onDragUp);
 
-    // 清除 zone hover
+    // 清除 zone hover + drop hint
     document.querySelectorAll('.hm-ic-zone').forEach(z => z.classList.remove('is-hover'));
+    hideDropHint();
 
     if (!drag) return;
 
@@ -1138,8 +1365,15 @@
     if (hovered) {
       snapToZone(hovered);
     } else {
-      // 丢到桌面 — 不吸附，删除 ghost 即可（简化版）
-      // 或者：在 canvas 上自由漂浮（留给后续）
+      // 丢到桌面 — 从 zone 拖的 item 因为已经 remove 了，需要恢复它原来的 zone 状态
+      if (drag.source === 'zone') {
+        updateZoneStates();
+        updateReceipt(document.querySelector(`.hm-ic-zone[data-ic-zone="${drag.zoneKey}"]`));
+      }
+      // 从冰箱拖的 item — 丢了不恢复（消失），更有真实感
+      else {
+        updateFridgeCount();
+      }
     }
 
     if (drag.dragEl) drag.dragEl.remove();
@@ -1147,7 +1381,6 @@
   }
 
   function snapToZone(zone) {
-    const key = zone.dataset.icZone;
     const container = zone.querySelector('.hm-ic-zone-items');
     if (!container) return;
 
@@ -1159,17 +1392,24 @@
     snap.dataset.flavor = drag.flavor;
     snap.style.setProperty('--i', container.children.length);
 
-    // 在 cone 上只能放 balls（topping 会自动放到最上面）
-    // 不做严格限制，所有组合都允许
     container.appendChild(snap);
-
-    // 新 item 在最上
     snap.addEventListener('pointerdown', onSnapItemDown);
 
-    window.playClickSound?.();
+    // ---- 交互增强 ----
+    playPop();
+    zone.classList.remove('is-bounce');
+    void zone.offsetWidth; // 强制 reflow 重启动画
+    zone.classList.add('is-bounce');
+    setTimeout(() => zone.classList.remove('is-bounce'), 400);
 
-    // 移除冰箱里的 item（但只移除 source=inventory 的，source=zone 的已经被 remove 了）
-    if (drag.source === 'inventory') drag.itemEl.remove();
+    updateZoneStates();
+    updateReceipt(zone);
+
+    // 移除冰箱里的 item
+    if (drag.source === 'inventory') {
+      drag.itemEl.remove();
+      updateFridgeCount();
+    }
   }
 
   // ---------- 操作按钮 ----------
@@ -1182,48 +1422,65 @@
       let anyItem = false;
       document.querySelectorAll('.hm-ic-snap-item').forEach(el => {
         anyItem = true;
-        // 让它自己 zone.is-eating 触发动画
         const zone = el.closest('.hm-ic-zone');
         if (zone) zone.classList.add('is-eating');
       });
+      playMua();
       // Mua~ 文字
       const mua = document.createElement('div');
       mua.className = 'hm-ic-mua';
       mua.textContent = anyItem ? 'Mua~' : '🫗 还没装呢';
       mua.style.left = '50%'; mua.style.top = '40%';
       canvas.appendChild(mua);
-      setTimeout(() => { mua.remove(); document.querySelectorAll('.hm-ic-zone').forEach(z => z.classList.remove('is-eating')); }, 1500);
-      // 吃完清空
+
       if (anyItem) {
+        // 逐个 zone 清空 receipt
+        document.querySelectorAll('.hm-ic-receipt').forEach(r => r.remove());
         setTimeout(() => {
-          document.querySelectorAll('.hm-ic-zone-items').forEach(c => c.innerHTML = '');
-        }, 800);
+          mua.remove();
+          document.querySelectorAll('.hm-ic-zone').forEach(z => {
+            z.classList.remove('is-eating');
+            z.querySelector('.hm-ic-zone-items').innerHTML = '';
+          });
+          updateZoneStates();
+          updateFridgeCount();
+        }, 1500);
+      } else {
+        setTimeout(() => mua.remove(), 1200);
       }
     }
 
-    // 拍照 —— 生成拍立得贴到 Gallery
+    // 拍照 —— playSnap + 真实拍立得
     if (e.target.closest('#hmIcPhotoBtn')) {
-      // 简单 toast
+      const count = document.querySelectorAll('.hm-ic-snap-item').length;
+      if (count === 0) {
+        const toast = document.createElement('div');
+        toast.className = 'hm-ic-photo-toast';
+        toast.innerHTML = '📷 先拼一份甜品再拍照哦~';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 1400);
+        return;
+      }
+      playSnap();
+      generatePolaroidFromCanvas();
+
+      const emojis = Array.from(document.querySelectorAll('.hm-ic-snap-item')).map(i => i.textContent.trim()).join('');
       const toast = document.createElement('div');
       toast.className = 'hm-ic-photo-toast';
-      toast.innerHTML = '📷 拍立得已生成！<br><span style="font-size:11px; color:#888;">去 Gallery 看看 ♡</span>';
+      toast.innerHTML = `📷 拍立得 · ${emojis}<br><span style="font-size:11px; color:#888;">已保存 ✦</span>`;
       document.body.appendChild(toast);
       setTimeout(() => toast.remove(), 1800);
-      // 简化版：把 canvas 上的 items 计数存 localStorage
-      const count = document.querySelectorAll('.hm-ic-snap-item').length;
-      if (count > 0) {
-        const photos = JSON.parse(localStorage.getItem('himemiro_icecream_photos') || '[]');
-        photos.unshift({ count, ts: Date.now() });
-        localStorage.setItem('himemiro_icecream_photos', JSON.stringify(photos.slice(0, 10)));
-      }
     }
 
     // 重做
     if (e.target.closest('#hmIcResetBtn')) {
+      // 清空 zone + receipt
       document.querySelectorAll('.hm-ic-zone-items').forEach(c => c.innerHTML = '');
-      // 冰箱重新渲染（从 photos 恢复 inventory？简化：重新 append HTML）
+      document.querySelectorAll('.hm-ic-receipt').forEach(r => r.remove());
+      // 恢复冰箱
       const fridgeInside = document.getElementById('hmIcFridgeInside');
-      if (fridgeInside && !fridgeInside.querySelector('.hm-ic-item')) {
+      const hasItems = fridgeInside?.querySelector('.hm-ic-item');
+      if (fridgeInside && !hasItems) {
         fridgeInside.innerHTML = `
           <div class="hm-ic-category"><div class="hm-ic-cat-title">🍦 アイス · Ice Cream</div>
             <div class="hm-ic-item" data-ic-type="ball" data-flavor="vanilla">🍨</div>
@@ -1240,6 +1497,8 @@
         `;
         initDragEngine();
       }
+      updateZoneStates();
+      updateFridgeCount();
     }
   });
 

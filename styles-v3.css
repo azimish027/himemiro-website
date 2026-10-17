@@ -2109,3 +2109,222 @@
   0%   { transform: translate(-50%,-50%) scale(0) rotate(-6deg); }
   100% { transform: translate(-50%,-50%) scale(1) rotate(0deg); }
 }
+
+/* ================================================================
+   DIY Ice Cream · 视觉层 + 交互层 + 反馈层 强化
+   ================================================================ */
+
+/* --- Zone 虚线投放圈（60px 半径可视化） --- */
+.hm-ic-zone::after {
+  content: '';
+  position: absolute;
+  top: calc(100% - 20px); left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120px; height: 120px;
+  border: 2px dashed rgba(214,51,108,.25);
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: .4;
+  transition: all .2s;
+}
+.hm-ic-zone.is-hover::after {
+  border-color: #ff6b9d;
+  border-width: 3px;
+  opacity: 1;
+  width: 130px; height: 130px;
+  box-shadow: 0 0 30px rgba(255,107,157,.25);
+  animation: hm-zone-pulse 1s ease-in-out infinite;
+}
+@keyframes hm-zone-pulse {
+  0%,100% { opacity: 1; }
+  50%     { opacity: .6; width: 124px; height: 124px; }
+}
+
+/* Zone bounce 吸附动画 */
+.hm-ic-zone.is-bounce { animation: hm-zone-bounce .4s cubic-bezier(.3,1.5,.6,1); }
+@keyframes hm-zone-bounce {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+/* >4 层倾斜警告 */
+.hm-ic-zone.is-wobbly { animation: hm-wobbly .6s ease-in-out infinite; }
+@keyframes hm-wobbly {
+  0%,100% { transform: rotate(0deg); }
+  25%     { transform: rotate(2deg); }
+  75%     { transform: rotate(-2deg); }
+}
+.hm-ic-zone.is-wobbly::before {
+  content: '🚨'; position: absolute; top: -16px; left: 50%; transform: translateX(-50%);
+  font-size: 14px; animation: none;
+}
+
+/* --- 甜筒 Wafer 纹理强化（clip-path 已裁切，不能用 ::after） --- */
+.hm-ic-cone {
+  background:
+    repeating-linear-gradient(90deg,
+      rgba(0,0,0,.08) 0 2px, transparent 2px 8px),
+    linear-gradient(180deg, #e8c49a 0%, #c48a4e 60%, #a06830 100%);
+}
+
+/* --- 纸杯 手柄（保留原始 ::before ♥，手柄用 ::after） --- */
+.hm-ic-cup {
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.5) 0%, transparent 40%),
+    linear-gradient(180deg, #fff 0%, #ffe4ea 50%, #f8b4c4 100%);
+  border-image: linear-gradient(180deg, #ff6b9d, #d6336c) 1;
+}
+.hm-ic-cup::after {
+  content: ''; position: absolute; top: 50%; right: -12px;
+  width: 18px; height: 30px;
+  border: 3px solid #ff6b9d;
+  border-left: none; border-radius: 0 12px 12px 0;
+  transform: translateY(-50%);
+}
+
+/* --- 盘子 浮雕阴影 --- */
+.hm-ic-plate {
+  background:
+    radial-gradient(ellipse at center, #fff 0%, #faf4e8 50%, #e8dcc4 100%);
+  box-shadow:
+    0 6px 16px rgba(0,0,0,.15),
+    inset 0 -3px 6px rgba(0,0,0,.08),
+    inset 0 2px 4px rgba(255,255,255,.8);
+}
+.hm-ic-plate::before {
+  border: 2px dashed rgba(212,196,168,.4);
+}
+
+/* --- 冰淇淋球 贴纸质感强化 --- */
+.hm-ic-snap-item::before {
+  content: ''; position: absolute; inset: -3px;
+  border-radius: inherit;
+  border: 2px solid #fff;
+  opacity: .9;
+  z-index: -1;
+}
+.hm-ic-snap-item::after {
+  content: ''; position: absolute; top: -1px; right: -1px;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(255,255,255,.6);
+  box-shadow: inset -1px -1px 2px rgba(0,0,0,.1);
+}
+
+/* --- Zone 满了占位提示 --- */
+.hm-ic-zone.is-full .hm-ic-cone,
+.hm-ic-zone.is-full .hm-ic-cup,
+.hm-ic-zone.is-full .hm-ic-plate {
+  opacity: .5; filter: grayscale(.5);
+}
+.hm-ic-zone.is-full::before {
+  content: '🫗 满了'; position: absolute; top: -20px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px; font-weight: 700; color: #d6336c;
+  background: #fff; padding: 2px 8px; border-radius: 8px;
+  border: 1px dashed #d6336c;
+}
+
+/* --- 空 Zone placeholder --- */
+.hm-ic-zone.is-empty .hm-ic-zone-items::after {
+  content: '← 拖到这里';
+  position: absolute; top: 20px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px; color: #c48a4e; opacity: .5;
+}
+
+/* --- Zone 堆叠层数标记 --- */
+.hm-ic-zone::before {
+  /* is-wobbly 已经占用，用 .hm-ic-zone-count 单独加 */
+}
+
+/* --- 冰箱门 玻璃高光 --- */
+.hm-ic-fridge-door::after {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%;
+  background: linear-gradient(180deg, rgba(255,255,255,.6), transparent);
+  border-radius: 8px 8px 0 0;
+  pointer-events: none;
+}
+
+/* --- 操作台 木纹强化 --- */
+.hm-ic-canvas {
+  background:
+    repeating-linear-gradient(180deg, transparent 0 2px, rgba(196,138,78,.04) 2px 3px),
+    repeating-linear-gradient(90deg, transparent 0 40px, rgba(196,138,78,.06) 40px 42px),
+    radial-gradient(ellipse at 30% 30%, #fff3d6 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 70%, #fde2c4 0%, transparent 50%),
+    linear-gradient(180deg, #fff8f0, #f5ead0);
+  box-shadow:
+    inset 0 0 60px rgba(196,138,78,.15),
+    inset 0 4px 0 rgba(255,255,255,.4),
+    inset 0 -4px 0 rgba(196,138,78,.15),
+    0 4px 20px rgba(0,0,0,.1);
+}
+
+/* --- 拖拽 ghost 下方层级提示 --- */
+.hm-ic-drop-hint {
+  position: fixed;
+  padding: 4px 10px; border-radius: 10px;
+  background: rgba(214,51,108,.9); color: #fff;
+  font-size: 10px; font-weight: 700; letter-spacing: 1px;
+  pointer-events: none; z-index: 10001;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 4px 12px rgba(0,0,0,.3);
+}
+.hm-ic-drop-hint.is-target { background: rgba(58,138,92,.9); }
+
+/* --- 剩余数量 badge --- */
+.hm-ic-fridge-count {
+  position: absolute; top: 8px; right: 8px;
+  background: #d6336c; color: #fff;
+  font-size: 10px; font-weight: 900;
+  width: 22px; height: 22px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 6px rgba(214,51,108,.4);
+}
+
+/* --- 订单小票 zone --- */
+.hm-ic-receipt {
+  position: absolute; bottom: -4px; right: -4px;
+  width: 150px;
+  background: #fffef5;
+  border: 1px dashed rgba(0,0,0,.2);
+  border-radius: 2px;
+  box-shadow: 3px 4px 12px rgba(0,0,0,.12);
+  padding: 10px 12px;
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  color: #333;
+  transform: rotate(-6deg);
+  z-index: 5;
+}
+.hm-ic-receipt-title {
+  font-weight: 900; letter-spacing: 2px; color: #d6336c;
+  border-bottom: 1px dashed rgba(0,0,0,.2); padding-bottom: 4px; margin-bottom: 4px;
+}
+.hm-ic-receipt-line {
+  display: flex; justify-content: space-between; margin: 2px 0;
+}
+.hm-ic-receipt-total {
+  border-top: 1px dashed rgba(0,0,0,.2); padding-top: 4px; margin-top: 4px;
+  font-weight: 900; font-size: 12px; color: #4a2c1a;
+}
+
+/* --- Zone 空状态 placeholder --- */
+.hm-ic-zone.is-empty .hm-ic-cup,
+.hm-ic-zone.is-empty .hm-ic-plate,
+.hm-ic-zone.is-empty .hm-ic-cone {
+  opacity: .6;
+}
+
+/* --- 开吃 "空了~" 提示 --- */
+.hm-ic-zone-empty-note {
+  font-size: 10px; color: #888; font-style: italic;
+  margin-top: 24px;
+}
+
+/* --- 冰箱 item 最后一个时淡化 --- */
+.hm-ic-item.hm-ic-item--last { opacity: .4; transform: scale(.85); }
+
+/* --- 拖拽 zone 内现有 item 时：先半透明 --- */
+.hm-ic-snap-item.is-dragging { opacity: .4; transform: scale(.9); }
