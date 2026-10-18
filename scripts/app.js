@@ -2,6 +2,33 @@
   // 防重入（万一某些浏览器 SPA_Init 被触发两次）
   if (window.__spaLoaded) return; window.__spaLoaded = true;
 
+  // ============ 共享导航模板 ============
+  // 6 个 SPA 页面（gallery / worlds / studio / music / archives / sweets）共用
+  function renderGalleryNav(currentPage) {
+    var links = [
+      { page: 'worlds',   icon: '🏘', label: 'Worlds & IP · 商业街' },
+      { page: 'gallery',  icon: '📸', label: 'Gallery · 公告栏' },
+      { page: 'sweets',   icon: '🍭', label: 'Sweets · 糖果店', optional: true },
+      { page: 'games',    icon: '🎮', label: 'Games · Space Jam Hub' },
+      { page: 'studio',   icon: '🎨', label: 'Studio · 工具箱' },
+      { page: 'music',    icon: '🎵', label: 'Music · 点唱机' },
+      { page: 'archives', icon: '📁', label: 'Archives · 档案柜' }
+    ];
+    // optional 的 Sweets 只在 sweets 页面或其他页面都显示（保持一致 → 都显示）
+    var html = `<div class="gallery-sidebar">
+      <div class="gallery-return" data-return-home="true">
+        <span class="return-scissors">✂</span><span class="return-label">返回桌面</span>
+      </div>
+      <div class="gallery-nav-title">· MUSEUM MAP ·</div>`;
+    links.forEach(function(l) {
+      var cls = l.page === currentPage ? 'gallery-nav-link is-current' : 'gallery-nav-link';
+      var href = l.page === currentPage ? '' : ' data-page-link="' + l.page + '"';
+      html += `<a class="${cls}"${href}>${l.icon} ${l.label}</a>`;
+    });
+    html += '</div>';
+    return html;
+  }
+
   // 1. 把现有 body children（除了 script）全部 move 到 home page
   //    ⚠️ script 标签绝对不能再 append 回 body——否则前面所有 IIFE 会重执行、事件监听器 double-bind
   const home = document.createElement('div');
@@ -24,19 +51,7 @@
       <div class="gallery-cork" aria-hidden="true"></div>
 
       <!-- 左侧导航：返回首页 + 其他子页面链接 -->
-      <div class="gallery-sidebar">
-        <div class="gallery-return" data-return-home="true">
-          <span class="return-scissors">✂</span>
-          <span class="return-label">返回桌面</span>
-        </div>
-        <div class="gallery-nav-title">· MUSEUM MAP ·</div>
-        <a class="gallery-nav-link" data-page-link="worlds">🏘 Worlds &amp; IP · 商业街</a>
-        <a class="gallery-nav-link is-current">📸 Gallery · 公告栏</a>
-        <a class="gallery-nav-link" data-page-link="games">🎮 Games · Space Jam Hub</a>
-        <a class="gallery-nav-link" data-page-link="studio">🎨 Studio · 工具箱</a>
-        <a class="gallery-nav-link" data-page-link="music">🎵 Music · 点唱机</a>
-        <a class="gallery-nav-link" data-page-link="archives">📁 Archives · 档案柜</a>
-      </div>
+      ${renderGalleryNav('gallery')}
 
       <!-- 公告栏内容：拍立得照片 + 撕纸 + 手写批注 -->
       <div class="gallery-board">
@@ -405,19 +420,7 @@
   worlds.innerHTML = `
     <div class="street-scene" aria-label="Worlds & IP · 商业街">
       <!-- 左侧导航 -->
-      <div class="gallery-sidebar">
-        <div class="gallery-return" data-return-home="true">
-          <span class="return-scissors">✂</span>
-          <span class="return-label">返回桌面</span>
-        </div>
-        <div class="gallery-nav-title">· MUSEUM MAP ·</div>
-        <a class="gallery-nav-link is-current">🏘 Worlds &amp; IP · 商业街</a>
-        <a class="gallery-nav-link" data-page-link="gallery">📸 Gallery · 公告栏</a>
-        <a class="gallery-nav-link" data-page-link="games">🎮 Games · Space Jam Hub</a>
-        <a class="gallery-nav-link" data-page-link="studio">🎨 Studio · 工具箱</a>
-        <a class="gallery-nav-link" data-page-link="music">🎵 Music · 点唱机</a>
-        <a class="gallery-nav-link" data-page-link="archives">📁 Archives · 档案柜</a>
-      </div>
+      ${renderGalleryNav('worlds')}
 
       <!-- 远景天空 + 店铺 -->
       <div class="street-sky"></div>
@@ -536,18 +539,7 @@
   studio.className = 'page'; studio.dataset.page = 'studio';
   studio.innerHTML = `
     <div class="studio-scene" aria-label="Creative Studio · 工具箱">
-      <div class="gallery-sidebar">
-        <div class="gallery-return" data-return-home="true">
-          <span class="return-scissors">✂</span><span class="return-label">返回桌面</span>
-        </div>
-        <div class="gallery-nav-title">· MUSEUM MAP ·</div>
-        <a class="gallery-nav-link" data-page-link="worlds">🏘 Worlds · 商业街</a>
-        <a class="gallery-nav-link" data-page-link="gallery">📸 Gallery · 公告栏</a>
-        <a class="gallery-nav-link" data-page-link="games">📺 Games · CRT</a>
-        <a class="gallery-nav-link is-current">🎨 Studio · 工具箱</a>
-        <a class="gallery-nav-link" data-page-link="music">🎵 Music · 点唱机</a>
-        <a class="gallery-nav-link" data-page-link="archives">📁 Archives · 档案柜</a>
-      </div>
+      ${renderGalleryNav('studio')}
 
       <div class="workbench">
         <!-- 工具箱左列：素材抽屉 -->
@@ -617,18 +609,7 @@
   music.className = 'page'; music.dataset.page = 'music';
   music.innerHTML = `
     <div class="jukebox-scene" aria-label="Music · 点唱机">
-      <div class="gallery-sidebar">
-        <div class="gallery-return" data-return-home="true">
-          <span class="return-scissors">✂</span><span class="return-label">返回桌面</span>
-        </div>
-        <div class="gallery-nav-title">· MUSEUM MAP ·</div>
-        <a class="gallery-nav-link" data-page-link="worlds">🏘 Worlds · 商业街</a>
-        <a class="gallery-nav-link" data-page-link="gallery">📸 Gallery · 公告栏</a>
-        <a class="gallery-nav-link" data-page-link="games">📺 Games · CRT</a>
-        <a class="gallery-nav-link" data-page-link="studio">🎨 Studio · 工具箱</a>
-        <a class="gallery-nav-link is-current">🎵 Music · 点唱机</a>
-        <a class="gallery-nav-link" data-page-link="archives">📁 Archives · 档案柜</a>
-      </div>
+      ${renderGalleryNav('music')}
 
       <!-- 点唱机 -->
       <div class="jukebox">
@@ -707,18 +688,7 @@
   archives.className = 'page'; archives.dataset.page = 'archives';
   archives.innerHTML = `
     <div class="archives-scene" aria-label="Archives · 档案柜">
-      <div class="gallery-sidebar">
-        <div class="gallery-return" data-return-home="true">
-          <span class="return-scissors">✂</span><span class="return-label">返回桌面</span>
-        </div>
-        <div class="gallery-nav-title">· MUSEUM MAP ·</div>
-        <a class="gallery-nav-link" data-page-link="worlds">🏘 Worlds · 商业街</a>
-        <a class="gallery-nav-link" data-page-link="gallery">📸 Gallery · 公告栏</a>
-        <a class="gallery-nav-link" data-page-link="games">📺 Games · CRT</a>
-        <a class="gallery-nav-link" data-page-link="studio">🎨 Studio · 工具箱</a>
-        <a class="gallery-nav-link" data-page-link="music">🎵 Music · 点唱机</a>
-        <a class="gallery-nav-link is-current">📁 Archives · 档案柜</a>
-      </div>
+      ${renderGalleryNav('archives')}
 
       <!-- 档案柜 + 索引卡片 -->
       <div class="archive-cabinet">
@@ -794,19 +764,7 @@
   sweets.className = 'page page--sweets'; sweets.dataset.page = 'sweets';
   sweets.innerHTML = `
     <div class="sweets-scene" aria-label="Sweets Shop · 糖果店">
-      <div class="gallery-sidebar">
-        <div class="gallery-return" data-return-home="true">
-          <span class="return-scissors">✂</span><span class="return-label">返回桌面</span>
-        </div>
-        <div class="gallery-nav-title">· MUSEUM MAP ·</div>
-        <a class="gallery-nav-link" data-page-link="gallery">📸 Gallery · 公告栏</a>
-        <a class="gallery-nav-link" data-page-link="worlds">🏘 Worlds · 商业街</a>
-        <a class="gallery-nav-link is-current">🍭 Sweets · 糖果店</a>
-        <a class="gallery-nav-link" data-page-link="games">🎮 Games · Space Jam Hub</a>
-        <a class="gallery-nav-link" data-page-link="studio">🎨 Studio · 工具箱</a>
-        <a class="gallery-nav-link" data-page-link="music">🎵 Music · 点唱机</a>
-        <a class="gallery-nav-link" data-page-link="archives">📁 Archives · 档案柜</a>
-      </div>
+      ${renderGalleryNav('sweets')}
 
       <div class="hm-sweets-header">
         <div class="hm-sweets-title">🍫 SWEETS SHOP ♡</div>
