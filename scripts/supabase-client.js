@@ -14,8 +14,8 @@
    ========================================================================= */
 
 // ---------- 配置 ----------
-const SUPABASE_URL = '';        // ← 填这里: https://xxxxx.supabase.co
-const SUPABASE_ANON_KEY = '';   // ← 填这里: eyJhbGciOi...
+const SUPABASE_URL = 'https://wvehbsbjqaazrgkvwcaw.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_RwGD1fiokJHX6-DnLHioRA_129H50EP';
 
 let _supabase = null;
 let _initialized = false;
