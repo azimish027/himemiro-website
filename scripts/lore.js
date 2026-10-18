@@ -136,14 +136,49 @@ window.HIMEMIRO_LORE = {
       location: '商业街（HIMEMIRO WORLD）',
       shopCount: 8,
       shops: [
-        { id:'cafe',    name:'煤咪露喫茶店',     owner:'Meromiro', type:'地狱料理',      era:'现代' },
-        { id:'antique', name:'巡夢姬古董屋',     owner:'Yumehime', type:'中世纪收藏',    era:'中世纪→现代' },
-        { id:'art',     name:'HIMEMIRO 画材工房', owner:'共用',     type:'画材/素材',    era:'现代' },
-        { id:'record',  name:'深夜唱片行',         owner:'共用',     type:'音乐',         era:'现代' },
-        { id:'sweets',  name:'HIMEMIRO スイーツ店',owner:'Meromiro', type:'糖果/周边',    era:'现代' },
-        { id:'stationery', name:'Y2K 文房具店',   owner:'TBD',      type:'文具',         status:'COMING SOON' },
-        { id:'gashapon',  name:'ガシャポン専門店', owner:'TBD',      type:'扭蛋',         status:'COMING SOON' },
-        { id:'florist',   name:'蔷薇の花屋',       owner:'Yumehime', type:'蔷薇/花束',    status:'COMING SOON — Yumehime 操控蔷薇' }
+        {
+          id:'cafe', name:'煤咪露喫茶店', owner:'Meromiro', type:'地狱料理', era:'现代',
+          note:'地狱极刑轮回层的官营食堂分店，菜单全是地狱风味。Meromiro 在人间开这家店的目的：赚测验报名费。',
+          menu:[
+            { name:'骨付き地狱カレー', price:'¥1200', note:'带骨咖喱，骨头是真的骨头' },
+            { name:'断罪パンケーキ',   price:'¥980',  note:'三层，每一层一个罪状' },
+            { name:'試験前打ち上げビール', price:'¥600', note:'地狱酿造，考前喝' }
+          ],
+          sign:'← OPEN · 今日の極刑: 炭酸抜け'
+        },
+        {
+          id:'antique', name:'巡夢姬古董屋', owner:'Yumehime', type:'中世纪收藏', era:'中世纪→现代',
+          note:'从黑死病古堡搬来的藏品。Yumehime 第一次独自出门时开的店。不卖。只放着。',
+          items:[
+            { name:'蜡像 × 数体', note:'已故家人 — 她做的，摆着' },
+            { name:'中世纪手写书', note:'她自己写的，画了很多古堡插画' },
+            { name:'蔷薇标本',     note:'用能力让花永远不败，压在玻璃下' }
+          ],
+          sign:'← OPEN · 请勿触碰任何东西'
+        },
+        { id:'art', name:'HIMEMIRO 画材工房', owner:'共用', type:'画材/素材', era:'现代',
+          note:'Meromiro 和 Yumehime 一起用的素材铺——Meromiro 画钻头说明书，Yumehime 画古堡。',
+          items:['素材表 × 3','哥特萝莉角色资产 × 全部','HIMEMIRO 画材 × 共用'],
+          sign:'← OPEN · 随时借用，用了记得放回去'
+        },
+        {
+          id:'record', name:'深夜唱片行', owner:'共用', type:'音乐', era:'现代',
+          note:'9 首主题曲的"实体"店。老板下班时间是 3 点，实际没人管。',
+          tracks:['01 きみのいる世界','02 輪廻ブルーインナー','03 Meido-in-hell 9999','…全 9 首'],
+          sign:'← OPEN · 3:00 AM 后禁止放音乐'
+        },
+        {
+          id:'sweets', name:'HIMEMIRO スイーツ店', owner:'Meromiro', type:'糖果/周边', era:'现代',
+          note:'Meromiro 觉得"糖果 = 人间极刑"。扭蛋机里放的是她测验的备用钻头。',
+          items:['糖果店 CSS-only 橱窗','扭蛋机（实体钻头 × 8 款）','万花筒','愿望罐'],
+          sign:'← OPEN · 今日推荐: 地狱糖'
+        },
+        { id:'stationery', name:'Y2K 文房具店', owner:'TBD', type:'文具', status:'COMING SOON',
+          note:'谁开的？不知道。暂时没人管。' },
+        { id:'gashapon', name:'ガシャポン専門店', owner:'TBD', type:'扭蛋', status:'COMING SOON',
+          note:'钻头扭蛋。Meromiro 投资的副业。' },
+        { id:'florist', name:'蔷薇の花屋', owner:'Yumehime', type:'蔷薇/花束', status:'COMING SOON',
+          note:'Yumehime 自己的花房。蔷薇是她内心防线的具象化——花越多，她越敢出门。' }
       ]
     },
 
@@ -160,6 +195,19 @@ window.HIMEMIRO_LORE = {
       ]
     }
   },
+
+  // ============ 音乐（9 首主题曲 + 角色/情绪/世界观场景绑定） ============
+  tracks: [
+    { idx:1,  title:'きみのいる世界',       src:'assets/music/01-kimi-no-iru-sekai.mp3', role:'共通',    mood:'治愈', scene:'Yumehime 第一次让 Meromiro 进入古董屋 — 不再躲着她的瞬间' },
+    { idx:2,  title:'輪廻ブルーインナー',   src:'assets/music/02-rinne-blue-inner.mp3', role:'Meromiro', mood:'冷静', scene:'地狱极刑轮回层的日常 — Meromiro 按程序执行工作时的内心独白' },
+    { idx:3,  title:'Meido-in-hell 9999',   src:'assets/music/03-meido-in-hell-9999.mp3', role:'Meromiro', mood:'暴走', scene:'Meromiro 发现自己被调错地址后的第一反应 — 钻头全开' },
+    { idx:4,  title:'Factory Below',        src:'assets/music/04-factory-below.mp3', role:'共通',    mood:'工业', scene:'商业街深夜打烊后 — 两家店各自收拾，谁也不说话' },
+    { idx:5,  title:'Jade Door After Rain', src:'assets/music/05-jade-door-after-rain.mp3', role:'Yumehime', mood:'神秘', scene:'古堡雨后，Yumehime 打开一扇锁了 400 年的门' },
+    { idx:6,  title:'The Fragile Pulse',    src:'assets/music/06-the-fragile-pulse.mp3', role:'Yumehime', mood:'忧伤', scene:'Yumehime 给已故家人蜡像换衣服 — 假装他们还在' },
+    { idx:7,  title:'BURN IT DOWN',          src:'assets/music/07-burn-it-down.mp3', role:'Meromiro', mood:'热血', scene:'极刑测验最终轮 — Meromiro 第一次使出古早的印' },
+    { idx:8,  title:'余響（よきょう）',       src:'assets/music/08-yokyo-start-chikyu-gacha.mp3', role:'共通', mood:'奇幻', scene:'商业街开业那天的背景音 — 两个异世界角色假装这一切很正常' },
+    { idx:9,  title:'琥珀色シュガー',        src:'assets/music/09-kohakuiro-sugar.mp3', role:'Meromiro', mood:'甜腻', scene:'Meromiro 把钻头藏进糖果店 — 觉得糖和刑具很像' }
+  ],
 
   // ============ 展览 ============
   exhibitions: [
@@ -237,11 +285,11 @@ window.HIMEMIRO_LIB = {
       <div style="display:flex;gap:28px;margin-bottom:36px;padding:28px;background:#fff;border-radius:12px;border:1px solid #e5dcd0;box-shadow:0 4px 18px rgba(200,117,51,0.08);">
         <!-- 左列：立绘 -->
         <div style="flex-shrink:0;width:200px;">
-          <div style="background:#faf3eb;border-radius:10px;padding:16px;text-align:center;margin-bottom:12px;">
-            <img loading="lazy" src="assets/characters/${fullImg}" alt="${c.shortName}" style="max-width:100%;max-height:280px;border-radius:6px;" onerror="this.style.display='none';this.parentElement.innerHTML='<div style=\\'color:#a08070;padding:40px 0;font-size:28px;\\'>${c.shortName}</div>';">
+          <div style="background:#faf3eb;border-radius:10px;padding:16px;text-align:center;margin-bottom:12px;cursor:pointer;" data-lightbox="assets/characters/${fullImg}" data-lightbox-title="${c.shortName} · 立绘" onclick="openHMLightbox('assets/characters/${fullImg}','${c.shortName} · 立绘')">
+            <img loading="lazy" src="assets/characters/${fullImg}" alt="${c.shortName}" style="max-width:100%;max-height:280px;border-radius:6px;pointer-events:none;" onerror="this.style.display='none';this.parentElement.innerHTML='<div style=\\'color:#a08070;padding:40px 0;font-size:28px;\\'>${c.shortName}</div>';">
           </div>
-          <div style="background:#faf3eb;border-radius:8px;padding:8px;text-align:center;">
-            <img loading="lazy" src="assets/characters/${chibiImg}" style="max-width:80px;border-radius:6px;">
+          <div style="background:#faf3eb;border-radius:8px;padding:8px;text-align:center;cursor:pointer;" onclick="openHMLightbox('assets/characters/${chibiImg}','${c.shortName} · Chibi')">
+            <img loading="lazy" src="assets/characters/${chibiImg}" style="max-width:80px;border-radius:6px;pointer-events:none;">
           </div>
         </div>
 
@@ -291,7 +339,8 @@ window.HIMEMIRO_LIB = {
     purples.forEach(function(n){ all.push({char:'purple', name:n}); });
 
     var cells = all.map(function(s){
-      return '<div style="background:#fff;border-radius:8px;padding:8px;text-align:center;border:1px solid #e5dcd0;"><img loading="lazy" src="assets/characters/'+s.char+'-chibi/'+s.name+'.png" style="max-width:60px;border-radius:4px;"></div>';
+      var src = 'assets/characters/'+s.char+'-chibi/'+s.name+'.png';
+      return '<div style="background:#fff;border-radius:8px;padding:8px;text-align:center;border:1px solid #e5dcd0;cursor:pointer;" onclick="openHMLightbox(\''+src+'\',\''+s.name+'\')"><img loading="lazy" src="'+src+'" style="max-width:60px;border-radius:4px;pointer-events:none;"></div>';
     }).join('');
 
     return `
@@ -398,10 +447,40 @@ function showShopModal(shop) {
           🚧 正在装修中…敬请期待
         </div>
       ` : `
-        <div style="font-size:13px;line-height:1.8;color:#4a3a2e;">
-          ${shop.name} — 位于 HIMEMIRO WORLD 商业街。<br>
-          ${character ? `更多 ${character.shortName} 的故事请前往 Gallery → 角色档案查看。` : '与周围店铺共同构成这条小小的异世界商业街。'}
-        </div>
+        ${shop.menu && shop.menu.length ? `
+          <div style="margin-top:14px;">
+            <div style="font-size:11px;color:#c87533;font-weight:700;letter-spacing:0.08em;margin-bottom:6px;">✦ 菜单 MENU</div>
+            ${shop.menu.map(function(m){
+              var note = m.note ? `<div style="font-size:11px;color:#8a7868;margin-top:1px;">${m.note}</div>` : '';
+              return `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #e8d8c8;font-size:13px;">
+                <div><strong>${m.name}</strong>${note}</div>
+                <div style="color:#c87533;font-weight:600;">${m.price || ''}</div>
+              </div>`;
+            }).join('')}
+          </div>` : ''}
+        ${shop.items && shop.items.length ? `
+          <div style="margin-top:14px;">
+            <div style="font-size:11px;color:#c87533;font-weight:700;letter-spacing:0.08em;margin-bottom:6px;">✦ 店铺陈列</div>
+            ${shop.items.map(function(it){
+              if (typeof it === 'string') return `<div style="font-size:13px;padding:4px 0;color:#4a3a2e;">· ${it}</div>`;
+              return `<div style="padding:6px 0;border-bottom:1px dashed #e8d8c8;font-size:13px;">
+                <strong>${it.name}</strong>${it.note ? `<div style="font-size:11px;color:#8a7868;margin-top:1px;">${it.note}</div>` : ''}
+              </div>`;
+            }).join('')}
+          </div>` : ''}
+        ${shop.tracks && shop.tracks.length ? `
+          <div style="margin-top:14px;">
+            <div style="font-size:11px;color:#c87533;font-weight:700;letter-spacing:0.08em;margin-bottom:6px;">✦ 在售唱片</div>
+            ${shop.tracks.map(function(t){ return `<div style="font-size:13px;padding:4px 0;color:#4a3a2e;">🎵 ${t}</div>`; }).join('')}
+          </div>` : ''}
+        ${shop.sign ? `
+          <div style="margin-top:16px;padding:10px 14px;background:#1a1a2e;color:#e8d8c8;font-size:12px;font-family:'Courier New',monospace;border-radius:6px;letter-spacing:0.05em;">
+            ${shop.sign}
+          </div>` : ''}
+        ${character ? `
+          <div style="margin-top:14px;font-size:12px;color:#8a7868;">
+            → 更多 ${character.shortName} 的故事请前往 Gallery 查看完整角色档案。
+          </div>` : ''}
       `}
     </div>
   `;

@@ -1769,7 +1769,11 @@
    Music · 点唱机 真实曲目 + Web Audio 播放器（修复暂停 + 音量 + EQ + 频谱）
    ========================================================================= */
 (() => {
-  const TRACKS = [
+  // 从 lore.js 加载曲目元数据（如果有），否则用基础版
+  var LORE_TRACKS = (window.HIMEMIRO_LORE && window.HIMEMIRO_LORE.tracks) || null;
+  const TRACKS = LORE_TRACKS ? LORE_TRACKS.map(function(t){
+    return { idx:t.idx, title:t.title, src:t.src, role:t.role, mood:t.mood, scene:t.scene };
+  }) : [
     { idx: 1,  title: 'きみのいる世界',        src: 'assets/music/01-kimi-no-iru-sekai.mp3' },
     { idx: 2,  title: '輪廻ブルーインナー',    src: 'assets/music/02-rinne-blue-inner.mp3' },
     { idx: 3,  title: 'Meido-in-hell 9999',    src: 'assets/music/03-meido-in-hell-9999.mp3' },
@@ -1847,23 +1851,56 @@
     requestAnimationFrame(drawSpectrum);
   }
 
-  /* ---------- 曲目列表 ---------- */
+  /* ---------- 曲目列表（含角色/情绪 tag） ---------- */
   function buildTracklist() {
     const container = document.getElementById('jboxTracks');
     if (!container) return;
-    container.innerHTML = TRACKS.map(t => `
-      <div class="jbox-track-row" data-jbox-track="${t.idx - 1}">
+    container.innerHTML = TRACKS.map(t => {
+      var roleTag = t.role ? `<span style="font-size:10px;background:#c87533;color:#fff;padding:1px 6px;border-radius:8px;margin-right:4px;">${t.role}</span>` : '';
+      var moodTag = t.mood ? `<span style="font-size:10px;background:#7a9e7e;color:#fff;padding:1px 6px;border-radius:8px;">${t.mood}</span>` : '';
+      return `
+      <div class="jbox-track-row" data-jbox-track="${t.idx - 1}" style="cursor:pointer;">
         <div class="jbox-track-idx">${String(t.idx).padStart(2, '0')}</div>
-        <div class="jbox-track-name">${t.title}</div>
+        <div class="jbox-track-name">${t.title} <span style="margin-left:6px;">${roleTag}${moodTag}</span></div>
         <div class="jbox-track-dur" id="jboxDur${t.idx - 1}">—</div>
-      </div>
-    `).join('');
+      </div>`;
+    }).join('');
 
     container.addEventListener('click', (e) => {
       const row = e.target.closest('.jbox-track-row');
       if (!row) return;
       playTrack(parseInt(row.dataset.jboxTrack));
     });
+
+    // 点击标题显示剧情场景
+    container.addEventListener('dblclick', (e) => {
+      const row = e.target.closest('.jbox-track-row');
+      if (!row) return;
+      const t = TRACKS[parseInt(row.dataset.jboxTrack)];
+      if (t.scene) {
+        showTrackScene(t);
+      }
+    });
+  }
+
+  // 双击曲目显示剧情场景
+  function showTrackScene(t) {
+    var overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;';
+    overlay.innerHTML = `
+      <div style="background:#fffaf2;border-radius:12px;max-width:440px;width:90%;padding:24px;box-shadow:0 20px 50px rgba(0,0,0,0.4);border:2px solid #c87533;">
+        <div style="font-family:'BigShoulders',sans-serif;font-size:20px;color:#1a1a2e;">${t.title}</div>
+        <div style="margin-top:6px;font-size:11px;color:#c87533;">角色 ${t.role} · 情绪 ${t.mood}</div>
+        <div style="margin-top:14px;padding:12px;background:#fff8f0;border-radius:8px;border-left:3px solid #c87533;font-size:13px;line-height:1.8;color:#4a3a2e;">
+          ${t.scene}
+        </div>
+        <div style="text-align:right;margin-top:14px;">
+          <button onclick="this.closest('[style*=position]').remove()" style="background:#c87533;color:#fff;border:none;padding:6px 18px;border-radius:6px;cursor:pointer;font-size:12px;">✕ 关闭</button>
+        </div>
+      </div>
+    `;
+    overlay.addEventListener('click', function(e){ if (e.target === overlay) overlay.remove(); });
+    document.body.appendChild(overlay);
   }
 
   function playTrack(idx) {
@@ -2266,6 +2303,134 @@ if (_origSwitchForWidgets) {
     setTimeout(tryMount, 300);
   } else {
     document.addEventListener('DOMContentLoaded', tryMount);
+  }
+})();
+
+/* ============================================================
+ * Lightbox — 全局图片放大器（Gallery 立绘 + 表情包 + Archives 档案卡）
+ * ============================================================ */
+window.openHMLightbox = function(src, title) {
+  var existing = document.getElementById('hmLightbox');
+  if (existing) existing.remove();
+  var overlay = document.createElement('div');
+  overlay.id = 'hmLightbox';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:10000;display:flex;align-items:center;justify-content:center;cursor:zoom-out;';
+  overlay.innerHTML = `
+    <div style="max-width:92vw;max-height:92vh;text-align:center;">
+      <img src="${src}" style="max-width:92vw;max-height:85vh;border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,0.5);">
+      <div style="color:#e8d8c8;margin-top:10px;font-size:13px;letter-spacing:0.05em;">${title || ''}</div>
+    </div>
+  `;
+  overlay.addEventListener('click', function(e){ if (e.target === overlay) overlay.remove(); });
+  document.addEventListener('keydown', function escClose(e) {
+    if (e.key === 'Escape' && document.getElementById('hmLightbox')) {
+      document.getElementById('hmLightbox').remove();
+      document.removeEventListener('keydown', escClose);
+    }
+  });
+  document.body.appendChild(overlay);
+};
+
+/* ============================================================
+ * Archives 档案卡图片弹窗（点击 archive-card 显示关联素材）
+ * ============================================================ */
+(function enhanceArchives() {
+  function bindArchives() {
+    var lore = window.HIMEMIRO_LORE;
+    if (!lore) return;
+    var cards = document.querySelectorAll('.archive-card[data-archive]');
+    cards.forEach(function(card) {
+      if (card.dataset.bound) return;
+      card.dataset.bound = '1';
+      card.style.cursor = 'pointer';
+      card.addEventListener('click', function() {
+        var id = this.dataset.archive;
+        var exp = (lore.exhibitions || []).find(function(e){ return e.id === id; });
+        if (!exp) return;
+        var gallery = (exp.gallery || []).map(function(g){
+          return `<div style="background:#fff;border-radius:8px;padding:10px;text-align:center;border:1px solid #e5dcd0;cursor:pointer;" onclick="openHMLightbox('${g.src}','${g.caption}')">
+            <img src="${g.src}" style="max-width:100%;max-height:120px;border-radius:4px;pointer-events:none;">
+            <div style="font-size:11px;color:#a08070;margin-top:6px;">${g.caption}</div>
+          </div>`;
+        }).join('');
+        var overlay = document.createElement('div');
+        overlay.style.cssText = 'position:fixed;inset:0;background:rgba(20,10,5,0.8);z-index:9999;display:flex;align-items:center;justify-content:center;';
+        overlay.innerHTML = `
+          <div style="background:#fffaf2;border-radius:14px;max-width:600px;width:92%;max-height:85vh;overflow-y:auto;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,0.3);border:2px solid #c87533;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
+              <div>
+                <div style="font-family:'BigShoulders',sans-serif;font-size:18px;color:#1a1a2e;">${exp.title}</div>
+                <div style="font-size:11px;color:#c87533;margin-top:2px;">${exp.id} · ${exp.year}</div>
+              </div>
+              <button onclick="this.closest('[style*=position]').remove()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#a08070;">×</button>
+            </div>
+            <div style="font-size:13px;line-height:1.8;color:#4a3a2e;padding:12px;background:#fff8f0;border-radius:8px;border-left:3px solid #c87533;margin-bottom:14px;">
+              ${exp.curator || ''}
+            </div>
+            ${gallery ? `
+              <div style="font-size:11px;color:#c87533;font-weight:700;letter-spacing:0.08em;margin-bottom:8px;">✦ 关联素材（点击放大）</div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;">${gallery}</div>
+            ` : '<div style="font-size:12px;color:#a08070;text-align:center;padding:20px;">素材图待补…</div>'}
+          </div>
+        `;
+        overlay.addEventListener('click', function(e){ if (e.target === overlay) overlay.remove(); });
+        document.body.appendChild(overlay);
+      });
+    });
+  }
+  // SPA 切换后重新绑定
+  var origSwitch = window.__spaInit && window.__spaInit.switchTo;
+  if (origSwitch) {
+    var prev = window.__spaInit.switchTo;
+    window.__spaInit.switchTo = function(name) {
+      var ret = prev.call(this, name);
+      setTimeout(bindArchives, 300);
+      return ret;
+    };
+  }
+  setTimeout(bindArchives, 500);
+})();
+
+/* ============================================================
+ * 音乐 SPA 持久化：不要切页重建 audio，保持播放状态
+ * ============================================================ */
+(function musicPersist() {
+  // 保存/恢复当前播放状态
+  function saveState() {
+    try {
+      var audio = document.getElementById('jboxAudio');
+      if (!audio) return;
+      var st = {
+        idx: window._lastPlayedIdx,
+        time: audio.currentTime,
+        playing: !audio.paused
+      };
+      sessionStorage.setItem('hmMusicState', JSON.stringify(st));
+    } catch(e) {}
+  }
+  function restoreState() {
+    try {
+      var raw = sessionStorage.getItem('hmMusicState');
+      if (!raw) return;
+      var st = JSON.parse(raw);
+      if (typeof st.idx !== 'number') return;
+      window._lastPlayedIdx = st.idx;
+      var audio = document.getElementById('jboxAudio');
+      if (!audio) return;
+      audio.currentTime = st.time || 0;
+      if (st.playing) audio.play().catch(function(){});
+    } catch(e) {}
+  }
+  // SPA 切换时不要暂停
+  var origSwitch = window.__spaInit && window.__spaInit.switchTo;
+  if (origSwitch) {
+    var orig = window.__spaInit.switchTo;
+    window.__spaInit.switchTo = function(name) {
+      saveState();
+      var ret = orig.call(this, name);
+      setTimeout(restoreState, 200);
+      return ret;
+    };
   }
 })();
 
