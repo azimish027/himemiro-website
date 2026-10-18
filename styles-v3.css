@@ -2706,3 +2706,144 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible {
   outline-offset: 3px;
   border-radius: 4px;
 }
+
+/* ================================================================
+   Dynamic Widgets · 访客计数 / 在线数 / 留言板
+   (Supabase → Mock 模式自动降级, 无后端也能跑)
+   ================================================================ */
+
+/* --- Footer 访客计数 --- */
+.footer__visitor-row {
+  margin-top: 12px;
+  padding: 6px 16px;
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--c-vanilla);
+  border: 1px dashed rgba(64,42,42,.15);
+  border-radius: 14px;
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+.hb-visitors-label { color: var(--c-cranberry); }
+.hb-visitors-num { color: var(--c-deep-chocolate); font-weight: 700; }
+.hb-visitors-today { color: var(--c-mint); margin-left: 4px; }
+
+/* --- 在线数 floating pill --- */
+.hb-online-pill {
+  position: fixed; right: 16px; bottom: 16px;
+  z-index: 9000;
+  background: var(--c-chocolate); color: var(--c-vanilla);
+  padding: 6px 14px; border-radius: 20px;
+  font-family: var(--font-pixel); font-size: 11px; letter-spacing: 2px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.2);
+  display: flex; align-items: center; gap: 6px;
+  user-select: none; pointer-events: none;
+  transition: opacity .3s;
+}
+.hb-online-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #7fe07f;
+  box-shadow: 0 0 6px #7fe07f;
+  animation: hb-online-pulse 2s ease-in-out infinite;
+}
+@keyframes hb-online-pulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+
+/* --- 留言板 slot --- */
+.hb-guestbook-slot {
+  margin-top: 40px; padding: 32px;
+  background: var(--c-vanilla);
+  border: 2px dashed var(--c-gray-brown);
+  border-radius: 14px 6px 18px 8px;
+  position: relative;
+}
+.hb-guestbook-slot::before {
+  content: ''; position: absolute; top: -8px; left: 40px;
+  width: 80px; height: 14px;
+  background: rgba(201,87,112,.15);
+  transform: rotate(-2deg);
+  border-radius: 2px;
+}
+
+.hb-gb-title {
+  font-family: var(--font-pixel);
+  font-size: 16px; letter-spacing: 3px;
+  color: var(--c-deep-chocolate);
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.hb-gb-form {
+  display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px;
+}
+.hb-gb-name, .hb-gb-content {
+  font-family: var(--font-serif);
+  background: #fff;
+  border: 2px solid var(--c-gray-brown);
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--c-chocolate);
+  transition: border-color .2s, box-shadow .2s;
+}
+.hb-gb-name:focus, .hb-gb-content:focus {
+  outline: none;
+  border-color: var(--c-candy-orange);
+  box-shadow: 0 0 0 3px rgba(240,100,59,.15);
+}
+.hb-gb-name { max-width: 220px; }
+.hb-gb-content { resize: vertical; min-height: 60px; }
+.hb-gb-submit {
+  align-self: flex-end;
+  background: var(--c-cranberry); color: #fff;
+  border: 2px solid var(--c-chocolate);
+  border-radius: 6px 3px 10px 4px;
+  box-shadow: 3px 3px 0 rgba(64,42,42,.15);
+  padding: 8px 20px;
+  font-family: var(--font-pixel); font-size: 12px; letter-spacing: 2px;
+  cursor: pointer;
+  transition: all .15s;
+}
+.hb-gb-submit:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 rgba(64,42,42,.2); }
+.hb-gb-submit:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 rgba(64,42,42,.1); }
+
+/* 留言列表 */
+.hb-posts-list { display: flex; flex-direction: column; gap: 10px; }
+.hb-post {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 12px 16px;
+  background: #fff;
+  border: 1px solid rgba(64,42,42,.1);
+  border-radius: 6px 3px 10px 4px;
+}
+.hb-post-emoji {
+  font-size: 22px; flex-shrink: 0;
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #fff5f7, #ffe0e8);
+  border-radius: 50%;
+}
+.hb-post-body { flex: 1; min-width: 0; }
+.hb-post-meta {
+  display: flex; gap: 8px; align-items: baseline; margin-bottom: 4px;
+}
+.hb-post-name {
+  font-family: var(--font-pixel); font-size: 12px; letter-spacing: 1px;
+  color: var(--c-deep-chocolate); font-weight: 700;
+}
+.hb-post-time { font-size: 10px; color: var(--c-gray-brown); font-family: var(--font-pixel); }
+.hb-post-content {
+  font-size: 13px; color: var(--c-chocolate);
+  line-height: 1.5;
+  word-break: break-word;
+}
+.hb-post-empty {
+  text-align: center; padding: 24px;
+  font-family: var(--font-pixel);
+  color: var(--c-gray-brown); font-size: 12px;
+  letter-spacing: 2px;
+}
+.hb-gb-footer {
+  margin-top: 16px; text-align: right;
+  font-family: var(--font-pixel); font-size: 10px;
+  color: var(--c-mint); letter-spacing: 1px;
+}

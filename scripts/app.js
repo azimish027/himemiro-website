@@ -781,6 +781,9 @@
             </div>
           </div>
         </div>
+
+        <!-- 留言板 Widget -->
+        <div id="hbGuestbook" class="hb-guestbook-slot"></div>
       </div>
     </div>
   `;

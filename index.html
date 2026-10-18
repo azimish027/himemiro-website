@@ -281,7 +281,11 @@
 <footer class="footer">
   <div class="footer__brand">HIMEMIRO</div>
   <div class="footer__line">— A Magical Dream Factory —</div>
-  <div class="footer__line" style="margin-top:8px;">© HIMEMIRO · 个人数字博物馆 · 本站零数据库、零追踪、零社交</div>
+  <div class="footer__visitor-row">
+    <span class="hb-visitors-label">✦ 累计来访</span>
+    <span class="hb-visitors-num" id="hbVisitors">--</span>
+  </div>
+  <div class="footer__line" style="margin-top:4px; font-size:10px; color:#b9a18b;">© HIMEMIRO · 个人数字博物馆 · 本站零追踪、零社交</div>
   <div class="footer__links">
     <a href="#curator">Curator's Room</a>
     <a href="#archives">Archives</a>
@@ -289,10 +293,16 @@
   </div>
 </footer>
 
+<!-- 在线数 floating pill（全局固定） -->
+<div id="hbOnline" class="hb-online-pill" aria-label="当前在线人数">
+  <span class="hb-online-dot"></span> online --
+</div>
+
 <script src="scripts/home.js" defer></script>
 
 <!-- SPA 框架 → scripts/app.js --><script src="scripts/app.js" defer></script>
-<!-- v3 增强层 → scripts/enhance.js (Gallery + Worlds 新交互) --><script src="scripts/enhance.js" defer></script>
+<!-- Supabase 数据层 → scripts/supabase-client.js (Mock 模式自动降级) --><script src="scripts/supabase-client.js" defer></script>
+<!-- v3 增强层 → scripts/enhance.js (Gallery + Worlds 新交互 + Widgets) --><script src="scripts/enhance.js" defer></script>
 </body>
 </html>
 

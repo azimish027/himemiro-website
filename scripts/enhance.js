@@ -2066,3 +2066,169 @@
   };
 })();
 
+/* =========================================================================
+   动态 Widget（访客计数 / 在线数 / 留言板）
+   -------------------------------------------------------------------------
+   全部通过 window.HB（supabase-client.js）取数据，Mock 模式自动降级
+   ========================================================================= */
+
+// 依赖 supabase-client.js（如果没加载就用 window.HB_MOCK）
+function ensureHB() {
+  return window.HB || null;
+}
+
+/* ---------- 1. Footer 访客计数 widget ---------- */
+function mountVisitorCounter() {
+  const widget = document.getElementById('hbVisitors');
+  if (!widget) return;
+
+  async function refresh() {
+    const HB = ensureHB();
+    if (!HB) { widget.textContent = '--'; return; }
+    const v = await HB.getVisitors();
+    if (v) {
+      widget.innerHTML = `<span class="hb-visitors-num">${v.count.toLocaleString()}</span><span class="hb-visitors-today">· 今日 ${v.today || 0}</span>`;
+    }
+  }
+  refresh();
+  // 每 30 秒刷新
+  setInterval(refresh, 30000);
+  // 新访客 +1（localStorage 去重）
+  const HB_MOCK = window.HB_MOCK;
+  if (HB_MOCK && !localStorage.getItem('hb_visited')) {
+    HB.incrementVisitors?.();
+    localStorage.setItem('hb_visited', '1');
+  }
+}
+
+/* ---------- 2. Header 在线数 widget ---------- */
+function mountOnlineCount() {
+  const widget = document.getElementById('hbOnline');
+  if (!widget) return;
+
+  async function refresh() {
+    const HB = ensureHB();
+    if (!HB) { widget.textContent = 'online --'; return; }
+    const n = await HB.getOnlineCount();
+    if (n) widget.innerHTML = `<span class="hb-online-dot"></span> ${n} online`;
+  }
+  refresh();
+  setInterval(refresh, 15000);
+}
+
+/* ---------- 3. 留言板 widget（挂在 Gallery 或 Archives 页） ---------- */
+function mountGuestbook() {
+  const container = document.getElementById('hbGuestbook');
+  if (!container) return;
+
+  let posts = [];
+
+  function formatTime(ts) {
+    if (!ts) return '';
+    const d = typeof ts === 'number' ? new Date(ts) : new Date(ts);
+    const now = new Date();
+    const diff = now - d;
+    if (diff < 60000) return '刚刚';
+    if (diff < 3600000) return Math.floor(diff / 60000) + ' 分钟前';
+    if (diff < 86400000) return Math.floor(diff / 3600000) + ' 小时前';
+    return d.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+  }
+
+  const EMOJIS = { happy: '♡', love: '❀', smirk: 'ฅ', sleepy: '(-ω-)', cool: '✦', wow: 'Σ(ﾟωﾟ;)' };
+
+  function render() {
+    const list = container.querySelector('.hb-posts-list');
+    if (!list) return;
+    if (posts.length === 0) {
+      list.innerHTML = '<div class="hb-post-empty">还没有留言 · 成为第一个吧 ♡</div>';
+      return;
+    }
+    list.innerHTML = posts.map(p => `
+      <div class="hb-post" data-id="${p.id}">
+        <span class="hb-post-emoji">${EMOJIS[p.emotion] || '♡'}</span>
+        <div class="hb-post-body">
+          <div class="hb-post-meta">
+            <span class="hb-post-name">${p.name || '匿名'}</span>
+            <span class="hb-post-time">${formatTime(p.created_at)}</span>
+          </div>
+          <div class="hb-post-content">${p.content || ''}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function refresh() {
+    const HB = ensureHB();
+    if (!HB) return;
+    posts = await HB.getPosts(30) || [];
+    render();
+  }
+
+  async function submit(nameEl, contentEl) {
+    const HB = ensureHB();
+    if (!HB) return;
+    const content = contentEl.value.trim();
+    if (!content || content.length < 2) {
+      contentEl.focus();
+      contentEl.style.borderColor = '#d6336c';
+      setTimeout(() => contentEl.style.borderColor = '', 1500);
+      return;
+    }
+    const name = nameEl.value.trim() || '匿名';
+    await HB.createPost(name, content);
+    contentEl.value = '';
+    refresh();
+  }
+
+  // 渲染留言板结构
+  container.innerHTML = `
+    <div class="hb-gb-title">✦ GUESTBOOK · 留言板 ✦</div>
+    <div class="hb-gb-form">
+      <input class="hb-gb-name" placeholder="你的名字（可留空）" maxlength="20">
+      <textarea class="hb-gb-content" placeholder="说点什么吧~  200字以内" maxlength="200" rows="3"></textarea>
+      <button class="hb-gb-submit" type="button">✎ 留言</button>
+    </div>
+    <div class="hb-posts-list"></div>
+    <div class="hb-gb-footer">💡 ${ensureHB()?.isMock ? '当前: 离线 Mock 模式' : '数据已上云'}</div>
+  `;
+
+  // 提交事件
+  const btn = container.querySelector('.hb-gb-submit');
+  const nameEl = container.querySelector('.hb-gb-name');
+  const contentEl = container.querySelector('.hb-gb-content');
+  btn?.addEventListener('click', () => submit(nameEl, contentEl));
+  contentEl?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit(nameEl, contentEl); }
+  });
+
+  refresh();
+  // 每 60s 自动刷新留言
+  setInterval(refresh, 60000);
+}
+
+/* ---------- 4. 全局启动 ---------- */
+function mountAllWidgets() {
+  mountVisitorCounter();
+  mountOnlineCount();
+  mountGuestbook();
+}
+
+// 等 supabase-client.js 先加载完
+document.addEventListener('DOMContentLoaded', () => {
+  // 确保 window.HB 可用（可能还要等 supabase-client.js 的 IIFE 跑）
+  setTimeout(mountAllWidgets, 300);
+});
+
+// SPA 页面切换后也重新 mount（DOM 被重建了）
+const _origSwitchForWidgets = window.__spaInit?.switchTo;
+if (_origSwitchForWidgets) {
+  window.__spaInit.switchTo = function(name) {
+    const ret = _origSwitchForWidgets.call(this, name);
+    setTimeout(mountAllWidgets, 200);
+    return ret;
+  };
+}
+
+console.log('%c HIMEMIRO Widgets 加载中… ', 'background:#C95770;color:#fff;padding:2px 12px;border-radius:4px');
+console.log('运行模式:', window.HB?.getConfig?.() || 'MOCK (等 Supabase)');
+
