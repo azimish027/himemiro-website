@@ -2229,6 +2229,47 @@ if (_origSwitchForWidgets) {
   };
 }
 
+/* ============================================================
+ * Phase 1 — Lore 注入：角色档案 / About / 店铺弹窗 / 首展
+ * 由 lore.js 提供渲染函数
+ * ============================================================ */
+(function injectLoreContent() {
+  function tryMount() {
+    var lib = window.HIMEMIRO_LIB;
+    if (!lib) { setTimeout(tryMount, 200); return; }
+
+    // 1. Gallery 页面（SPA 切换到 gallery 时再注入，避免 DOM 还没创建）
+    var origSwitch = window.__spaInit && window.__spaInit.switchTo;
+    function tryGalleryMount() {
+      var gallery = document.querySelector('.page[data-page="gallery"]');
+      if (gallery && !gallery.dataset.loreMounted) {
+        lib.mountGalleryCards();
+      }
+    }
+    if (origSwitch) {
+      window.__spaInit.switchTo = function(name) {
+        var ret = origSwitch.call(this, name);
+        setTimeout(function() {
+          tryGalleryMount();
+          lib.setupWorldsShops();
+        }, 100);
+        return ret;
+      };
+    }
+    setTimeout(tryGalleryMount, 400);
+    setTimeout(function(){ lib.setupWorldsShops(); }, 400);
+
+    // 2. 首页 Featured Exhibition（静态 DOM，直接注入）
+    setTimeout(function(){ lib.mountFeaturedExhibition(); }, 200);
+  }
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    setTimeout(tryMount, 300);
+  } else {
+    document.addEventListener('DOMContentLoaded', tryMount);
+  }
+})();
+
 console.log('%c HIMEMIRO Widgets 加载中… ', 'background:#C95770;color:#fff;padding:2px 12px;border-radius:4px');
 console.log('运行模式:', window.HB?.getConfig?.() || 'MOCK (等 Supabase)');
+console.log('角色设定:', window.HIMEMIRO_LORE ? '✅ Meromiro + Yumehime' : '⏳ 加载中…');
 
