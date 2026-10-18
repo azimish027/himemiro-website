@@ -1,4 +1,4 @@
-﻿(function SPA_Init() {
+(function SPA_Init() {
   // 防重入（万一某些浏览器 SPA_Init 被触发两次）
   if (window.__spaLoaded) return; window.__spaLoaded = true;
 
@@ -1110,6 +1110,9 @@ document.querySelectorAll('[data-page-link]').forEach(el => {
       switchTo(el.dataset.pageLink);
     });
   }
+
+  // 暴露给 enhance.js 的 hook — SPA 切换统一入口
+  window.__spaInit = { switchTo };
 });
 })();
 

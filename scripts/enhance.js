@@ -2080,16 +2080,6 @@
     });
   }
 
-  // 每次 SPA 切换后运行
-  const origSwitch = window.__spaInit?.switchTo;
-  if (origSwitch) {
-    window.__spaInit.switchTo = function(pageName) {
-      const ret = origSwitch.call(this, pageName);
-      setTimeout(patchAria, 100);
-      return ret;
-    };
-  }
-
   // DOM 就绪后首次运行
   document.addEventListener('DOMContentLoaded', () => setTimeout(patchAria, 500));
   // SPA init 后也要跑
@@ -2097,10 +2087,12 @@
   const origOnPage = window.__onPage;
   window.__onPage = function(name, fn) {
     origOnPage(name, fn);
-    // 所有页面切换后都 patch
     const wrapped = typeof fn === 'function' ? function() { fn(); patchAria(); } : fn;
     origOnPage.call(this, name, wrapped);
   };
+
+  // 暴露给统一 SPA hook
+  window.__hmPatchAria = patchAria;
 })();
 
 /* =========================================================================
@@ -2256,16 +2248,6 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(mountAllWidgets, 300);
 });
 
-// SPA 页面切换后也重新 mount（DOM 被重建了）
-const _origSwitchForWidgets = window.__spaInit?.switchTo;
-if (_origSwitchForWidgets) {
-  window.__spaInit.switchTo = function(name) {
-    const ret = _origSwitchForWidgets.call(this, name);
-    setTimeout(mountAllWidgets, 200);
-    return ret;
-  };
-}
-
 /* ============================================================
  * Phase 1 — Lore 注入：角色档案 / About / 店铺弹窗 / 首展
  * 由 lore.js 提供渲染函数
@@ -2275,23 +2257,12 @@ if (_origSwitchForWidgets) {
     var lib = window.HIMEMIRO_LIB;
     if (!lib) { setTimeout(tryMount, 200); return; }
 
-    // 1. Gallery 页面（SPA 切换到 gallery 时再注入，避免 DOM 还没创建）
-    var origSwitch = window.__spaInit && window.__spaInit.switchTo;
+    // 1. Gallery 页面（首次注入 + SPA 切页时 remount）
     function tryGalleryMount() {
       var gallery = document.querySelector('.page[data-page="gallery"]');
       if (gallery && !gallery.dataset.loreMounted) {
         lib.mountGalleryCards();
       }
-    }
-    if (origSwitch) {
-      window.__spaInit.switchTo = function(name) {
-        var ret = origSwitch.call(this, name);
-        setTimeout(function() {
-          tryGalleryMount();
-          lib.setupWorldsShops();
-        }, 100);
-        return ret;
-      };
     }
     setTimeout(tryGalleryMount, 400);
     setTimeout(function(){ lib.setupWorldsShops(); }, 400);
@@ -2378,21 +2349,12 @@ window.openHMLightbox = function(src, title) {
       });
     });
   }
-  // SPA 切换后重新绑定
-  var origSwitch = window.__spaInit && window.__spaInit.switchTo;
-  if (origSwitch) {
-    var prev = window.__spaInit.switchTo;
-    window.__spaInit.switchTo = function(name) {
-      var ret = prev.call(this, name);
-      setTimeout(bindArchives, 300);
-      return ret;
-    };
-  }
+  window.__hmBindArchives = bindArchives;
   setTimeout(bindArchives, 500);
 })();
 
 /* ============================================================
- * 音乐 SPA 持久化：不要切页重建 audio，保持播放状态
+ * 音乐 SPA 持久化：切页保存/恢复播放状态
  * ============================================================ */
 (function musicPersist() {
   // 保存/恢复当前播放状态
@@ -2421,17 +2383,69 @@ window.openHMLightbox = function(src, title) {
       if (st.playing) audio.play().catch(function(){});
     } catch(e) {}
   }
-  // SPA 切换时不要暂停
-  var origSwitch = window.__spaInit && window.__spaInit.switchTo;
-  if (origSwitch) {
-    var orig = window.__spaInit.switchTo;
-    window.__spaInit.switchTo = function(name) {
-      saveState();
-      var ret = orig.call(this, name);
-      setTimeout(restoreState, 200);
-      return ret;
-    };
+  // 暴露给统一 hook
+  window.__hmMusicPersist = { saveState: saveState, restoreState: restoreState };
+})();
+
+/* ============================================================
+ * SPA 统一 Hook — 切页前后回调集中管理
+ * （app.js 暴露 window.__spaInit.switchTo，这里做唯一一次 override）
+ * ============================================================ */
+(function unifiedSpaHook() {
+  var spa = window.__spaInit;
+  if (!spa || !spa.switchTo) {
+    // app.js 可能还没加载完，等一下
+    setTimeout(unifiedSpaHook, 100);
+    return;
   }
+  var rawSwitch = spa.switchTo;
+
+  spa.switchTo = function(name) {
+    // —— 切页前：保存音乐状态 ——
+    try { window.__hmMusicPersist?.saveState?.(); } catch(e) {}
+
+    // —— 执行原始切换 ——
+    var ret = rawSwitch.call(this, name);
+
+    // —— 切页后：统一回调（每个都 try/catch 防连锁失败） ——
+    setTimeout(function() {
+      try { window.__hmPatchAria?.(); } catch(e) {}
+      try { mountAllWidgets?.(); } catch(e) {}
+      try {
+        var lib = window.HIMEMIRO_LIB;
+        if (lib) {
+          // Gallery 首次切到时注入角色档案（dataset.loreMounted 防重）
+          var gallery = document.querySelector('.page[data-page="gallery"]');
+          if (gallery && !gallery.dataset.loreMounted) lib.mountGalleryCards?.();
+          // Worlds 每次重绑店铺点击（SPA 切页不会重建 DOM，但 data-shop 元素需要事件）
+          lib.setupWorldsShops?.();
+        }
+      } catch(e) {}
+      try { window.__hmBindArchives?.(); } catch(e) {}
+      try { window.__hmMusicPersist?.restoreState?.(); } catch(e) {}
+    }, 150);
+
+    return ret;
+  };
+
+  console.log('%c SPA 统一 Hook ✅ ', 'background:#7a9e7e;color:#fff;padding:1px 8px;border-radius:4px');
+
+  // —— 首次页面加载后也触发一次后处理（确保 lore / worlds 绑定成功） ——
+  setTimeout(function() {
+    try { mountAllWidgets?.(); } catch(e) {}
+    try { window.__hmPatchAria?.(); } catch(e) {}
+    try {
+      var lib = window.HIMEMIRO_LIB;
+      if (lib) {
+        var gallery = document.querySelector('.page[data-page="gallery"]');
+        if (gallery && !gallery.dataset.loreMounted) lib.mountGalleryCards?.();
+        // 重置防重标记，确保首次绑定成功
+        document.querySelectorAll('[data-shop]').forEach(function(el){ el.dataset.modalBound = ''; });
+        lib.setupWorldsShops?.();
+      }
+    } catch(e) {}
+    try { window.__hmBindArchives?.(); } catch(e) {}
+  }, 1200);
 })();
 
 console.log('%c HIMEMIRO Widgets 加载中… ', 'background:#C95770;color:#fff;padding:2px 12px;border-radius:4px');

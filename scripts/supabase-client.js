@@ -86,7 +86,7 @@ async function loadSupabase() {
 }
 
 /* ---------- 导出 API ---------- */
-export const HB = {
+window.HB = {
   // === 访客数 ===
   async getVisitors() {
     const sb = await loadSupabase();

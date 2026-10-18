@@ -114,7 +114,7 @@ window.HIMEMIRO_LORE = {
     },
 
     catchphrases: [
-      '……'（很少说话）,
+      '……（很少说话）',
       '别碰蔷薇。'
     ]
   },
