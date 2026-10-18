@@ -2678,3 +2678,31 @@
    ================================================================ */
 .explore { padding-bottom: 80px; }
 .exhibit { padding-bottom: 40px; }
+
+/* ================================================================
+   无障碍 · Skip Link（键盘 Tab 第一个焦点）
+   ================================================================ */
+.skip-link {
+  position: fixed; top: -50px; left: 12px;
+  z-index: 9999;
+  background: var(--c-cranberry); color: #fff;
+  padding: 10px 16px; border-radius: 4px;
+  font-family: var(--font-pixel); font-size: 12px; letter-spacing: 2px;
+  text-decoration: none;
+  transition: top .2s;
+}
+.skip-link:focus { top: 12px; }
+
+/* main-content 锚点（SPA 动态挂到当前 .page 上） */
+#main-content { outline: none; }
+#main-content:focus {
+  outline: 3px dashed var(--c-candy-orange);
+  outline-offset: 4px;
+}
+
+/* focus-visible 统一 outline（替代默认蓝色焦点环） */
+a:focus-visible, button:focus-visible, [role="button"]:focus-visible {
+  outline: 3px dashed var(--c-candy-orange);
+  outline-offset: 3px;
+  border-radius: 4px;
+}

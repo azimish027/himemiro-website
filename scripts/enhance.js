@@ -1,4 +1,4 @@
-﻿/* =========================================================================
+/* =========================================================================
    HIMEMIRO v3 增强脚本 — Gallery + Worlds 模块升级
    全部使用事件委托，兼容 SPA 动态 append 的元素
    ========================================================================= */
@@ -1996,5 +1996,73 @@
       });
     });
   });
+})();
+
+/* =========================================================================
+   无障碍 · aria-label 自动补全 + main-content 锚点注入
+   ========================================================================= */
+(() => {
+  const ARIA_MAP = {
+    'hmIcEatBtn':   '开吃冰淇淋',
+    'hmIcPhotoBtn': '拍照保存',
+    'hmIcResetBtn': '重新制作',
+    'hmIcFridgeDoor': '冰箱门（点击开关）',
+    'jboxPlayBtn': '播放/暂停',
+    'jboxVol': '音量',
+    'jboxBar': '播放进度（点击跳转）',
+    'hmIcDragLayer': '拖拽层',
+    'hmIcCanvas': '操作台'
+  };
+
+  function patchAria() {
+    // 1. 给当前 active page 注入 main-content id
+    document.querySelectorAll('.page').forEach(p => p.id = p.id === 'main-content' ? '' : p.id);
+    const active = document.querySelector('.page--active');
+    if (active && !active.id) active.id = 'main-content';
+    else if (active && active.id !== 'main-content') {
+      const prev = document.getElementById('main-content');
+      if (prev) prev.id = prev.dataset.oldId || '';
+      active.id = 'main-content';
+    }
+
+    // 2. 给 map 里的元素补 aria-label
+    Object.entries(ARIA_MAP).forEach(([id, label]) => {
+      const el = document.getElementById(id);
+      if (el && !el.getAttribute('aria-label')) {
+        el.setAttribute('aria-label', label);
+        if (el.tagName !== 'BUTTON' && el.tagName !== 'INPUT') {
+          el.setAttribute('role', 'button');
+          el.setAttribute('tabindex', '0');
+        }
+      }
+    });
+
+    // 3. 所有 gallery-nav-link 补 aria-current
+    document.querySelectorAll('.gallery-nav-link.is-current, .sj-topbar a.is-current').forEach(el => {
+      el.setAttribute('aria-current', 'page');
+    });
+  }
+
+  // 每次 SPA 切换后运行
+  const origSwitch = window.__spaInit?.switchTo;
+  if (origSwitch) {
+    window.__spaInit.switchTo = function(pageName) {
+      const ret = origSwitch.call(this, pageName);
+      setTimeout(patchAria, 100);
+      return ret;
+    };
+  }
+
+  // DOM 就绪后首次运行
+  document.addEventListener('DOMContentLoaded', () => setTimeout(patchAria, 500));
+  // SPA init 后也要跑
+  window.__onPage = window.__onPage || function(){};
+  const origOnPage = window.__onPage;
+  window.__onPage = function(name, fn) {
+    origOnPage(name, fn);
+    // 所有页面切换后都 patch
+    const wrapped = typeof fn === 'function' ? function() { fn(); patchAria(); } : fn;
+    origOnPage.call(this, name, wrapped);
+  };
 })();
 
