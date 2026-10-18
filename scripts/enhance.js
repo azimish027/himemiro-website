@@ -1975,3 +1975,26 @@
   window.__onPage?.('music', () => { setTimeout(initJukebox, 300); });
 })();
 
+/* =========================================================================
+   首页 id-wall 入场动画（风格统一后补上 is-visible 触发）
+   ========================================================================= */
+(() => {
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('is-visible');
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.id-wall').forEach(w => obs.observe(w));
+    // explore__card 也顺便补入场（styles.css 里有 opacity:0）
+    document.querySelectorAll('.explore__grid').forEach(g => {
+      g.querySelectorAll('.explore__card').forEach((c, i) => {
+        setTimeout(() => { c.style.opacity = '1'; c.style.transform = 'none'; }, 100 + i * 80);
+      });
+    });
+  });
+})();
+

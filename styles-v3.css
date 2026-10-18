@@ -2333,7 +2333,7 @@
    首页加长 · 角色档案墙 + 时间线
    ================================================================ */
 
-/* --- Identity Wall --- */
+/* --- Identity Wall · 统一为 explore__card 手作材质 --- */
 .identity-wall {
   max-width: 1100px; margin: 64px auto; padding: 48px 32px;
   position: relative;
@@ -2343,56 +2343,69 @@
   gap: 24px; margin-top: 32px;
 }
 .id-card {
-  background: #fff; border-radius: 16px;
-  border: 2px solid rgba(0,0,0,.06);
-  box-shadow: 6px 8px 0 rgba(0,0,0,.05), 0 16px 32px rgba(0,0,0,.06);
+  background: var(--c-vanilla);
+  border: 2px solid var(--c-chocolate);
+  border-radius: 8px 4px 14px 6px;
+  box-shadow:
+    4px 4px 0 rgba(64,42,42,.18),
+    8px 8px 0 rgba(64,42,42,.06);
   padding: 28px;
   display: flex; gap: 18px;
-  transition: transform .3s cubic-bezier(.3,1.5,.6,1), box-shadow .3s;
+  transition: all .3s cubic-bezier(.3,1.5,.6,1);
+  position: relative;
+  opacity: 0; transform: translateY(24px) rotate(-.8deg);
 }
-.id-card:hover { transform: translateY(-6px) rotate(-.5deg); box-shadow: 10px 14px 0 rgba(0,0,0,.06), 0 24px 48px rgba(0,0,0,.1); }
-.id-card--pink   { background: linear-gradient(135deg, #fff5f7, #ffe0e8); }
-.id-card--purple { background: linear-gradient(135deg, #f5efff, #e8d4ff); }
-.id-card--teal   { background: linear-gradient(135deg, #e8f8f4, #cdeee4); }
+.id-card:nth-child(2) { transform: translateY(24px) rotate(.6deg); }
+.id-card:nth-child(3) { transform: translateY(24px) rotate(-.4deg); }
+.id-wall.is-visible .id-card { opacity: 1; transform: none; }
+.id-card:hover {
+  transform: translateY(-4px) rotate(.5deg);
+  box-shadow: 6px 6px 0 rgba(64,42,42,.22), 12px 12px 0 rgba(64,42,42,.08);
+}
+.id-card--pink   { background: linear-gradient(135deg, var(--c-vanilla), #FBE4E8); }
+.id-card--purple { background: linear-gradient(135deg, var(--c-vanilla), #EDE2F8); }
+.id-card--teal   { background: linear-gradient(135deg, var(--c-vanilla), #DBECE0); }
 .id-portrait {
-  width: 72px; height: 72px; border-radius: 50%;
+  width: 72px; height: 72px;
+  border-radius: 8px 4px 14px 6px;       /* 跟卡一样的不对称圆角！ */
+  border: 2px solid var(--c-chocolate);
   display: flex; align-items: center; justify-content: center;
   font-size: 32px; flex-shrink: 0;
-  box-shadow: inset -4px -4px 8px rgba(0,0,0,.1), 0 4px 12px rgba(0,0,0,.1);
-  border: 3px solid #fff;
+  box-shadow: 2px 2px 0 rgba(64,42,42,.15);
 }
-.id-portrait--pink   { background: linear-gradient(135deg, #ffb3c6, #ff6b9d); color: #fff; }
-.id-portrait--purple { background: linear-gradient(135deg, #c9a0ff, #8a4fff); color: #fff; }
-.id-portrait--teal   { background: linear-gradient(135deg, #8cd4b8, #4ab894); color: #fff; }
+.id-portrait--pink   { background: var(--c-cranberry); }
+.id-portrait--purple { background: #7B3FA0; }
+.id-portrait--teal   { background: var(--c-mint); color: var(--c-chocolate); }
 .id-info { flex: 1; min-width: 0; }
-.id-name { font-size: 22px; font-weight: 900; letter-spacing: 3px; color: #2a1a1a; }
-.id-sub  { font-size: 11px; letter-spacing: 2px; color: #d6336c; margin-top: 2px; text-transform: uppercase; }
-.id-tags { font-size: 11px; color: #666; margin-top: 6px; letter-spacing: .5px; }
-.id-desc { font-size: 13px; color: #4a2c3a; margin-top: 10px; line-height: 1.6; }
+.id-name { font-family: var(--font-pixel); font-size: 22px; letter-spacing: 3px; color: var(--c-deep-chocolate); }
+.id-sub  { font-family: var(--font-pixel); font-size: 11px; letter-spacing: 2px; color: var(--c-candy-orange); margin-top: 2px; }
+.id-tags { font-family: var(--font-rounded); font-size: 11px; color: var(--c-chocolate); margin-top: 6px; letter-spacing: .5px; }
+.id-desc { font-family: var(--font-serif); font-size: 13px; color: var(--c-chocolate); margin-top: 10px; line-height: 1.6; }
 
-/* --- Timeline --- */
+/* --- Timeline · 像素字体 + token 虚线 --- */
 .timeline {
   max-width: 1100px; margin: 80px auto 100px; padding: 48px 32px;
   position: relative;
 }
 .tl {
   position: relative; margin-top: 40px; padding-left: 32px;
-  border-left: 3px dashed rgba(214,51,108,.3);
+  border-left: 3px dashed rgba(201,87,112,.45);   /* var(--c-cranberry) */
 }
 .tl-item { position: relative; margin-bottom: 40px; padding-left: 24px; }
 .tl-dot {
   position: absolute; left: -40px; top: 4px;
-  width: 24px; height: 24px; border-radius: 50%;
-  border: 4px solid #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  width: 24px; height: 24px;
+  border: 2px solid var(--c-chocolate);
+  border-radius: 50%;
+  box-shadow: 2px 2px 0 rgba(64,42,42,.18);
 }
-.tl-dot--past   { background: #a0a0a0; }
-.tl-dot--now    { background: linear-gradient(135deg, #ff6b9d, #d6336c); animation: tl-pulse 2s ease-in-out infinite; }
-.tl-dot--future { background: linear-gradient(135deg, #ffd93d, #ff9f43); }
+.tl-dot--past   { background: var(--c-gray-brown); }
+.tl-dot--now    { background: var(--c-cranberry); animation: tl-pulse 2s ease-in-out infinite; }
+.tl-dot--future { background: var(--c-candy-orange); }
 @keyframes tl-pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }
-.tl-date { font-size: 11px; letter-spacing: 3px; color: #d6336c; font-weight: 700; }
-.tl-title { font-size: 18px; font-weight: 900; letter-spacing: 2px; color: #2a1a1a; margin-top: 4px; }
-.tl-body { font-size: 13px; color: #666; margin-top: 6px; line-height: 1.5; }
+.tl-date { font-family: var(--font-pixel); font-size: 11px; letter-spacing: 3px; color: var(--c-candy-orange); font-weight: 700; }
+.tl-title { font-family: var(--font-pixel); font-size: 18px; letter-spacing: 2px; color: var(--c-deep-chocolate); margin-top: 4px; }
+.tl-body { font-family: var(--font-serif); font-size: 13px; color: var(--c-chocolate); margin-top: 6px; line-height: 1.5; }
 
 /* ================================================================
    Music · 真曲目表 + HTML5 Audio 播放器
