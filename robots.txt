@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /scripts/debug/
+Disallow: /scripts/check-*.js
+
+Sitemap: https://azimish027.github.io/himemiro-website/sitemap.xml

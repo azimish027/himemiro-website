@@ -2410,6 +2410,147 @@
 /* ================================================================
    Music · 真曲目表 + HTML5 Audio 播放器
    ================================================================ */
+
+/* ================================================================
+   响应式 · 6 断点覆盖 99% 设备
+   基准：styles.css 里 explore__grid auto-fit minmax(220px)
+   ================================================================ */
+
+/* --- 超大屏 (≥1920px) --- */
+@media (min-width: 1920px) {
+  .explore__grid { max-width: 1400px; }
+  .page--home .explore__title { font-size: 28px; }
+}
+
+/* --- 常规桌面 (≤1440px) --- */
+@media (max-width: 1440px) {
+  .explore__grid { gap: 20px; }
+  .explore__card { padding: 20px; }
+}
+
+/* --- iPad 横屏 (≤1024px) --- */
+@media (max-width: 1024px) {
+  /* 糖果店 3 栏 → 2 栏 */
+  .sweets-counters {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .explore__grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+  /* 冰淇淋店 canvas */
+  .hm-ic-canvas {
+    padding: 32px 24px;
+  }
+  /* Games Hub 左右 → 上下 */
+  .sj-hub {
+    flex-direction: column !important;
+    gap: 24px !important;
+  }
+  .sj-planet-nav {
+    flex-direction: row !important;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+  .sj-planet-nav a {
+    flex-shrink: 0;
+  }
+}
+
+/* --- iPad 竖屏 (≤768px) --- */
+@media (max-width: 768px) {
+  .explore__grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+  }
+  .explore__card {
+    padding: 16px;
+    border-radius: 8px 4px 10px 4px;
+  }
+  .explore__title { font-size: 16px; }
+  /* 糖果店 → 1 栏 */
+  .sweets-counters {
+    grid-template-columns: 1fr !important;
+  }
+  /* nav 简化 */
+  .gallery-nav {
+    flex-wrap: wrap;
+    gap: 4px !important;
+  }
+  .gallery-nav-link {
+    font-size: 11px !important;
+    padding: 4px 10px !important;
+  }
+  /* 冰淇淋店 */
+  .hm-ic-canvas {
+    padding: 24px 16px;
+  }
+  .hm-ic-fridge {
+    width: 100% !important;
+    max-width: 320px;
+    margin: 0 auto;
+  }
+  .hm-ic-zones-row {
+    flex-direction: column !important;
+    align-items: center;
+  }
+  /* id-wall */
+  .id-wall {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --- 大号手机 (≤480px) --- */
+@media (max-width: 480px) {
+  .explore__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .explore__card {
+    padding: 12px;
+  }
+  .explore__card-icon { font-size: 32px !important; }
+  .explore__card-title { font-size: 11px !important; }
+  /* timeline 字体缩小 */
+  .tl-date, .tl-title { font-size: 13px; letter-spacing: 1px; }
+  .tl-body { font-size: 11px; }
+  /* 点唱机 */
+  .jbox-player {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .jbox-player-info { width: 100%; }
+  .jbox-eq-row { gap: 4px; }
+  .jbox-eq-btn { font-size: 10px; padding: 2px 6px; }
+  /* id-card */
+  .id-card { padding: 20px; }
+  .id-portrait { width: 56px; height: 56px; font-size: 24px; }
+  .id-name { font-size: 16px; letter-spacing: 2px; }
+}
+
+/* --- iPhone SE (≤375px) --- */
+@media (max-width: 375px) {
+  .explore__grid {
+    grid-template-columns: 1fr;
+  }
+  .explore__card {
+    padding: 16px;
+  }
+  /* 全局字体缩小 */
+  body { font-size: 14px; }
+  h1 { font-size: 22px; }
+  h2 { font-size: 18px; }
+  /* nav 简化到极致 */
+  .gallery-nav-link {
+    font-size: 10px !important;
+    padding: 3px 6px !important;
+  }
+  /* footer 简化 */
+  .footer {
+    font-size: 11px;
+    padding: 24px 16px;
+  }
+}
 .jbox-player {
   background: linear-gradient(135deg, #2a1a2a, #3a2a3a);
   border-radius: 12px;

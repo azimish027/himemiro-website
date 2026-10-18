@@ -1,4 +1,4 @@
-/* =========================================================================
+﻿/* =========================================================================
    HIMEMIRO v3 增强脚本 — Gallery + Worlds 模块升级
    全部使用事件委托，兼容 SPA 动态 append 的元素
    ========================================================================= */
@@ -262,7 +262,7 @@
       el.style.animation = `ped-walk ${durations[i]} linear ${delays[i]} infinite`;
       const bubble = ped.bubbles[Math.floor(Math.random() * ped.bubbles.length)];
       el.innerHTML = `<span class="ped-bubble">${bubble}</span>
-        <img src="${ped.img}" alt="${ped.name}" onerror="this.style.display='none'">`;
+        <img loading="lazy" src="${ped.img}" alt="${ped.name}" onerror="this.style.display='none'">`;
       scene.appendChild(el);
     });
 

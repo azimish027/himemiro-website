@@ -1,4 +1,4 @@
-(function SPA_Init() {
+﻿(function SPA_Init() {
   // 防重入（万一某些浏览器 SPA_Init 被触发两次）
   if (window.__spaLoaded) return; window.__spaLoaded = true;
 
@@ -46,7 +46,7 @@
           <div class="pin pin--red"></div>
           <div class="polaroid-frame">
             <div class="polaroid-photo">
-              <img src="assets/characters/angel-full.png" alt="煤咪露" onerror="this.style.display='none'; this.parentNode.classList.add('photo-fallback');">
+              <img loading="lazy" src="assets/characters/angel-full.png" alt="煤咪露" onerror="this.style.display='none'; this.parentNode.classList.add('photo-fallback');">
               <span class="photo-fallback-text">♀ 煤咪露</span>
             </div>
             <div class="polaroid-caption">— 煤咪露 · 粉毛锁天使 —</div>
@@ -60,7 +60,7 @@
           <div class="pin pin--blue"></div>
           <div class="polaroid-frame">
             <div class="polaroid-photo">
-              <img src="assets/characters/purple-full.png" alt="巡夢姬" onerror="this.style.display='none'; this.parentNode.classList.add('photo-fallback');">
+              <img loading="lazy" src="assets/characters/purple-full.png" alt="巡夢姬" onerror="this.style.display='none'; this.parentNode.classList.add('photo-fallback');">
               <span class="photo-fallback-text">♀ 巡夢姬</span>
             </div>
             <div class="polaroid-caption">— 巡夢姬 · 紫玫瑰大小姐 —</div>
@@ -73,7 +73,7 @@
           <div class="pin pin--yellow"></div>
           <div class="polaroid-frame">
             <div class="polaroid-photo">
-              <img src="assets/characters/angel-chibi/粉毛锁天使_09_开心.png" alt="开心" onerror="this.style.display='none'; this.parentNode.classList.add('photo-fallback');">
+              <img loading="lazy" src="assets/characters/angel-chibi/粉毛锁天使_09_开心.png" alt="开心" onerror="this.style.display='none'; this.parentNode.classList.add('photo-fallback');">
               <span class="photo-fallback-text">♡ 开心</span>
             </div>
             <div class="polaroid-caption">— 今日の気分 —</div>
@@ -104,7 +104,7 @@
           <div class="pin pin--red"></div>
           <div class="polaroid-frame">
             <div class="polaroid-photo">
-              <img src="assets/characters/purple-chibi/紫玫瑰大小姐_05_软笑抱兔.png" alt="抱兔" onerror="this.style.display='none'; this.parentNode.classList.add('photo-fallback');">
+              <img loading="lazy" src="assets/characters/purple-chibi/紫玫瑰大小姐_05_软笑抱兔.png" alt="抱兔" onerror="this.style.display='none'; this.parentNode.classList.add('photo-fallback');">
               <span class="photo-fallback-text">♡ 抱兔</span>
             </div>
             <div class="polaroid-caption">— for u —</div>
@@ -116,7 +116,7 @@
           <div class="pin pin--blue"></div>
           <div class="polaroid-frame">
             <div class="polaroid-photo">
-              <img src="assets/characters/angel-chibi/粉毛锁天使_05_摆烂.png" alt="摆烂" onerror="this.style.display='none'; this.parentNode.classList.add('photo-fallback');">
+              <img loading="lazy" src="assets/characters/angel-chibi/粉毛锁天使_05_摆烂.png" alt="摆烂" onerror="this.style.display='none'; this.parentNode.classList.add('photo-fallback');">
               <span class="photo-fallback-text">摆烂中</span>
             </div>
             <div class="polaroid-caption">— 怠け者 —</div>
@@ -432,7 +432,7 @@
           </div>
           <div class="shop-front">
             <div class="shop-window">
-              <img src="assets/characters/angel-chibi/粉毛锁天使_04_干饭.png" alt="干饭" onerror="this.style.display='none';">
+              <img loading="lazy" src="assets/characters/angel-chibi/粉毛锁天使_04_干饭.png" alt="干饭" onerror="this.style.display='none';">
             </div>
             <div class="shop-door" data-shop-open="true">→ OPEN</div>
           </div>
@@ -446,7 +446,7 @@
           </div>
           <div class="shop-front">
             <div class="shop-window">
-              <img src="assets/characters/purple-chibi/紫玫瑰大小姐_05_软笑抱兔.png" alt="抱兔" onerror="this.style.display='none';">
+              <img loading="lazy" src="assets/characters/purple-chibi/紫玫瑰大小姐_05_软笑抱兔.png" alt="抱兔" onerror="this.style.display='none';">
             </div>
             <div class="shop-door" data-shop-open="true">→ OPEN</div>
           </div>
@@ -588,11 +588,11 @@
             </div>
             <div class="drawer-inner">
               <div class="material material--char" draggable="true" data-char="angel">
-                <img src="assets/characters/angel-chibi/粉毛锁天使_09_开心.png" alt="" onerror="this.style.display='none';">
+                <img loading="lazy" src="assets/characters/angel-chibi/粉毛锁天使_09_开心.png" alt="立绘" onerror="this.style.display='none';">
                 <span>煤咪露</span>
               </div>
               <div class="material material--char" draggable="true" data-char="purple">
-                <img src="assets/characters/purple-chibi/紫玫瑰大小姐_05_软笑抱兔.png" alt="" onerror="this.style.display='none';">
+                <img loading="lazy" src="assets/characters/purple-chibi/紫玫瑰大小姐_05_软笑抱兔.png" alt="立绘" onerror="this.style.display='none';">
                 <span>巡夢姬</span>
               </div>
             </div>
@@ -1165,9 +1165,9 @@ document.querySelectorAll('[data-page-link]').forEach(el => {
       item.style.transform = `rotate(${(Math.random() * 10 - 5).toFixed(1)}deg)`;
 
       if (draggedData.char === 'angel') {
-        item.innerHTML = `<img src="assets/characters/angel-chibi/粉毛锁天使_09_开心.png" alt="">`;
+        item.innerHTML = `<img loading="lazy" src="assets/characters/angel-chibi/粉毛锁天使_09_开心.png" alt="">`;
       } else if (draggedData.char === 'purple') {
-        item.innerHTML = `<img src="assets/characters/purple-chibi/紫玫瑰大小姐_05_软笑抱兔.png" alt="">`;
+        item.innerHTML = `<img loading="lazy" src="assets/characters/purple-chibi/紫玫瑰大小姐_05_软笑抱兔.png" alt="">`;
       } else if (draggedData.type === 'sticker') {
         const icon = {'sticker':'✦','sticker2':'♡','sticker3':'✚','sticker4':'✧','sticker5':'❀'}[draggedData.type] || '✦';
         item.textContent = icon;
