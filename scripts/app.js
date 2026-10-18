@@ -672,6 +672,28 @@
             </div>
             <audio id="jboxAudio" preload="metadata"></audio>
           </div>
+
+          <!-- 频谱 canvas + EQ + 音量 -->
+          <div class="jbox-effects">
+            <!-- 频谱可视化 -->
+            <canvas id="jboxSpectrum" width="300" height="60" class="jbox-spectrum"></canvas>
+            <!-- EQ 预设 -->
+            <div class="jbox-eq-row">
+              <span class="jbox-eq-label">EQ</span>
+              <button class="jbox-eq-btn is-active" data-eq="flat">Flat</button>
+              <button class="jbox-eq-btn" data-eq="pop">Pop</button>
+              <button class="jbox-eq-btn" data-eq="rock">Rock</button>
+              <button class="jbox-eq-btn" data-eq="classical">Classical</button>
+              <button class="jbox-eq-btn" data-eq="vocal">Vocal</button>
+              <button class="jbox-eq-btn" data-eq="night">Night</button>
+            </div>
+            <!-- 音量 slider -->
+            <div class="jbox-vol-row">
+              <span class="jbox-vol-icon">🔊</span>
+              <input type="range" id="jboxVol" min="0" max="100" value="70" class="jbox-vol-slider" aria-label="音量">
+            </div>
+          </div>
+
           <!-- 真实曲目列表 -->
           <div class="jbox-tracklist-real" id="jboxTracks"></div>
         </div>

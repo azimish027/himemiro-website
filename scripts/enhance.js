@@ -1766,21 +1766,59 @@
 })();
 
 /* =========================================================================
-   Music · 点唱机 真实曲目 + HTML5 Audio 播放器
+   Music · 点唱机 真实曲目 + Web Audio 播放器（修复暂停 + 音量 + EQ + 频谱）
    ========================================================================= */
 (() => {
   const TRACKS = [
-    { idx: 1,  title: 'きみのいる世界',        src: 'assets/music/01-kimi-no-iru-sekai.mp3',        dur: '—' },
-    { idx: 2,  title: '輪廻ブルーインナー',    src: 'assets/music/02-rinne-blue-inner.mp3',         dur: '—' },
-    { idx: 3,  title: 'Meido-in-hell 9999',    src: 'assets/music/03-meido-in-hell-9999.mp3',       dur: '—' },
-    { idx: 4,  title: 'Factory Below',         src: 'assets/music/04-factory-below.mp3',            dur: '—' },
-    { idx: 5,  title: 'Jade Door After Rain',  src: 'assets/music/05-jade-door-after-rain.mp3',      dur: '—' },
-    { idx: 6,  title: 'The Fragile Pulse',     src: 'assets/music/06-the-fragile-pulse.mp3',         dur: '—' },
-    { idx: 7,  title: 'BURN IT DOWN',          src: 'assets/music/07-burn-it-down.mp3',              dur: '—' },
-    { idx: 8,  title: '余響（よきょう）',       src: 'assets/music/08-yokyo-start-chikyu-gacha.mp3',  dur: '—' },
-    { idx: 9,  title: '琥珀色シュガー',        src: 'assets/music/09-kohakuiro-sugar.mp3',           dur: '—' }
+    { idx: 1,  title: 'きみのいる世界',        src: 'assets/music/01-kimi-no-iru-sekai.mp3' },
+    { idx: 2,  title: '輪廻ブルーインナー',    src: 'assets/music/02-rinne-blue-inner.mp3' },
+    { idx: 3,  title: 'Meido-in-hell 9999',    src: 'assets/music/03-meido-in-hell-9999.mp3' },
+    { idx: 4,  title: 'Factory Below',         src: 'assets/music/04-factory-below.mp3' },
+    { idx: 5,  title: 'Jade Door After Rain',  src: 'assets/music/05-jade-door-after-rain.mp3' },
+    { idx: 6,  title: 'The Fragile Pulse',     src: 'assets/music/06-the-fragile-pulse.mp3' },
+    { idx: 7,  title: 'BURN IT DOWN',          src: 'assets/music/07-burn-it-down.mp3' },
+    { idx: 8,  title: '余響（よきょう）',       src: 'assets/music/08-yokyo-start-chikyu-gacha.mp3' },
+    { idx: 9,  title: '琥珀色シュガー',        src: 'assets/music/09-kohakuiro-sugar.mp3' }
   ];
   let _curIdx = -1;
+
+  /* ---------- Web Audio Graph: audio → source → bass → mid → treble → masterGain → analyser → destination ---------- */
+  let _audCtx = null, _src = null, _gBass = null, _gMid = null, _gTreble = null, _gMaster = null, _analyser = null, _dataArr = null;
+  let _vol = 0.7;
+
+  function ensureWebAudio(audio) {
+    if (_audCtx) return;
+    _audCtx = new (window.AudioContext || window.webkitAudioContext)();
+    _src = _audCtx.createMediaElementSource(audio);
+    // 三段 EQ
+    _gBass   = _audCtx.createBiquadFilter(); _gBass.type = 'lowshelf';    _gBass.frequency.value = 120; _gBass.gain.value = 0;
+    _gMid    = _audCtx.createBiquadFilter(); _gMid.type = 'peaking';      _gMid.frequency.value = 1000; _gMid.Q.value = 0.7; _gMid.gain.value = 0;
+    _gTreble = _audCtx.createBiquadFilter(); _gTreble.type = 'highshelf';  _gTreble.frequency.value = 8000; _gTreble.gain.value = 0;
+    // 总音量
+    _gMaster = _audCtx.createGain(); _gMaster.gain.value = _vol;
+    // 频谱分析
+    _analyser = _audCtx.createAnalyser(); _analyser.fftSize = 64;
+    _dataArr = new Uint8Array(_analyser.frequencyBinCount);
+    // 串联
+    _src.connect(_gBass).connect(_gMid).connect(_gTreble).connect(_gMaster).connect(_analyser).connect(_audCtx.destination);
+  }
+
+  const EQ_PRESETS = {
+    flat:    { bass: 0,  mid: 0,  treble: 0  },
+    pop:     { bass: 5,  mid: 0,  treble: 4  },
+    rock:    { bass: 7,  mid: -2, treble: 6  },
+    classical:{ bass: 4, mid: 3,  treble: 3  },
+    vocal:   { bass: -3, mid: 5,  treble: 2  },
+    night:   { bass: 2,  mid: 2,  treble: -4 }
+  };
+
+  function applyEQPreset(name) {
+    if (!_audCtx) return;
+    const p = EQ_PRESETS[name]; if (!p) return;
+    _gBass.gain.value = p.bass;
+    _gMid.gain.value = p.mid;
+    _gTreble.gain.value = p.treble;
+  }
 
   function fmt(sec) {
     if (!sec || isNaN(sec)) return '0:00';
@@ -1788,6 +1826,28 @@
     return m + ':' + (s < 10 ? '0' : '') + s;
   }
 
+  /* ---------- 频谱可视化 ---------- */
+  function drawSpectrum() {
+    if (!_analyser) { requestAnimationFrame(drawSpectrum); return; }
+    const canvas = document.getElementById('jboxSpectrum');
+    if (!canvas) { requestAnimationFrame(drawSpectrum); return; }
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height;
+    _analyser.getByteFrequencyData(_dataArr);
+    ctx.clearRect(0, 0, w, h);
+    const barW = w / _dataArr.length * 0.8;
+    for (let i = 0; i < _dataArr.length; i++) {
+      const v = _dataArr[i] / 255;
+      const bh = v * h;
+      const grad = ctx.createLinearGradient(0, h - bh, 0, h);
+      grad.addColorStop(0, '#ff6b9d'); grad.addColorStop(1, '#c9a0ff');
+      ctx.fillStyle = grad;
+      ctx.fillRect(i * barW * 1.2, h - bh, barW, bh);
+    }
+    requestAnimationFrame(drawSpectrum);
+  }
+
+  /* ---------- 曲目列表 ---------- */
   function buildTracklist() {
     const container = document.getElementById('jboxTracks');
     if (!container) return;
@@ -1795,7 +1855,7 @@
       <div class="jbox-track-row" data-jbox-track="${t.idx - 1}">
         <div class="jbox-track-idx">${String(t.idx).padStart(2, '0')}</div>
         <div class="jbox-track-name">${t.title}</div>
-        <div class="jbox-track-dur" id="jboxDur${t.idx - 1}">${t.dur}</div>
+        <div class="jbox-track-dur" id="jboxDur${t.idx - 1}">—</div>
       </div>
     `).join('');
 
@@ -1812,30 +1872,54 @@
     const btn = document.getElementById('jboxPlayBtn');
     if (!audio) return;
 
-    if (_curIdx === idx && !audio.paused) { audio.pause(); btn.textContent = '▶'; return; }
-    if (_curIdx === idx && audio.paused)  { audio.play();  btn.textContent = '❚❚'; return; }
+    ensureWebAudio(audio);
+    // 浏览器首次 user gesture 后恢复 AudioContext
+    if (_audCtx && _audCtx.state === 'suspended') _audCtx.resume();
 
+    // 同一首：切换播放/暂停
+    if (_curIdx === idx) {
+      if (audio.paused) { audio.play().catch(() => {}); btn.textContent = '❚❚'; }
+      else              { audio.pause(); btn.textContent = '▶'; }
+      return;
+    }
+
+    // 切歌
     _curIdx = idx;
     const t = TRACKS[idx];
+    audio.pause();
     audio.src = t.src;
-    audio.play().then(() => { btn.textContent = '❚❚'; }).catch(() => {});
+    audio.load();                // ← 关键！确保资源就绪
+    audio.currentTime = 0;
+    audio.play().then(() => {
+      btn.textContent = '❚❚';
+    }).catch(err => {
+      console.warn('jbox play failed:', err.message);
+      btn.textContent = '▶';
+    });
+
     if (titleEl) titleEl.textContent = t.title;
     document.querySelectorAll('.jbox-track-row').forEach((row, i) => {
       row.classList.toggle('is-active', i === idx);
     });
   }
 
+  /* ---------- 初始化 ---------- */
   function initJukebox() {
     buildTracklist();
     const audio = document.getElementById('jboxAudio');
     const btn = document.getElementById('jboxPlayBtn');
     if (!audio) return;
 
+    // 大按钮：播放/暂停
     btn?.addEventListener('click', () => {
+      ensureWebAudio(audio);
+      if (_audCtx && _audCtx.state === 'suspended') _audCtx.resume();
       if (_curIdx < 0) { playTrack(0); return; }
-      if (audio.paused) audio.play(); else audio.pause();
+      if (audio.paused) { audio.play().catch(() => {}); btn.textContent = '❚❚'; }
+      else              { audio.pause(); btn.textContent = '▶'; }
     });
 
+    // 进度
     audio.addEventListener('timeupdate', () => {
       const cur = document.getElementById('jboxCur');
       const fill = document.getElementById('jboxFill');
@@ -1843,24 +1927,49 @@
       if (fill && audio.duration) fill.style.width = (audio.currentTime / audio.duration * 100) + '%';
     });
     audio.addEventListener('loadedmetadata', () => {
-      const totalDur = document.getElementById('jboxDur');
-      if (totalDur) totalDur.textContent = fmt(audio.duration);
       const rowDur = document.getElementById('jboxDur' + _curIdx);
       if (rowDur) rowDur.textContent = fmt(audio.duration);
+      document.querySelectorAll('.jbox-track-row').forEach((r, i) => {
+        if (i === _curIdx) r.querySelector('.jbox-track-dur').textContent = fmt(audio.duration);
+      });
     });
-    audio.addEventListener('play', () => { btn.textContent = '❚❚'; });
+    audio.addEventListener('play',  () => { btn.textContent = '❚❚'; });
     audio.addEventListener('pause', () => { btn.textContent = '▶'; });
     audio.addEventListener('ended', () => {
       if (_curIdx < TRACKS.length - 1) playTrack(_curIdx + 1);
       else { _curIdx = -1; btn.textContent = '▶'; }
     });
 
+    // 进度条点击跳转
     const bar = document.getElementById('jboxBar');
     bar?.addEventListener('click', (e) => {
       if (!audio.duration) return;
       const r = bar.getBoundingClientRect();
       audio.currentTime = (e.clientX - r.left) / r.width * audio.duration;
     });
+
+    // 音量 slider
+    const volSlider = document.getElementById('jboxVol');
+    if (volSlider) {
+      volSlider.value = _vol * 100;
+      volSlider.addEventListener('input', (e) => {
+        _vol = e.target.value / 100;
+        if (_gMaster) _gMaster.gain.value = _vol;
+        else audio.volume = _vol;
+      });
+    }
+
+    // EQ 预设按钮
+    document.querySelectorAll('.jbox-eq-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.jbox-eq-btn').forEach(b => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        applyEQPreset(btn.dataset.eq);
+      });
+    });
+
+    // 启动频谱
+    setTimeout(drawSpectrum, 500);
   }
 
   window.__onPage?.('music', () => { setTimeout(initJukebox, 300); });
