@@ -1765,3 +1765,104 @@
 
 })();
 
+/* =========================================================================
+   Music · 点唱机 真实曲目 + HTML5 Audio 播放器
+   ========================================================================= */
+(() => {
+  const TRACKS = [
+    { idx: 1,  title: 'きみのいる世界',        src: 'assets/music/01-kimi-no-iru-sekai.mp3',        dur: '—' },
+    { idx: 2,  title: '輪廻ブルーインナー',    src: 'assets/music/02-rinne-blue-inner.mp3',         dur: '—' },
+    { idx: 3,  title: 'Meido-in-hell 9999',    src: 'assets/music/03-meido-in-hell-9999.mp3',       dur: '—' },
+    { idx: 4,  title: 'Factory Below',         src: 'assets/music/04-factory-below.mp3',            dur: '—' },
+    { idx: 5,  title: 'Jade Door After Rain',  src: 'assets/music/05-jade-door-after-rain.mp3',      dur: '—' },
+    { idx: 6,  title: 'The Fragile Pulse',     src: 'assets/music/06-the-fragile-pulse.mp3',         dur: '—' },
+    { idx: 7,  title: 'BURN IT DOWN',          src: 'assets/music/07-burn-it-down.mp3',              dur: '—' },
+    { idx: 8,  title: '余響（よきょう）',       src: 'assets/music/08-yokyo-start-chikyu-gacha.mp3',  dur: '—' },
+    { idx: 9,  title: '琥珀色シュガー',        src: 'assets/music/09-kohakuiro-sugar.mp3',           dur: '—' }
+  ];
+  let _curIdx = -1;
+
+  function fmt(sec) {
+    if (!sec || isNaN(sec)) return '0:00';
+    const m = Math.floor(sec / 60); const s = Math.floor(sec % 60);
+    return m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
+  function buildTracklist() {
+    const container = document.getElementById('jboxTracks');
+    if (!container) return;
+    container.innerHTML = TRACKS.map(t => `
+      <div class="jbox-track-row" data-jbox-track="${t.idx - 1}">
+        <div class="jbox-track-idx">${String(t.idx).padStart(2, '0')}</div>
+        <div class="jbox-track-name">${t.title}</div>
+        <div class="jbox-track-dur" id="jboxDur${t.idx - 1}">${t.dur}</div>
+      </div>
+    `).join('');
+
+    container.addEventListener('click', (e) => {
+      const row = e.target.closest('.jbox-track-row');
+      if (!row) return;
+      playTrack(parseInt(row.dataset.jboxTrack));
+    });
+  }
+
+  function playTrack(idx) {
+    const audio = document.getElementById('jboxAudio');
+    const titleEl = document.getElementById('jboxTitle');
+    const btn = document.getElementById('jboxPlayBtn');
+    if (!audio) return;
+
+    if (_curIdx === idx && !audio.paused) { audio.pause(); btn.textContent = '▶'; return; }
+    if (_curIdx === idx && audio.paused)  { audio.play();  btn.textContent = '❚❚'; return; }
+
+    _curIdx = idx;
+    const t = TRACKS[idx];
+    audio.src = t.src;
+    audio.play().then(() => { btn.textContent = '❚❚'; }).catch(() => {});
+    if (titleEl) titleEl.textContent = t.title;
+    document.querySelectorAll('.jbox-track-row').forEach((row, i) => {
+      row.classList.toggle('is-active', i === idx);
+    });
+  }
+
+  function initJukebox() {
+    buildTracklist();
+    const audio = document.getElementById('jboxAudio');
+    const btn = document.getElementById('jboxPlayBtn');
+    if (!audio) return;
+
+    btn?.addEventListener('click', () => {
+      if (_curIdx < 0) { playTrack(0); return; }
+      if (audio.paused) audio.play(); else audio.pause();
+    });
+
+    audio.addEventListener('timeupdate', () => {
+      const cur = document.getElementById('jboxCur');
+      const fill = document.getElementById('jboxFill');
+      if (cur) cur.textContent = fmt(audio.currentTime);
+      if (fill && audio.duration) fill.style.width = (audio.currentTime / audio.duration * 100) + '%';
+    });
+    audio.addEventListener('loadedmetadata', () => {
+      const totalDur = document.getElementById('jboxDur');
+      if (totalDur) totalDur.textContent = fmt(audio.duration);
+      const rowDur = document.getElementById('jboxDur' + _curIdx);
+      if (rowDur) rowDur.textContent = fmt(audio.duration);
+    });
+    audio.addEventListener('play', () => { btn.textContent = '❚❚'; });
+    audio.addEventListener('pause', () => { btn.textContent = '▶'; });
+    audio.addEventListener('ended', () => {
+      if (_curIdx < TRACKS.length - 1) playTrack(_curIdx + 1);
+      else { _curIdx = -1; btn.textContent = '▶'; }
+    });
+
+    const bar = document.getElementById('jboxBar');
+    bar?.addEventListener('click', (e) => {
+      if (!audio.duration) return;
+      const r = bar.getBoundingClientRect();
+      audio.currentTime = (e.clientX - r.left) / r.width * audio.duration;
+    });
+  }
+
+  window.__onPage?.('music', () => { setTimeout(initJukebox, 300); });
+})();
+

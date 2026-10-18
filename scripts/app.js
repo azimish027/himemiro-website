@@ -228,11 +228,12 @@
                 <div class="sj-sitemap-desc">→ Coming Soon — development diaries &amp; lore</div>
               </div>
             </a>
-            <a class="sj-sitemap-card sj-sitemap-card--community" href="#" onclick="return false;">
+            <!-- IP 创作工作台 · 外部跳转（workshop 部署后替换 URL） -->
+            <a class="sj-sitemap-card sj-sitemap-card--community sj-sitemap-card--external" href="#" data-ip-workshop target="_blank" rel="noopener">
               <div class="sj-sitemap-planet sj-planet--community"></div>
               <div class="sj-sitemap-info">
-                <div class="sj-sitemap-title">COMMUNITY ZONE</div>
-                <div class="sj-sitemap-desc">→ Coming Soon — guestbook &amp; doodle wall</div>
+                <div class="sj-sitemap-title">IP 创作工作台 <span class="sj-sitemap-card-ext-tag">↗ EXTERNAL</span></div>
+                <div class="sj-sitemap-desc">拼贴工坊 · 立绘/表情包/海报无代码创作</div>
               </div>
             </a>
             <a class="sj-sitemap-card sj-sitemap-card--merch" href="#" onclick="return false;">
@@ -659,20 +660,20 @@
             <div class="jbox-label">▶ NOW PLAYING</div>
           </div>
         </div>
-        <!-- 磁带详情（打字机曲目表） -->
+        <!-- 磁带详情（真实曲目表 + HTML5 Audio） -->
         <div class="jukebox-tracklist" id="jboxTracklist">
-          <pre class="jbox-typewriter">
-TITLE  · 夢と魔法の物語
-ARTIST · HIMEMIRO BAND
-YEAR   · 2001
-TRACKS · 12
-──────────────────────────
-01. はじまりのメロディ    3:12
-02. 蝶々の秘密            4:05
-03. 薔薇と十字架          3:58
-04. 星屑のダンス          4:22
-05. 君に会いたくて        3:45
-          </pre>
+          <!-- 播放器 -->
+          <div class="jbox-player">
+            <button class="jbox-player-btn" id="jboxPlayBtn" aria-label="播放/暂停">▶</button>
+            <div class="jbox-player-info">
+              <div class="jbox-player-title" id="jboxTitle">选一首来听 ♡</div>
+              <div class="jbox-player-time"><span id="jboxCur">0:00</span> / <span id="jboxDur">0:00</span></div>
+              <div class="jbox-player-bar" id="jboxBar"><div class="jbox-player-bar-fill" id="jboxFill"></div></div>
+            </div>
+            <audio id="jboxAudio" preload="metadata"></audio>
+          </div>
+          <!-- 真实曲目列表 -->
+          <div class="jbox-tracklist-real" id="jboxTracks"></div>
         </div>
       </div>
     </div>

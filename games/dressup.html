@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>HIMEMIRO Dressup Studio — 最小 Demo</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+/* ===== HIMEMIRO 换装 Demo ===== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #1a1410;
+  background-image: radial-gradient(ellipse at 20% 30%, rgba(240,100,59,.12) 0%, transparent 50%),
+                    radial-gradient(ellipse at 80% 70%, rgba(201,87,112,.12) 0%, transparent 50%);
+  min-height: 100vh;
+  font-family: var(--font-rounded);
+  color: var(--c-vanilla);
+}
+
+/* 顶部标题 */
+.du-header {
+  text-align: center;
+  padding: 32px 16px 16px;
+}
+.du-header h1 {
+  font-size: 32px;
+  color: var(--c-candy-orange);
+  text-shadow: 0 2px 0 var(--c-deep-chocolate);
+  letter-spacing: 2px;
+}
+.du-header p {
+  margin-top: 8px;
+  font-size: 13px;
+  color: rgba(255,248,224,.6);
+}
+
+/* 三栏布局 */
+.du-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr 220px;
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* 左右面板 */
+.du-panel {
+  background: var(--c-deep-chocolate);
+  border: 3px solid var(--c-chocolate);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: var(--shadow-candy);
+}
+.du-panel h3 {
+  font-size: 14px;
+  color: var(--c-candy-orange);
+  text-align: center;
+  padding-bottom: 8px;
+  border-bottom: 2px dashed rgba(240,100,59,.3);
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+}
+
+/* 工具栏物品 */
+.du-tool-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  margin-bottom: 6px;
+  background: rgba(255,248,224,.06);
+  border: 2px solid transparent;
+  border-radius: 8px;
+  cursor: grab;
+  font-size: 12px;
+  transition: all .15s ease;
+}
+.du-tool-item:hover {
+  background: rgba(255,248,224,.12);
+  border-color: var(--c-candy-orange);
+  transform: translateX(4px);
+}
+.du-tool-item:active { cursor: grabbing; }
+
+/* 占位衣服预览（CSS clip-path 画简单形状） */
+.tool-preview {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 4px;
+}
+.preview-candy {
+  background: linear-gradient(135deg, #F0643B, #C95770);
+  clip-path: polygon(20% 0, 80% 0, 100% 100%, 0 100%);
+}
+.preview-school {
+  background: linear-gradient(180deg, #3A2424, #6B4226);
+  clip-path: polygon(25% 0, 75% 0, 100% 100%, 0 100%);
+}
+.preview-sweater {
+  background: linear-gradient(135deg, #FFF8E0, #F5E6C8);
+  border-radius: 6px 6px 4px 4px;
+}
+.preview-punk {
+  background: linear-gradient(135deg, #1a1410, #3A2424);
+  clip-path: polygon(15% 0, 85% 0, 100% 40%, 85% 100%, 15% 100%, 0 40%);
+  border: 2px solid #F0643B;
+}
+.preview-hair-pigtail {
+  background: #f8b4c8;
+  border-radius: 50% 50% 0 0;
+  clip-path: polygon(0 0, 100% 0, 90% 100%, 10% 100%);
+}
+.preview-hair-long {
+  background: #d4a88a;
+  clip-path: polygon(20% 0, 80% 0, 95% 100%, 5% 100%);
+  border-radius: 50% 50% 10% 10%;
+}
+
+/* 中央舞台 */
+.du-stage-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.du-stage {
+  position: relative;
+  width: 400px;
+  height: 600px;
+  background: #2a1820;
+  border: 4px solid var(--c-chocolate);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,.4), inset 0 2px 0 rgba(255,248,224,.08);
+}
+/* 舞台地面 */
+.du-stage::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 80px;
+  background: linear-gradient(180deg, transparent, rgba(107,66,38,.3));
+}
+/* 舞台背景装饰星星 */
+.du-stage::after {
+  content: '✦ ✧ ✦';
+  position: absolute;
+  top: 20px; right: 20px;
+  color: var(--c-candy-orange);
+  font-size: 14px;
+  opacity: .3;
+  letter-spacing: 8px;
+}
+
+/* 角色层 */
+.du-character {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 320px;
+  height: 560px;
+  pointer-events: none;
+  z-index: 1;
+}
+.du-character img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* 衣服叠加层（放在角色上面） */
+.du-outfit-layer {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 320px;
+  height: 560px;
+  pointer-events: none;
+  z-index: 10; /* ✅ 关键：盖在角色上面 */
+}
+
+/* 舞台上的衣服（占位 DIV） */
+.stage-item {
+  position: absolute;
+  pointer-events: auto;
+  cursor: grab;
+  transition: transform .08s ease;
+}
+.stage-item:active { cursor: grabbing; }
+.stage-item.is-dragging { z-index: 9999; }
+.stage-item__label {
+  position: absolute;
+  top: -16px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: var(--c-candy-orange);
+  white-space: nowrap;
+  font-family: var(--font-pixel);
+}
+
+/* 占位衣服形状（舞台上的样子） */
+.stage-outfit {
+  width: 180px;
+  height: 300px;
+  /* 默认锚点：肩膀位置约 */
+  transform-origin: top center;
+}
+.stage-outfit.candy {
+  background: linear-gradient(180deg, #F0643B, #C95770);
+  clip-path: polygon(30% 0, 70% 0, 95% 100%, 5% 100%);
+  border-radius: 8px 8px 0 0;
+  box-shadow: 0 4px 16px rgba(240,100,59,.3);
+}
+.stage-outfit.school {
+  background: linear-gradient(180deg, #3A2424, #6B4226);
+  clip-path: polygon(30% 0, 70% 0, 90% 100%, 10% 100%);
+  border-left: 4px solid #FFF8E0;
+  border-right: 4px solid #FFF8E0;
+}
+.stage-outfit.sweater {
+  background: linear-gradient(180deg, #FFF8E0, #F5E6C8);
+  border-radius: 12px 12px 4px 4px;
+  border: 3px solid #F0643B;
+  border-bottom: none;
+}
+.stage-outfit.punk {
+  background: linear-gradient(180deg, #1a1410, #3A2424);
+  border: 3px solid #F0643B;
+  clip-path: polygon(25% 0, 75% 0, 100% 30%, 90% 100%, 10% 100%, 0 30%);
+}
+
+/* 发型层 */
+.stage-hair {
+  width: 200px;
+  height: 140px;
+}
+.stage-hair.pigtail {
+  background: #f8b4c8;
+  clip-path: polygon(10% 40%, 30% 0, 70% 0, 90% 40%, 100% 100%, 0 100%);
+  border-radius: 50% 50% 10% 10%;
+}
+.stage-hair.long {
+  background: #d4a88a;
+  clip-path: polygon(20% 0, 80% 0, 95% 100%, 5% 100%);
+  border-radius: 50% 50% 20% 20%;
+}
+
+/* 舞台下方操作按钮 */
+.du-controls {
+  margin-top: 16px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.du-btn {
+  padding: 8px 20px;
+  font-size: 12px;
+  font-family: var(--font-rounded);
+  font-weight: 700;
+  border: 2px solid var(--c-candy-orange);
+  background: transparent;
+  color: var(--c-candy-orange);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all .15s ease;
+  letter-spacing: 1px;
+}
+.du-btn:hover {
+  background: var(--c-candy-orange);
+  color: var(--c-deep-chocolate);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(240,100,59,.4);
+}
+.du-btn--solid {
+  background: var(--c-candy-orange);
+  color: var(--c-deep-chocolate);
+}
+.du-btn--solid:hover {
+  background: var(--c-vanilla);
+  border-color: var(--c-vanilla);
+}
+
+/* 右侧面板：保存/历史 */
+.du-slot {
+  background: rgba(255,248,224,.06);
+  border: 2px dashed rgba(255,248,224,.2);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 8px;
+  text-align: center;
+  font-size: 11px;
+  color: rgba(255,248,224,.5);
+}
+.du-slot.has-data {
+  border-style: solid;
+  border-color: var(--c-mint-lite);
+  color: var(--c-mint-lite);
+}
+
+/* 拖拽预览 */
+.drag-ghost {
+  position: fixed;
+  pointer-events: none;
+  z-index: 99999;
+  opacity: .85;
+  transform-origin: center;
+  transition: none !important;
+}
+</style>
+</head>
+<body>
+
+<div class="du-header">
+  <h1>🎀 HIMEMIRO DRESSUP STUDIO</h1>
+  <p>v0.1 — 最小可运行 Demo · 拖衣服到角色身上 · 保存搭配到 localStorage</p>
+</div>
+
+<div class="du-layout">
+
+  <!-- 左侧工具栏 -->
+  <div class="du-panel">
+    <h3>👗 OUTFITS</h3>
+    <div class="du-tool-item" draggable="true" data-type="outfit" data-style="candy" data-name="糖果裙">
+      <div class="tool-preview preview-candy"></div>
+      <span>糖果裙</span>
+    </div>
+    <div class="du-tool-item" draggable="true" data-type="outfit" data-style="school" data-name="制服">
+      <div class="tool-preview preview-school"></div>
+      <span>哥特制服</span>
+    </div>
+    <div class="du-tool-item" draggable="true" data-type="outfit" data-style="sweater" data-name="毛衣">
+      <div class="tool-preview preview-sweater"></div>
+      <span>奶油毛衣</span>
+    </div>
+    <div class="du-tool-item" draggable="true" data-type="outfit" data-style="punk" data-name="朋克">
+      <div class="tool-preview preview-punk"></div>
+      <span>朋克外套</span>
+    </div>
+
+    <h3 style="margin-top:16px">💇 HAIR</h3>
+    <div class="du-tool-item" draggable="true" data-type="hair" data-style="pigtail" data-name="双马尾">
+      <div class="tool-preview preview-hair-pigtail"></div>
+      <span>双马尾</span>
+    </div>
+    <div class="du-tool-item" draggable="true" data-type="hair" data-style="long" data-name="长发">
+      <div class="tool-preview preview-hair-long"></div>
+      <span>长发</span>
+    </div>
+  </div>
+
+  <!-- 中央舞台 -->
+  <div class="du-stage-wrap">
+    <div class="du-stage" id="duStage">
+      <!-- 衣服叠加层（最上面） -->
+      <div class="du-outfit-layer" id="outfitLayer"></div>
+      <!-- 角色层 -->
+      <div class="du-character">
+        <img src="../assets/dressup/base/angel-gothic-full.png" alt="煤咪露" draggable="false">
+      </div>
+    </div>
+    <div class="du-controls">
+      <button class="du-btn" id="btnSave">💾 SAVE 保存</button>
+      <button class="du-btn" id="btnLoad">📂 LOAD 读取</button>
+      <button class="du-btn" id="btnReset">🗑 RESET 清空</button>
+    </div>
+  </div>
+
+  <!-- 右侧面板 -->
+  <div class="du-panel">
+    <h3>💾 SAVED SLOTS</h3>
+    <div class="du-slot" data-slot="0">SLOT 1<br><span style="font-size:10px">(空)</span></div>
+    <div class="du-slot" data-slot="1">SLOT 2<br><span style="font-size:10px">(空)</span></div>
+    <div class="du-slot" data-slot="2">SLOT 3<br><span style="font-size:10px">(空)</span></div>
+
+    <h3 style="margin-top:16px">📌 当前搭配</h3>
+    <div id="currentOutfits" style="font-size:11px;color:rgba(255,248,224,.6);min-height:40px;">
+      (还没穿衣服～ 从左边拖点什么试试？)
+    </div>
+
+    <h3 style="margin-top:16px">🎨 技术说明</h3>
+    <div style="font-size:10px;color:rgba(255,248,224,.4);line-height:1.6;">
+      · 占位衣服用 CSS clip-path 画<br>
+      · 真衣服后续由硅基流动 AI 生成<br>
+      · 拖拽用 Pointer Events API<br>
+      · 保存用 localStorage
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ===== HIMEMIRO Dressup Engine v0.1 =====
+(function() {
+  const STORAGE_KEY = 'himemiro-dressup-v1';
+  const stage = document.getElementById('duStage');
+  const outfitLayer = document.getElementById('outfitLayer');
+  const currentList = document.getElementById('currentOutfits');
+
+  let stageItems = []; // { id, type, style, name, x, y }
+  let nextId = 1;
+
+  // ===== 拖拽：工具栏 → 舞台 =====
+  document.querySelectorAll('.du-tool-item').forEach(item => {
+    item.addEventListener('pointerdown', onToolPointerDown);
+  });
+
+  function onToolPointerDown(e) {
+    e.preventDefault();
+    const toolItem = e.currentTarget; // 🔒 存闭包，pointerup 时 ev.currentTarget 会变 null
+    const ghost = createGhost(toolItem);
+
+    function onMove(ev) {
+      ghost.style.left = (ev.clientX - ghost.offsetWidth/2) + 'px';
+      ghost.style.top = (ev.clientY - ghost.offsetHeight/2) + 'px';
+    }
+
+    function onUp(ev) {
+      document.removeEventListener('pointermove', onMove);
+      document.removeEventListener('pointerup', onUp);
+      ghost.remove();
+
+      const stageRect = stage.getBoundingClientRect();
+      if (ev.clientX >= stageRect.left && ev.clientX <= stageRect.right &&
+          ev.clientY >= stageRect.top && ev.clientY <= stageRect.bottom) {
+        placeItem(toolItem, ev.clientX, ev.clientY); // ✅ 用闭包里的 toolItem
+      }
+    }
+
+    document.addEventListener('pointermove', onMove);
+    document.addEventListener('pointerup', onUp);
+  }
+
+  function createGhost(toolItem) {
+    const ghost = toolItem.cloneNode(true);
+    ghost.classList.add('drag-ghost');
+    ghost.style.left = (toolItem.getBoundingClientRect().left) + 'px';
+    ghost.style.top = (toolItem.getBoundingClientRect().top) + 'px';
+    ghost.style.width = toolItem.offsetWidth + 'px';
+    ghost.style.height = toolItem.offsetHeight + 'px';
+    document.body.appendChild(ghost);
+    return ghost;
+  }
+
+  // ===== 放置到舞台 =====
+  function placeItem(toolItem, clientX, clientY) {
+    const rect = stage.getBoundingClientRect();
+    const style = toolItem.dataset.style;
+    const type = toolItem.dataset.type;
+    const name = toolItem.dataset.name;
+
+    // 衣服类型的 snap 锚点（百分比）
+    let defaultX = 30, defaultY = 0;
+    if (type === 'outfit') { defaultX = 30; defaultY = 30; } // 躯干
+    if (type === 'hair') { defaultX = 50; defaultY = 0; }   // 头顶区域
+
+    // 计算相对舞台位置
+    const relX = clientX - rect.left - 90; // 90 = 衣服宽度一半
+    const relY = clientY - rect.top;
+
+    const id = 'item-' + nextId++;
+    const el = document.createElement('div');
+    el.className = 'stage-item';
+    el.dataset.id = id;
+    el.style.left = relX + 'px';
+    el.style.top = relY + 'px';
+
+    const inner = document.createElement('div');
+    const itemClass = type === 'outfit' ? 'stage-outfit' : 'stage-hair';
+    inner.className = itemClass + ' ' + style;
+    inner.innerHTML = '<span class="stage-item__label">' + name + '</span>';
+    el.appendChild(inner);
+
+    outfitLayer.appendChild(el);
+
+    stageItems.push({ id, type, style, name, x: relX, y: relY });
+    updateCurrentList();
+
+    // 舞台上的二次拖拽（移动已放的衣服）
+    el.addEventListener('pointerdown', onStageItemPointerDown);
+  }
+
+  // ===== 舞台上衣服的二次拖拽 =====
+  function onStageItemPointerDown(e) {
+    e.stopPropagation();
+    const el = e.currentTarget;
+    const id = el.dataset.id;
+    let item = stageItems.find(i => i.id === id);
+    if (!item) return;
+
+    el.classList.add('is-dragging');
+    const itemRect = el.getBoundingClientRect();
+    const startX = e.clientX - itemRect.left;
+    const startY = e.clientY - itemRect.top;
+
+    function onMove(ev) {
+      const rect = stage.getBoundingClientRect();
+      const newX = ev.clientX - rect.left - startX;
+      const newY = ev.clientY - rect.top - startY;
+      el.style.left = newX + 'px';
+      el.style.top = newY + 'px';
+      item.x = newX; item.y = newY;
+    }
+
+    function onUp() {
+      el.classList.remove('is-dragging');
+      document.removeEventListener('pointermove', onMove);
+      document.removeEventListener('pointerup', onUp);
+    }
+
+    document.addEventListener('pointermove', onMove);
+    document.addEventListener('pointerup', onUp);
+  }
+
+  function updateCurrentList() {
+    if (stageItems.length === 0) {
+      currentList.innerHTML = '(还没穿衣服～ 从左边拖点什么试试？)';
+      return;
+    }
+    currentList.innerHTML = stageItems.map(i =>
+      '<span style="color:' + (i.type === 'hair' ? '#f8b4c8' : '#F0643B') + '">●</span> ' + i.name
+    ).join('<br>');
+  }
+
+  // ===== 保存/读取/清空 =====
+  document.getElementById('btnSave').addEventListener('click', () => {
+    if (stageItems.length === 0) { alert('先穿点衣服再保存嘛～'); return; }
+    // 找第一个空 slot
+    const slotIdx = findEmptySlot();
+    localStorage.setItem(STORAGE_KEY + '-slot' + slotIdx, JSON.stringify(stageItems));
+    updateSlots();
+    alert('✅ 保存到 SLOT ' + (slotIdx + 1));
+  });
+
+  document.getElementById('btnLoad').addEventListener('click', () => {
+    const slotIdx = prompt('读取哪个 SLOT？(0/1/2)');
+    if (slotIdx === null) return;
+    const data = localStorage.getItem(STORAGE_KEY + '-slot' + slotIdx);
+    if (!data) { alert('这个 slot 是空的'); return; }
+    clearStage();
+    const saved = JSON.parse(data);
+    saved.forEach(item => {
+      const toolItem = document.querySelector(
+        `.du-tool-item[data-type="${item.type}"][data-style="${item.style}"]`
+      );
+      if (toolItem) {
+        const rect = stage.getBoundingClientRect();
+        placeItem(toolItem, rect.left + item.x + 90, rect.top + item.y);
+      }
+    });
+  });
+
+  document.getElementById('btnReset').addEventListener('click', clearStage);
+
+  function clearStage() {
+    stageItems.forEach(i => {
+      const el = document.querySelector(`.stage-item[data-id="${i.id}"]`);
+      if (el) el.remove();
+    });
+    stageItems = [];
+    updateCurrentList();
+  }
+
+  function findEmptySlot() {
+    for (let i = 0; i < 3; i++) {
+      if (!localStorage.getItem(STORAGE_KEY + '-slot' + i)) return i;
+    }
+    // 都满了，覆盖最后一个
+    return 2;
+  }
+
+  function updateSlots() {
+    document.querySelectorAll('.du-slot').forEach(slot => {
+      const idx = slot.dataset.slot;
+      const data = localStorage.getItem(STORAGE_KEY + '-slot' + idx);
+      if (data) {
+        const items = JSON.parse(data);
+        slot.classList.add('has-data');
+        slot.innerHTML = 'SLOT ' + (parseInt(idx)+1) + '<br><span style="font-size:10px">' +
+          items.map(i => i.name).join(' + ') + '</span>';
+      } else {
+        slot.classList.remove('has-data');
+        slot.innerHTML = 'SLOT ' + (parseInt(idx)+1) + '<br><span style="font-size:10px">(空)</span>';
+      }
+    });
+  }
+
+  // 初始化
+  updateSlots();
+  console.log('🎀 HIMEMIRO Dressup Studio v0.1 已就绪 —— 拖衣服试试吧！');
+})();
+</script>
+</body>
+</html>

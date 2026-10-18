@@ -2328,3 +2328,149 @@
 
 /* --- 拖拽 zone 内现有 item 时：先半透明 --- */
 .hm-ic-snap-item.is-dragging { opacity: .4; transform: scale(.9); }
+
+/* ================================================================
+   首页加长 · 角色档案墙 + 时间线
+   ================================================================ */
+
+/* --- Identity Wall --- */
+.identity-wall {
+  max-width: 1100px; margin: 64px auto; padding: 48px 32px;
+  position: relative;
+}
+.id-wall {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px; margin-top: 32px;
+}
+.id-card {
+  background: #fff; border-radius: 16px;
+  border: 2px solid rgba(0,0,0,.06);
+  box-shadow: 6px 8px 0 rgba(0,0,0,.05), 0 16px 32px rgba(0,0,0,.06);
+  padding: 28px;
+  display: flex; gap: 18px;
+  transition: transform .3s cubic-bezier(.3,1.5,.6,1), box-shadow .3s;
+}
+.id-card:hover { transform: translateY(-6px) rotate(-.5deg); box-shadow: 10px 14px 0 rgba(0,0,0,.06), 0 24px 48px rgba(0,0,0,.1); }
+.id-card--pink   { background: linear-gradient(135deg, #fff5f7, #ffe0e8); }
+.id-card--purple { background: linear-gradient(135deg, #f5efff, #e8d4ff); }
+.id-card--teal   { background: linear-gradient(135deg, #e8f8f4, #cdeee4); }
+.id-portrait {
+  width: 72px; height: 72px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px; flex-shrink: 0;
+  box-shadow: inset -4px -4px 8px rgba(0,0,0,.1), 0 4px 12px rgba(0,0,0,.1);
+  border: 3px solid #fff;
+}
+.id-portrait--pink   { background: linear-gradient(135deg, #ffb3c6, #ff6b9d); color: #fff; }
+.id-portrait--purple { background: linear-gradient(135deg, #c9a0ff, #8a4fff); color: #fff; }
+.id-portrait--teal   { background: linear-gradient(135deg, #8cd4b8, #4ab894); color: #fff; }
+.id-info { flex: 1; min-width: 0; }
+.id-name { font-size: 22px; font-weight: 900; letter-spacing: 3px; color: #2a1a1a; }
+.id-sub  { font-size: 11px; letter-spacing: 2px; color: #d6336c; margin-top: 2px; text-transform: uppercase; }
+.id-tags { font-size: 11px; color: #666; margin-top: 6px; letter-spacing: .5px; }
+.id-desc { font-size: 13px; color: #4a2c3a; margin-top: 10px; line-height: 1.6; }
+
+/* --- Timeline --- */
+.timeline {
+  max-width: 1100px; margin: 80px auto 100px; padding: 48px 32px;
+  position: relative;
+}
+.tl {
+  position: relative; margin-top: 40px; padding-left: 32px;
+  border-left: 3px dashed rgba(214,51,108,.3);
+}
+.tl-item { position: relative; margin-bottom: 40px; padding-left: 24px; }
+.tl-dot {
+  position: absolute; left: -40px; top: 4px;
+  width: 24px; height: 24px; border-radius: 50%;
+  border: 4px solid #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,.15);
+}
+.tl-dot--past   { background: #a0a0a0; }
+.tl-dot--now    { background: linear-gradient(135deg, #ff6b9d, #d6336c); animation: tl-pulse 2s ease-in-out infinite; }
+.tl-dot--future { background: linear-gradient(135deg, #ffd93d, #ff9f43); }
+@keyframes tl-pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+.tl-date { font-size: 11px; letter-spacing: 3px; color: #d6336c; font-weight: 700; }
+.tl-title { font-size: 18px; font-weight: 900; letter-spacing: 2px; color: #2a1a1a; margin-top: 4px; }
+.tl-body { font-size: 13px; color: #666; margin-top: 6px; line-height: 1.5; }
+
+/* ================================================================
+   Music · 真曲目表 + HTML5 Audio 播放器
+   ================================================================ */
+.jbox-player {
+  background: linear-gradient(135deg, #2a1a2a, #3a2a3a);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin: 12px 0;
+  display: flex; align-items: center; gap: 16px;
+  color: #fde2e4;
+}
+.jbox-player-btn {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: linear-gradient(135deg, #ff6b9d, #d6336c);
+  border: none; cursor: pointer;
+  color: #fff; font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 12px rgba(214,51,108,.4);
+  transition: transform .15s;
+}
+.jbox-player-btn:hover { transform: scale(1.08); }
+.jbox-player-btn:active { transform: scale(.95); }
+.jbox-player-info { flex: 1; min-width: 0; }
+.jbox-player-title { font-size: 14px; font-weight: 700; letter-spacing: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.jbox-player-time { font-size: 11px; color: #aaa; margin-top: 2px; font-family: monospace; }
+.jbox-player-bar {
+  width: 100%; height: 4px; background: rgba(255,255,255,.15);
+  border-radius: 2px; margin-top: 6px; overflow: hidden;
+  cursor: pointer;
+}
+.jbox-player-bar-fill {
+  height: 100%; background: linear-gradient(90deg, #ff6b9d, #c9a0ff);
+  width: 0%; border-radius: 2px;
+  transition: width .1s linear;
+}
+.jbox-tracklist-real {
+  display: flex; flex-direction: column; gap: 6px;
+}
+.jbox-track-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px; border-radius: 8px;
+  cursor: pointer;
+  transition: background .15s;
+  border: 1px solid transparent;
+}
+.jbox-track-row:hover { background: rgba(255,255,255,.08); }
+.jbox-track-row.is-active {
+  background: linear-gradient(90deg, rgba(214,51,108,.25), transparent);
+  border-color: rgba(255,107,157,.5);
+}
+.jbox-track-idx {
+  width: 28px; font-size: 12px; font-weight: 700;
+  color: #ff6b9d; text-align: center; font-family: monospace;
+}
+.jbox-track-row.is-active .jbox-track-idx { color: #fff; background: #d6336c; border-radius: 4px; }
+.jbox-track-name { flex: 1; font-size: 13px; color: #fde2e4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.jbox-track-row.is-active .jbox-track-name { font-weight: 700; }
+.jbox-track-dur { font-size: 11px; color: #aaa; font-family: monospace; }
+.jbox-track-row.is-playing .jbox-track-idx::before { content: '▶ '; font-size: 10px; }
+
+/* ================================================================
+   Games · Community Zone / IP 工作台跳转卡
+   ================================================================ */
+.sj-sitemap-card--community.sj-sitemap-card--external {
+  cursor: pointer; transition: all .3s;
+}
+.sj-sitemap-card--community.sj-sitemap-card--external:hover {
+  transform: translateY(-4px);
+}
+.sj-sitemap-card-ext-tag {
+  font-size: 9px; padding: 2px 6px; border-radius: 4px;
+  background: rgba(255,255,255,.15); color: #fff;
+  letter-spacing: 1px;
+}
+
+/* ================================================================
+   首页 explore section 留白加长
+   ================================================================ */
+.explore { padding-bottom: 80px; }
+.exhibit { padding-bottom: 40px; }
